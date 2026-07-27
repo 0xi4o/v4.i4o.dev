@@ -1,0 +1,138 @@
+---
+courseTitle: SaaS marketing for founders
+title: The map, and your first move
+description: Why "where do I start?" has a known answer — the funnel, the channel map, and the one activity that works at zero users.
+lessonNumber: 1
+createdAt: 2026-07-27
+updatedAt: 2026-07-27
+---
+
+import { Callout, Term } from '../assets/LessonLayout'
+import { Quiz } from '../assets/Quiz'
+
+**Time: ~30 minutes reading, then a task that fits inside your week.**
+
+You asked nine questions — users, channels, analytics, SEO, content, and
+"where do I start?". Good news: the last one has a known answer, and once you
+see the map, the other eight fall into an order. This lesson gives you the map
+and your first move for Kobun. Nothing else. The rest of the course works
+through the map one piece at a time.
+
+## The map: a funnel
+
+Every SaaS user, everywhere, goes through the same five steps. They **hear you
+exist** (awareness), they **visit your site** (interest), they **sign up**,
+they **reach the moment the product becomes useful to them** — marketers call
+this <Term word="activation" plain="the first genuinely useful moment, e.g. a user publishes their first page through Kobun" /> —
+and eventually they **pay**.
+
+People leak out at every step. A thousand people can hear about Kobun, thirty
+visit, three sign up, one activates. That leaky pipe is called the
+
+<Term word='funnel' plain='wide at the top, narrow at the bottom' />, and it's the whole map. Every
+marketing question you listed lives at one spot on it:
+
+- "How do I get users?" and "what channels are there?" → the **awareness** end.
+- "How do I convert them?" → **interest → signup**.
+- "How do I track what users do in my app?" → **signup → activation**.
+- SEO and content marketing → awareness channels, ones that pay off slowly and
+  then keep paying.
+
+Two rules follow from the shape, and they're the ones beginners miss:
+
+**Rule 1 — fix the bottom before pouring into the top.** Driving traffic to a
+landing page that doesn't convert, or collecting signups nobody activates from,
+wastes the scarcest thing you have. With a handful of users you can find and
+fix those leaks cheaply.
+
+**Rule 2 — every activity must name its stage.** "I should post on X" is not a
+plan. "I'm posting on X to create awareness among SSG users" is. If you can't
+name the stage, skip the activity.
+
+The full one-page version, including the organic-vs-paid channel map, is in the
+reference: [The funnel and the channel map](../reference/the-funnel-and-channel-map.mdx).
+Print it if that's your thing.
+
+## Your first move: recruit users by hand
+
+Here's the part that feels wrong to an engineer, which is exactly why it needs
+saying early. At zero users, the only channel that works is **talking to
+individual people, one at a time**. Not SEO (months to work, and you need
+content first). Not ads (money spent learning things you can learn free). Not
+even a big launch (a spike into an untested funnel — see Rule 1).
+
+This isn't a beginner's compromise; it's how nearly everyone did it. Paul
+Graham's ["Do Things That Don't Scale"](https://paulgraham.com/ds.html) is the
+canonical argument — the Airbnb founders went door to door in New York. Lenny
+Rachitsky [studied how over twenty B2B companies](https://www.lennysnewsletter.com/p/how-todays-fastest-growing-b2b-businesses)
+(Figma, Notion, Airtable…) found their first ten customers: personal networks
+and going where users already gather, in almost every case. And
+[PostHog — an open-source devtool, the closest thing to Kobun's situation —
+got their first thousand](https://posthog.com/founders/first-1000-users) via
+Hacker News and word of mouth, not ads.
+
+Manual recruiting also quietly solves a problem you didn't list: at this stage
+every user is also a research subject. Ten hand-picked users who talk to you
+teach you more than a thousand anonymous signups.
+
+<Quiz
+	title='Check yourself'
+	questions={[
+		{
+			prompt: "Kobun's landing page converts almost nobody, and you have £200. What's the better spend of your effort this month?",
+			options: [
+				'Fix the page using feedback from a few real users',
+				'Run search ads to drive more traffic toward the page',
+			],
+			correctIndex: 0,
+			explanation:
+				'Rule 1: fix the bottom before pouring into the top. Ads into a leaky funnel buy traffic that falls straight out.',
+		},
+		{
+			prompt: 'You have zero users. Which channel actually works right now?',
+			options: [
+				'Direct outreach to individual people',
+				'Search engine optimised blog content',
+			],
+			correctIndex: 0,
+			explanation:
+				"SEO compounds over months and needs content and authority you don't have yet. At zero, you recruit by hand — Graham, Rachitsky, and PostHog all land on the same answer.",
+		},
+		{
+			prompt: '"A user publishes their first page through Kobun." Which funnel stage is that?',
+			options: ['Activation — first real value', 'Awareness — they discovered it'],
+			correctIndex: 0,
+			explanation:
+				'Activation is the moment the product delivers the value it promised. Signup is just an account; this is the point of the thing.',
+		},
+	]}
+/>
+
+<Callout label="This week's task — about an hour">
+
+Open a note and write two things:
+
+1. **One sentence:** who Kobun is for and the problem it removes. Format:
+   "Kobun is for **[specific person]** who **[situation]** and want
+   **[outcome]**." A working guess is fine — lesson 2 will pressure-test it
+   properly.
+2. **A list of ten.** Real people you could message directly (former
+   colleagues, dev friends who blog, anyone who's complained to you about
+   CMSes), and real places your users already talk (specific subreddits,
+   Discords, forums — names, not categories). This list is lesson 3's raw
+   material. Don't message anyone yet.
+
+Bring both back to our next session.
+
+</Callout>
+
+## Read this one thing
+
+If you read nothing else this week:
+[**"Do Things That Don't Scale"** — Paul Graham](https://paulgraham.com/ds.html).
+Twenty minutes, and it reframes the entire "where do I start?" anxiety.
+
+---
+
+_Stuck on anything, or want to argue with the funnel? Ask me — I'm your
+teacher for this course, and questions between lessons are part of it._
