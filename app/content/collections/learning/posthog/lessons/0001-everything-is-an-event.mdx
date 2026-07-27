@@ -1,0 +1,213 @@
+---
+courseTitle: PostHog — Web and Product Analytics from Scratch
+title: Everything Is an Event
+description: One table underneath every chart. Learn its shape and most analytics jargon stops being jargon.
+lessonNumber: 1
+createdAt: 2026-07-26
+updatedAt: 2026-07-26
+---
+
+import Quiz from '../assets/Quiz'
+
+**The win for this lesson:** you'll be able to look at any PostHog chart — a funnel, a
+retention grid, a traffic-sources table — and say exactly what it is counting. And
+you'll know the one thing that has to happen in Kobun's code before any of those charts
+can exist.
+
+Analytics tools present themselves as a wall of dashboards, and the vocabulary arrives
+all at once: sessions, cohorts, funnels, retention, attribution. It looks like a dozen
+separate features to learn. It isn't. There is one table underneath, and every chart is
+a different question asked of it.
+
+## The table
+
+PostHog stores a long, append-only list of things that happened. Each row is an
+[**event**](https://posthog.com/docs/data/events) — PostHog's docs call it "the core unit
+of data". One row means: this happened, once, at this moment, and here is who did it.
+
+You have seen this shape recently. Temporal's event history is the same idea: nothing is
+snapshotted, everything is a log of what occurred, and the useful answers are derived by
+reading the log. Analytics is that, for humans instead of workflows.
+
+An event has [four parts](https://posthog.com/docs/data/events). Here is one from Kobun:
+
+```json
+{
+	"event": "post_publish",
+	"distinct_id": "018daf23-89b3-7cf8-a4f1-94064c96df90",
+	"timestamp": "2026-07-26T09:14:02.331Z",
+	"properties": {
+		"collection": "essays",
+		"word_count": 1240,
+		"is_first_publish": true,
+		"$current_url": "https://app.kobun.dev/essays/new"
+	}
+}
+```
+
+- The **event name** says what kind of thing happened. Names starting with `$` are
+  PostHog's own — `$pageview`, `$pageleave`. Yours are plain.
+- The **distinct ID** says who did it.
+- The **timestamp** says when.
+- The **properties** are labelled details hung off the event. They are the whole reason
+  the data is worth anything, because properties are what you filter and split by later.
+
+That last point is the one worth slowing down on. `post_publish` on its own tells you a
+count. `post_publish` with `collection` and `is_first_publish` lets you ask whether
+people who publish essays behave differently from people who publish notes, and whether
+anyone ever gets past their first post. Same event. The properties did the work.
+
+## Who is "who"?
+
+The distinct ID is a string, and before somebody logs in, PostHog has no idea who they
+are — so the browser SDK invents a random one and stamps it on their events. Those are
+[**anonymous events**](https://posthog.com/docs/data/persons). They are stored, but no
+person profile exists for them yet.
+
+When they sign up, your code calls `identify` with your real user ID. PostHog creates a
+**person** — its record of one human — and links the earlier anonymous activity from that
+session to it.
+
+That single call is what turns two disconnected piles of data into one story. It is the
+mechanism behind the question you actually want answered: _which of my blog posts brought
+in the people who went on to use Kobun?_ Without `identify`, the reader and the user are
+strangers to each other. ([PostHog also recommends](https://posthog.com/docs/product-analytics/best-practices)
+putting the marketing site and the app in the same project, for the same reason.)
+
+## Every chart is a query over that table
+
+Now the jargon collapses. Each of these is the same rows, filtered and counted
+differently:
+
+| The question                                                | The chart                                                    | What it actually counts                                            |
+| ----------------------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------------ |
+| How many posts got published this month, and is it growing? | Trend                                                        | Rows named `post_publish`, bucketed by day                         |
+| Which collections do people publish into?                   | Trend with a breakdown                                       | The same rows, split by the `collection` property                  |
+| How many people who start a post finish it?                 | [Funnel](https://posthog.com/docs/product-analytics/funnels) | People with `post_create`, then `post_publish`, in that order      |
+| Do people who publish once come back and publish again?     | Retention                                                    | People with `post_publish`, checked for another one in later weeks |
+| Where did this month's visitors come from?                  | Web analytics                                                | Rows named `$pageview`, grouped by referrer                        |
+
+There is no separate "funnel data" or "retention data" being collected. There is one
+event stream, and a funnel is a particular way of interrogating it.
+
+This also explains PostHog's two halves.
+[Web analytics](https://posthog.com/docs/web-analytics/web-vs-product-analytics) is a
+pre-built dashboard over a fixed handful of events — pageviews, page-leaves — with no
+custom insights. Product analytics is the open-ended half: any event you capture, any
+question you like. Same table, different amount of freedom.
+
+## The catch, and it is a real one
+
+You can only ask questions about events you captured. There is no retroactive data. If
+Kobun never recorded which collection a post went into, that column does not exist for
+last month and never will.
+
+[Autocapture](https://posthog.com/docs/product-analytics/autocapture) softens this on the
+web — PostHog will record clicks, pageviews, page-leaves and form submissions without you
+writing anything. What it cannot do is know what an action _means_ in your product.
+"Clicked a button with class `btn-primary`" is not "published their first essay". Meaning
+is the part you have to write down in advance.
+
+Which is why the next real decision isn't a technical one: it's choosing the short list of
+events that carry meaning in your product. That's lesson 3, and PostHog has an opinionated
+way in — [pick the one number that represents your product working, then work backwards to
+the behaviour that drives it](https://posthog.com/docs/new-to-posthog/getting-hogpilled).
+(When you get there, names follow a convention: lowercase, snake case, present-tense verb,
+per [PostHog's best practices](https://posthog.com/docs/product-analytics/best-practices).)
+
+## Check yourself
+
+Answer from memory before scrolling back up. The effort is what makes it stick.
+
+<Quiz
+	questions={[
+		{
+			prompt: 'Kobun has been capturing post_publish for a month, with no properties on it. You now want to know which collection each of last month’s posts went into. Can you?',
+			options: [
+				{
+					text: 'No, that detail was never recorded',
+					correct: true,
+					explanation:
+						'Analytics has no retroactive powers. A property that was not captured at the time does not exist, and adding it now only helps from now on.',
+				},
+				{
+					text: 'Yes, PostHog can infer it retroactively',
+					explanation:
+						'Nothing infers your product’s meaning. PostHog stored exactly the four parts you sent, and collection was not among them.',
+				},
+				{
+					text: 'Yes, add the property and rerun',
+					explanation:
+						'Adding it now fixes future events only. Last month’s rows are already written and they are missing the field.',
+				},
+			],
+		},
+		{
+			prompt: 'Somebody reads three of your blog posts over a week, then signs up for Kobun. What connects those three pageviews to their new account?',
+			options: [
+				{
+					text: 'The identify call made at signup',
+					correct: true,
+					explanation:
+						'identify creates the person profile and links the anonymous distinct ID’s activity to it. Without that call, the reader and the user stay strangers.',
+				},
+				{
+					text: 'The email address on the account',
+					explanation:
+						'Anonymous pageviews carry no email. PostHog has nothing to match on until you explicitly tell it these are the same person.',
+				},
+				{
+					text: 'The person profile created on arrival',
+					explanation:
+						'No profile exists on arrival. Events before identify are stored anonymously and do not create a person.',
+				},
+			],
+		},
+		{
+			prompt: 'You have a trend showing post_create counts and another showing post_publish counts. What can a funnel over those two events tell you that the pair of trends cannot?',
+			options: [
+				{
+					text: 'How many people did each of these things',
+					explanation:
+						'Two trends already give you that. A funnel exists to answer something the separate counts cannot reach.',
+				},
+				{
+					text: 'Whether the same person did them in order',
+					correct: true,
+					explanation:
+						'A funnel follows individuals through a sequence. Equal counts could still mean two entirely different sets of people.',
+				},
+				{
+					text: 'How often the events happened over last week',
+					explanation:
+						'That is a trend with a date filter. Sequence and per-person continuity are what the funnel adds.',
+				},
+			],
+		},
+	]}
+/>
+
+## Go deeper
+
+**Primary source:** [Getting HogPilled](https://posthog.com/docs/new-to-posthog/getting-hogpilled)
+— PostHog's own opening guide. Read it now, while this is fresh. It skips the data model
+and goes straight to what to measure, so the two fit together neatly.
+
+If you want the model itself in PostHog's words, [Events](https://posthog.com/docs/data/events)
+and [Persons](https://posthog.com/docs/data/persons) are short and precise. Every term
+above is in the [glossary](../reference/glossary.mdx).
+
+Worth knowing: every source in [RESOURCES.md](../RESOURCES.md) so far is PostHog's own
+documentation. Good documentation, but a vendor describing its own category. Read the
+category claims with that in mind.
+
+**Next lesson:** hands-on. Create the Cloud project, install PostHog on both a marketing
+site and the app it feeds — one project, deliberately — and watch these rows arrive in
+real time. Then read the pre-built web analytics dashboard and work out which events each
+tile is counting.
+
+---
+
+_Anything unclear — what a "session" actually is, why the `$` prefix matters, what happens
+if you call `identify` twice with different IDs — ask me. I'm your teacher for this course,
+and the follow-up questions are where the learning compounds._

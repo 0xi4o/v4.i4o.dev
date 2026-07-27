@@ -1,0 +1,65 @@
+---
+courseTitle: PostHog — Web and Product Analytics from Scratch
+title: Glossary
+description: The plain-English decoder for analytics jargon. Every lesson uses these words exactly as defined here.
+createdAt: 2026-07-26
+updatedAt: 2026-07-26
+---
+
+# Glossary
+
+Analytics has a lot of words for a small number of ideas. This is the decoder. When a
+lesson uses one of these words, it means precisely what is written here — no more.
+
+Definitions follow [PostHog's own](https://posthog.com/docs/data/events) where PostHog
+has one. This file grows with each lesson; nothing is added until it has been used.
+
+## The data model
+
+| Term                 | Meaning                                                                                                                                                                                                                                                             |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Event**            | One thing that happened, once, at a moment in time. "Someone viewed this page." "Someone published a post." [PostHog calls it "the core unit of data"](https://posthog.com/docs/data/events) — everything else is derived from events.                              |
+| **Event name**       | The label for the kind of thing that happened, like `$pageview` or `post_publish`. Names starting with `$` are PostHog's own; yours should not use it.                                                                                                              |
+| **Property**         | A labelled detail attached to an event or a person — `collection: "posts"`, `plan: "free"`. Properties are what you filter and split charts by.                                                                                                                     |
+| **Distinct ID**      | The identifier stamped on an event saying who did it. Before someone logs in it is a random ID from their browser; after, it is your user ID.                                                                                                                       |
+| **Person**           | PostHog's record of one human, gathering the distinct IDs and properties known about them. Also called a _person profile_.                                                                                                                                          |
+| **Anonymous event**  | An event captured before you told PostHog who the user is. It carries a browser-generated ID and [does not create a person profile](https://posthog.com/docs/data/persons).                                                                                         |
+| **Identified event** | An event captured after `identify` ran, tied to a person profile.                                                                                                                                                                                                   |
+| **`identify`**       | The SDK call that says "this browser is user X". It creates the person profile and links the anonymous activity from that session to it. This is how a visitor's pre-signup browsing joins up with their account.                                                   |
+| **Autocapture**      | PostHog recording common web interactions without you writing code for them — [clicks, pageviews, page-leaves, form submissions](https://posthog.com/docs/product-analytics/autocapture). Free coverage, but it cannot know what an action _means_ in your product. |
+| **Custom event**     | An event you capture deliberately in your own code, because it carries meaning autocapture cannot infer.                                                                                                                                                            |
+| **Session**          | One continuous visit — a run of events from the same person with no long gap. The unit web analytics counts visits in.                                                                                                                                              |
+
+## Reading the data
+
+| Term            | Meaning                                                                                                                                                                             |
+| --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Insight**     | PostHog's word for a saved chart or table. A question you asked the event data, kept so you can ask it again.                                                                       |
+| **Dashboard**   | A collection of insights on one screen.                                                                                                                                             |
+| **Trend**       | An insight counting events over time, optionally split by a property. Answers "how much, and is it going up?"                                                                       |
+| **Breakdown**   | Splitting a chart by a property — one line per country, per plan, per referrer.                                                                                                     |
+| **Funnel**      | An insight counting how many people who did step 1 went on to do steps 2 and 3, [in order](https://posthog.com/docs/product-analytics/funnels). Answers "where do people drop off?" |
+| **Conversion**  | Completing a funnel, or reaching some goal event. The conversion _rate_ is the fraction who made it.                                                                                |
+| **Retention**   | An insight asking whether people who did something once came back and did it again later. Answers "does this stick?"                                                                |
+| **Cohort**      | A named group of people defined by a rule — "everyone who published a post last month". Reusable as a filter.                                                                       |
+| **Attribution** | Deciding which source gets credit for a conversion when a person touched several before converting.                                                                                 |
+
+## Words you will meet elsewhere
+
+| Term                  | Meaning                                                                                                                                                                                                                              |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **North star metric** | The one number that best represents your product working. [PostHog suggests picking one first](https://posthog.com/docs/new-to-posthog/getting-hogpilled), then working backwards to the events that drive it.                       |
+| **Activation**        | [The moment a user first gets real value](https://posthog.com/docs/new-to-posthog/activation) — the threshold past which they tend to come back. Different for every product; for Dropbox it was storing one file in the first week. |
+| **Referrer**          | The page a visitor arrived from, as reported by their browser.                                                                                                                                                                       |
+| **UTM parameters**    | Tags you add to a link (`?utm_source=x`) so the destination can record where the click came from. How you tell your own campaigns apart.                                                                                             |
+| **Bounce rate**       | The share of visits where the person left without doing anything else. Widely reported, easily misread — a satisfied reader of one post bounces.                                                                                     |
+| **Vanity metric**     | A number that reliably goes up and reliably changes nothing. Pageviews, usually.                                                                                                                                                     |
+
+## Two halves of PostHog
+
+| Term                  | Meaning                                                                                                                                                                                                                 |
+| --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Web analytics**     | The pre-built dashboard for site traffic — visitors, views, sessions, referrers. Fixed events, [no custom insights](https://posthog.com/docs/web-analytics/web-vs-product-analytics). The Google Analytics replacement. |
+| **Product analytics** | The open-ended half — any event you capture, any insight you build. Where funnels, retention and cohorts live.                                                                                                          |
+
+Related: [Lesson 1 — Everything Is an Event](../lessons/0001-everything-is-an-event.mdx)
