@@ -1,0 +1,158 @@
+---
+courseTitle: Temporal.io — Durable Execution with Go
+title: Run It, Kill It, Watch It Survive
+description: Hands-on — run your first Temporal application in Go, then break it three ways and check each outcome against the mental model.
+lessonNumber: 2
+createdAt: 2026-07-22
+updatedAt: 2026-07-22
+---
+
+import Quiz from '../assets/Quiz'
+
+**The win for this lesson:** you'll have run a real Temporal application in Go, killed its worker and its server mid-flight, and correctly predicted what happened each time — turning [Lesson 1's](./0001-the-event-history-is-the-program.mdx) model from something you read into something you've tested.
+
+This is a doing lesson. Open Ghostty; you'll want three terminal tabs. The whole thing takes about twenty minutes.
+
+**The rule for every experiment below: write your prediction down before you act.** One line is enough. Predict-then-verify is the feedback loop — if you skip the prediction, you're just watching a demo, and demos don't build storage strength.
+
+## Setup (once)
+
+Following the [official Go setup guide](https://learn.temporal.io/getting_started/go/dev_environment/):
+
+```sh
+go version                 # any recent Go is fine
+brew install temporal      # the Temporal CLI
+```
+
+Start the local dev server — a complete single-binary Temporal Service:
+
+```sh
+temporal server start-dev --db-filename temporal.db --ui-port 8080
+```
+
+The service listens on `localhost:7233`; the Web UI is at [http://localhost:8080](http://localhost:8080). The `--db-filename` flag matters: without it the dev server keeps everything in memory, and one of our experiments is going to kill the server. Durability needs a disk.
+
+Then grab the official sample — a money transfer with `Withdraw`, `Deposit`, and `Refund` activities ([tutorial](https://learn.temporal.io/getting_started/go/first_program_in_go/)):
+
+```sh
+git clone https://github.com/temporalio/money-transfer-project-template-go
+cd money-transfer-project-template-go
+```
+
+Before running anything, skim the code and name what you see in Lesson 1 vocabulary: the workflow definition (deterministic decision-maker), the three activities (quarantined side effects), and the task queue name both the starter and worker share.
+
+## Experiment 1 — start a workflow with no worker
+
+**Predict first:** you start a workflow, but no worker process is running anywhere. What does the Web UI show?
+
+```sh
+go run start/main.go
+```
+
+Now check the UI. You should find the workflow **Running** — even though not a single line of your workflow code has executed. Sit with that: the Temporal Service accepted the request, wrote `WorkflowExecutionStarted` to the history, put a task on the queue… and is now simply waiting for someone to poll. The service never runs your code; a workflow can exist and be "running" with zero compute attached.
+
+Now, in a second tab:
+
+```sh
+go run worker/main.go
+```
+
+Watch the worker pick everything up and drive the transfer to **Completed**. Open the workflow in the UI and read the **History** tab top to bottom — you'll recognise the trace from Lesson 1 (`ActivityTaskScheduled`, `ActivityTaskCompleted`, …) with real payloads this time.
+
+## Experiment 2 — kill the server itself
+
+**Predict first:** a workflow is mid-flight and you kill the _Temporal server_ — not the worker, the whole service. Gone forever?
+
+Stop the worker (`Ctrl+C`), start a fresh workflow with `go run start/main.go`, confirm it's Running in the UI — then `Ctrl+C` the server too. Everything is now dead.
+
+Restart the server with the same command (same `--db-filename`!). Check the UI: the workflow is still there, still Running. The event history was on disk; the service's own process was just as disposable as a worker. Start the worker again and watch the transfer complete as if nothing happened.
+
+## Experiment 3 — a failing activity
+
+**Predict first:** the `Deposit` activity starts throwing errors every time. Does the workflow fail?
+
+Open `activity.go`, and in the `Deposit` function swap the call to `bank.Deposit` for the provided `bank.DepositThatFails`. Start the worker and watch the logs: attempt 1, attempt 2, attempt 3… Temporal is retrying the activity on a backoff schedule, and the workflow just stays Running — from its point of view, `Deposit` merely hasn't answered yet. The UI shows the pending activity and its attempt count.
+
+Now the best part, straight from the [tutorial](https://learn.temporal.io/getting_started/go/first_program_in_go/): stop the worker, fix the bug (put `bank.Deposit` back), and start the worker again. The next retry runs your _corrected_ code and the workflow completes. You just deployed a bug fix into a live, in-flight execution — no restart, no lost state, no manual reconciliation. This is the everyday superpower the whole architecture buys you.
+
+## Check yourself
+
+<Quiz
+	questions={[
+		{
+			prompt: 'You start a workflow but no worker is running anywhere. What does the Web UI show?',
+			options: [
+				{
+					text: 'Failed, because no worker process was found',
+					explanation:
+						'Nothing has failed — the service has recorded the start and queued a task that will wait for a poller.',
+				},
+				{
+					text: 'Running, waiting for a worker to poll',
+					correct: true,
+					explanation:
+						'The service persists the history and queues the work; execution begins whenever a worker shows up.',
+				},
+				{
+					text: 'Nothing, workflows appear once a worker starts',
+					explanation:
+						'The execution exists in the service the moment it is started — workers are irrelevant to its visibility.',
+				},
+			],
+		},
+		{
+			prompt: 'The Deposit activity keeps failing every attempt. What is the workflow execution doing meanwhile?',
+			options: [
+				{
+					text: 'Failed after the first activity error came back',
+					explanation:
+						'Activity failures are retried per policy by default — one bad attempt does not fail the workflow.',
+				},
+				{
+					text: 'Replaying its history to find the failure cause',
+					explanation:
+						'Replay is for reconstructing state after a worker loss — it plays no role in ordinary activity retries.',
+				},
+				{
+					text: 'Still running while the activity retries on schedule',
+					correct: true,
+					explanation:
+						"From the workflow's perspective the activity simply has not returned yet; retries happen underneath it.",
+				},
+			],
+		},
+		{
+			prompt: 'You fix the Deposit bug and restart the worker. Why does the in-flight transfer now complete?',
+			options: [
+				{
+					text: 'Retries continue and the next attempt succeeds',
+					correct: true,
+					explanation:
+						'The retry schedule survived the worker restart; the next attempt executed your corrected activity code.',
+				},
+				{
+					text: 'The worker replays and re-runs every activity',
+					explanation:
+						'Replay reuses recorded results — Withdraw is never re-executed; only the unfinished Deposit runs.',
+				},
+				{
+					text: 'The server re-sends the whole workflow again',
+					explanation:
+						'Nothing is re-sent from scratch — the same execution simply carries on from its recorded frontier.',
+				},
+			],
+		},
+	]}
+/>
+
+## Go deeper
+
+**Primary source:** [Run your first Temporal application with the Go SDK](https://learn.temporal.io/getting_started/go/first_program_in_go/) — this lesson follows its skeleton; the tutorial adds screenshots and detail on reading the Web UI.
+
+Worth a skim afterwards: the [money-transfer template source](https://github.com/temporalio/money-transfer-project-template-go) end to end — it's small, and every file maps to a [glossary](../reference/glossary.mdx) term.
+
+**Next lesson:** now that you've _seen_ retries and the history, we build our own from scratch — a Go workflow of your design, where you choose the workflow/activity boundary and defend it ([build-from-scratch guide](https://learn.temporal.io/getting_started/go/hello_world_in_go/)).
+
+---
+
+_If any experiment surprises you — a prediction that missed, an event in the history you can't name, worker logs you can't read — bring it back here and ask. Wrong predictions are the most valuable thing this lesson can produce._

@@ -1,0 +1,31 @@
+---
+courseTitle: Temporal.io — Durable Execution with Go
+title: Core mental model acquired
+description: Lesson 1 complete — event history + replay model in place, verified by quiz.
+createdAt: 2026-07-22
+updatedAt: 2026-07-22
+---
+
+# 0001 — Core mental model acquired
+
+**Date:** 2026-07-22
+**Status:** confirmed
+
+## What happened
+
+Ilango completed [Lesson 1](../lessons/0001-the-event-history-is-the-program.mdx), read the referenced sources (including the Go event-history walkthrough), and answered all three quiz questions correctly on the first pass.
+
+## What this establishes
+
+- He can state the mechanism: append-only event history + replay with recorded results pinned.
+- He can derive the two consequences: the determinism constraint, and why activities exist.
+- Vocabulary from the [glossary](../reference/glossary.mdx) is in play: commands vs events, workers vs the service, replay.
+
+## Caveats for future sessions
+
+- All of this is **conceptual** — nothing has been run yet. Same-session quiz success is fluency, not yet storage strength. Lesson 2's hands-on prediction exercises are the real test; re-probe these concepts with spaced retrieval in lesson 3 or later.
+- Not yet covered at all: timers in depth, signals/queries, `continueAsNew`, retry policies, the time-skipping test server.
+
+## Drives next
+
+Lesson 2: run the dev server and the money-transfer sample, then break things on purpose — predict-then-verify against the lesson 1 model.

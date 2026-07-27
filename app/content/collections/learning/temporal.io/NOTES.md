@@ -11,6 +11,7 @@
 ## Session log
 
 - **2026-07-20** — Workspace initialised. Mission set (build + internals, Go). Lesson 1 written: the event history / replay mental model. Next natural step: hands-on — run the dev server and first Go program (learn.temporal.io Go path), then workflow vs activity boundaries in practice.
+- **2026-07-22** — Lesson 1 complete: references read, quiz 3/3 first pass (learning record 0001). Lesson 2 written: hands-on money-transfer sample with three predict-then-verify experiments (no-worker start, server kill, failing activity + live fix). Next: build a workflow from scratch, choosing and defending the workflow/activity boundary; then signals/queries. Remember spaced retrieval of lesson 1 concepts in lesson 3.
 
 ## Reminders for future sessions
 
