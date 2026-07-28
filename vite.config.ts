@@ -19,9 +19,6 @@ const rehypePrettyCodeOptions = {
 }
 
 export default defineConfig({
-	staged: {
-		'*': 'vp check --fix',
-	},
 	fmt: {
 		jsdoc: true,
 		jsxSingleQuote: true,
@@ -62,5 +59,11 @@ export default defineConfig({
 	]),
 	resolve: {
 		tsconfigPaths: true,
+	},
+	server: {
+		port: 3000,
+	},
+	staged: {
+		'*': 'vp check --fix',
 	},
 })
