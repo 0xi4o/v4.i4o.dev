@@ -4,17 +4,16 @@
 	"type": "module",
 	"scripts": {
 		"build": "react-router build",
-		"cf-typegen": "wrangler types",
 		"check": "vp check",
 		"check:fix": "vp check --fix",
-		"deploy": "pnpm run build && wrangler deploy",
+		"check:types": "wrangler types && react-router typegen && tsc -b",
+		"deploy": "vp run build && wrangler deploy",
 		"dev": "react-router dev",
 		"fmt": "vp fmt",
 		"lint": "vp lint",
 		"postinstall": "wrangler types",
 		"prepare": "vp config",
-		"preview": "pnpm run build && vp preview",
-		"typecheck": "wrangler types && react-router typegen && tsc -b"
+		"preview": "vp run build && vp preview"
 	},
 	"dependencies": {
 		"@base-ui/react": "^1.6.0",
