@@ -1,12 +1,13 @@
 ---
 title: 'Vim Adventures: Final Part'
-description: After over 10 months of using the Neovim, I've decided to move back to WebStorm and RustRover. Here's why.
-tags:
-    - uncategorized
+slug: vim-adventures-final-part
+description: >-
+  After over 10 months of using the Neovim, I've decided to move back to
+  WebStorm and RustRover. Here's why.
 status: published
-createdAt: 2023-10-09
-publishedAt: 2023-10-09
-updatedAt: 2023-10-09
+createdAt: '2023-10-09'
+updatedAt: '2023-10-09'
+publishedAt: '2023-10-09'
 ---
 
 In the previous Vim Adventures, I wrote about switching to Neovim as my go to code editor. Since then I tried several Neovim IDE setups — lunarvim, astronvim, and nvchad. I even tried setting up my own Neovim config from scratch.

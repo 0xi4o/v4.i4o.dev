@@ -1,15 +1,16 @@
 ---
 title: I'm using Linear to accomplish my 2024 goals
+slug: linear-for-personal-productivity
 description: >-
-    Will a beloved project management software built for teams, work for personal
-    use?
+  Will a beloved project management software built for teams, work for personal
+  use?
 tags:
-    - productivity
-    - workflow
+  - productivity
+  - workflow
 status: published
-createdAt: 2024-01-19
-publishedAt: 2024-01-19
-updatedAt: 2024-01-19
+createdAt: '2024-01-19'
+updatedAt: '2024-01-19'
+publishedAt: '2024-01-19'
 ---
 
 I'm a huge fan of Linear. I'm sure a lot of people — primarily software developers like myself — who have used Linear, love it. Yes, it has a kanban board but there's a lot of other stuff going on underneath.

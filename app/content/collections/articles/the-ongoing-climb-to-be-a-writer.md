@@ -1,12 +1,11 @@
 ---
 title: The ongoing climb to be a writer
+slug: the-ongoing-climb-to-be-a-writer
 description: The story of why and how I'm on the path to becoming a writer.
-tags:
-    - uncategorized
 status: published
-createdAt: 2021-09-14
-publishedAt: 2021-09-14
-updatedAt: 2021-10-10
+createdAt: '2021-09-14'
+updatedAt: '2021-10-10'
+publishedAt: '2021-09-14'
 ---
 
 As a kid, I used to write short stories. I rarely finished any of them. An occasional running joke in my family is about a fantasy story that I wrote half way, ended in a cliff hanger but never finished. And that pretty much sums up my efforts to become a writer.

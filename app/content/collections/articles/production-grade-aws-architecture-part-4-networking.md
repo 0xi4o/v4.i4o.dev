@@ -1,12 +1,13 @@
 ---
 title: 'Production-grade AWS architecture [Part 4]: Networking'
-description: Networking in AWS spans multiple services. Each has its own set of features that provides an incredible level of flexibility for your needs.
-tags:
-    - uncategorized
+slug: production-grade-aws-architecture-part-4-networking
+description: >-
+  Networking in AWS spans multiple services. Each has its own set of features
+  that provides an incredible level of flexibility for your needs.
 status: published
-createdAt: 2020-05-05
-publishedAt: 2020-05-05
-updatedAt: 2021-10-10
+createdAt: '2020-05-05'
+updatedAt: '2021-10-10'
+publishedAt: '2020-05-05'
 ---
 
 Networking in AWS is such a huge topic that cannot be explained in one blog post. I'm also not going to cover every service under it's roof. Networking in AWS spans multiple services. Each has its own set of features that provides an incredible level of flexibility for your needs. This flexibility exists to support any requirements that you might have.

@@ -1,12 +1,13 @@
 ---
 title: Learning Go and saving Rust for later
-description: A while ago, I wrote about how I'm learning Rust. I've actually stopped and chose to learn Go instead.
-tags:
-    - uncategorized
+slug: learning-go-and-saving-rust-for-later
+description: >-
+  A while ago, I wrote about how I'm learning Rust. I've actually stopped and
+  chose to learn Go instead.
 status: published
-createdAt: 2022-06-15
-publishedAt: 2022-06-15
-updatedAt: 2022-06-15
+createdAt: '2022-06-15'
+updatedAt: '2022-06-15'
+publishedAt: '2022-06-15'
 ---
 
 A while ago, I wrote about how [I'm learning Rust](https://i4o.dev/blog/learning-rust-as-a-javascript-developer/). At the time, I got motivated to learn a new language and chose Rust, mainly because I wanted to get into systems programming. Another reason is that Rust is a fantastic option for web assembly.

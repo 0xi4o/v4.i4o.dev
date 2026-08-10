@@ -1,14 +1,16 @@
 ---
 title: The Single Most Important Thing I Did To Grow As A Software Engineer
-description: "The single most important thing I've done to grow my career and
-    learn valuable skills: Just-In-Time Learning"
+slug: the-single-most-important-thing-i-did-to-grow-as-a-software-engineer
+description: >-
+  The single most important thing I've done to grow my career and learn valuable
+  skills: Just-In-Time Learning
 tags:
-    - journal
-    - learning
+  - journal
+  - learning
 status: published
-createdAt: 2025-10-14
-updatedAt: 2025-10-14
-publishedAt: 2025-10-14
+createdAt: '2025-10-14'
+updatedAt: '2025-10-14'
+publishedAt: '2025-10-14'
 ---
 
 Over the past 10 years working in tech as a software engineer, this is the single most important thing I've done to grow my career and learn valuable skills. It's what I call:

@@ -1,15 +1,16 @@
 ---
 title: Remix is great for local-first apps
+slug: remix-is-great-for-local-first-apps
 description: >-
-    There's a lot to love about Remix. But what I've found recently is Remix is a
-    great choice for local-first apps.
+  There's a lot to love about Remix. But what I've found recently is Remix is a
+  great choice for local-first apps.
 tags:
-    - local-first
-    - remix
+  - local-first
+  - remix
 status: published
-createdAt: 2024-08-08
-publishedAt: 2024-08-08
-updatedAt: 2024-08-08
+createdAt: '2024-08-08'
+updatedAt: '2024-08-08'
+publishedAt: '2024-08-08'
 ---
 
 There's a lot to love about Remix. I've written enough about that here and on X. But what I've found recently is Remix is a great choice for local-first apps. For the past 2 years, I've always reached for Remix for building web applications. So when I decided to revive Aurelius, a writing app that I built for myself, I wanted to make it local-first.

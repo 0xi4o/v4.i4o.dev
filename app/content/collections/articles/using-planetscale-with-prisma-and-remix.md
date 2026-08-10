@@ -1,12 +1,13 @@
 ---
 title: Using Planetscale with Prisma in a Remix app
-description: In this post, I'll walkthrough how I combine three of my favorite technologies - Remix, Prisma, and Planetscale - to build fullstack applications
-tags:
-    - uncategorized
+slug: using-planetscale-with-prisma-and-remix
+description: >-
+  In this post, I'll walkthrough how I combine three of my favorite technologies
+  - Remix, Prisma, and Planetscale - to build fullstack applications
 status: published
-createdAt: 2023-03-28
-publishedAt: 2023-03-28
-updatedAt: 2023-03-28
+createdAt: '2023-03-28'
+updatedAt: '2023-03-28'
+publishedAt: '2023-03-28'
 ---
 
 I can't remember the last time I set up a database or managed one manually. That's because hosted solutions are a much better choice today for a few reasons.

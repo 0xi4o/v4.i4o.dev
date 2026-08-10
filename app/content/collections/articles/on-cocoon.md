@@ -1,12 +1,13 @@
 ---
-title: 'On Cocoon — a mind-bending puzzle game'
-description: I recently played a 3D puzzle platformer called Cocoon. I was so awestruck by its beautify and game design, I decided to write about it.
-tags:
-    - uncategorized
+title: On Cocoon — a mind-bending puzzle game
+slug: on-cocoon
+description: >-
+  I recently played a 3D puzzle platformer called Cocoon. I was so awestruck by
+  its beautify and game design, I decided to write about it.
 status: published
-createdAt: 2023-10-10
-publishedAt: 2023-10-10
-updatedAt: 2023-10-10
+createdAt: '2023-10-10'
+updatedAt: '2023-10-10'
+publishedAt: '2023-10-10'
 ---
 
 I usually write about software engineering stuff, mostly in web dev. This post isn't like the other posts. This one is about a videogame I played recently. It's called Cocoon and it's an awesome little game.

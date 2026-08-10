@@ -1,12 +1,13 @@
 ---
 title: The NPM package stack for 2023
-description: If you're building a shared library or publishing a library to NPM, then this stack will save you so much time and effort.
-tags:
-    - uncategorized
+slug: npm-package-stack-2023
+description: >-
+  If you're building a shared library or publishing a library to NPM, then this
+  stack will save you so much time and effort.
 status: published
-createdAt: 2023-03-22
-publishedAt: 2023-03-22
-updatedAt: 2023-03-22
+createdAt: '2023-03-22'
+updatedAt: '2023-03-22'
+publishedAt: '2023-03-22'
 ---
 
 I started this year building two projects that are meant to be deployed as NPM packages — [Catalyst UI](https://catalyst-ui.com/) and [Rescribe](https://rescribe.site/).

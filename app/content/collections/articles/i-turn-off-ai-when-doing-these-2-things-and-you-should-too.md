@@ -1,15 +1,17 @@
 ---
 title: I Turn Off AI When Doing These 2 Things And You Should Too
-description: "I use AI every day for work, but I intentionally turn it off for
-    three things: learning, writing, and increasingly, coding. Here's why
-    protecting these activities from AI has become essential to me, and why you
-    might want to do the same."
+slug: i-turn-off-ai-when-doing-these-2-things-and-you-should-too
+description: >-
+  I use AI every day for work, but I intentionally turn it off for three things:
+  learning, writing, and increasingly, coding. Here's why protecting these
+  activities from AI has become essential to me, and why you might want to do
+  the same.
 tags:
-    - journal
+  - journal
 status: published
-createdAt: 2025-10-30
-updatedAt: 2025-10-30
-publishedAt: 2025-10-30
+createdAt: '2025-10-30'
+updatedAt: '2025-10-30'
+publishedAt: '2025-10-30'
 ---
 
 For the past few months, I've been relying more and more on AI to get things done. I've replaced Google search with Perplexity. My code editor has AI in it. My terminal runs not one but two different coding agents.

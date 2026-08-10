@@ -1,12 +1,13 @@
 ---
 title: Setting up a terminal you will love to use
-description: In this post, I'll walk you through how I set up my Linux terminal workflow with very little effort and how you can do the same.
-tags:
-    - uncategorized
+slug: setting-up-a-terminal-you-will-love-to-use
+description: >-
+  In this post, I'll walk you through how I set up my Linux terminal workflow
+  with very little effort and how you can do the same.
 status: published
-createdAt: 2022-01-10
-publishedAt: 2022-01-10
-updatedAt: 2022-01-10
+createdAt: '2022-01-10'
+updatedAt: '2022-01-10'
+publishedAt: '2022-01-10'
 ---
 
 The terminal is easily the most powerful tool at your disposal in your desktop environment. So learning to use the terminal and setting it up to fit your workflow will give you a huge productivity boost.

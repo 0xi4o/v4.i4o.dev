@@ -1,12 +1,13 @@
 ---
 title: Learning TypeScript by building stuff
-description: Building projects that you would actually use is the best way to learn new things in software
-tags:
-    - uncategorized
+slug: learning-typescript-by-building-stuff
+description: >-
+  Building projects that you would actually use is the best way to learn new
+  things in software
 status: published
-createdAt: 2022-05-02
-publishedAt: 2022-05-02
-updatedAt: 2022-05-09
+createdAt: '2022-05-02'
+updatedAt: '2022-05-09'
+publishedAt: '2022-05-02'
 ---
 
 For the longest time, I resisted learning TypeScript. For some reason, coding in a language that's not a language but compiles to a language seemed like overkill to me. It maybe because I had gotten so used to JavaScript. I was comfortable with JS, maybe too much.

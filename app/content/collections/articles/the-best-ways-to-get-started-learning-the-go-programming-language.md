@@ -1,14 +1,16 @@
 ---
 title: The Best Ways To Get Started Learning The Go Programming Language
-description: I've been coding a lot in Golang and thought I'll write down which
-    resources I use to learn Golang.
+slug: the-best-ways-to-get-started-learning-the-go-programming-language
+description: >-
+  I've been coding a lot in Golang and thought I'll write down which resources I
+  use to learn Golang.
 tags:
-    - golang
-    - learning
+  - golang
+  - learning
 status: published
-createdAt: 2025-10-12
-updatedAt: 2025-10-12
-publishedAt: 2025-10-12
+createdAt: '2025-10-12'
+updatedAt: '2025-10-12'
+publishedAt: '2025-10-12'
 ---
 
 After spending several years coding in JavaScript, I was ready to try something new. Since I'm a web developer, I wanted to learn a new language that's general purpose but primarily used for web development, simple to learn but also in its design, fast, and has a good standard library. I chose Go.

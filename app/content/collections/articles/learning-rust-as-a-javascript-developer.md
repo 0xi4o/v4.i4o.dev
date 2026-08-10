@@ -1,12 +1,13 @@
 ---
 title: Learning Rust as a JavaScript Developer
-description: I recently decided to learn the Rust programming language. This is an introductory post on why I decided to learn Rust and how I'm going about it.
-tags:
-    - uncategorized
+slug: learning-rust-as-a-javascript-developer
+description: >-
+  I recently decided to learn the Rust programming language. This is an
+  introductory post on why I decided to learn Rust and how I'm going about it.
 status: published
-createdAt: 2021-09-09
-publishedAt: 2021-09-09
-updatedAt: 2022-06-15
+createdAt: '2021-09-09'
+updatedAt: '2022-06-15'
+publishedAt: '2021-09-09'
 ---
 
 ### Why I decided to learn Rust

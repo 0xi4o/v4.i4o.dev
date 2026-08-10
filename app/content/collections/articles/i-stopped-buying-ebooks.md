@@ -1,19 +1,20 @@
 ---
 title: I stopped buying ebooks
+slug: i-stopped-buying-ebooks
 description: >-
-    I love my Kindle, and for years, it was my exclusive reading companion. But
-    lately,
-      I've found myself gravitating back to physical books. It's not just about the feel of
-      paper under my fingers or the satisfying smell of a new book — though I do love these things.
-      It's about ownership. After watching Amazon exercise their control over the devices and content
-      they sell, I've realized that maybe the convenience of digital isn't worth giving up the permanence
-      of physical books.
+  I love my Kindle, and for years, it was my exclusive reading companion. But
+  lately,
+    I've found myself gravitating back to physical books. It's not just about the feel of
+    paper under my fingers or the satisfying smell of a new book — though I do love these things.
+    It's about ownership. After watching Amazon exercise their control over the devices and content
+    they sell, I've realized that maybe the convenience of digital isn't worth giving up the permanence
+    of physical books.
 tags:
-    - Books
+  - books
 status: published
-createdAt: 2025-02-21
-updatedAt: 2025-02-21
-publishedAt: 2025-02-21
+createdAt: '2025-02-21'
+updatedAt: '2025-02-21'
+publishedAt: '2025-02-21'
 ---
 
 I love my Kindle. It's one of the best purchases that I've ever made. For a

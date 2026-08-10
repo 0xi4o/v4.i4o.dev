@@ -1,12 +1,13 @@
 ---
 title: Writing layouts for time.Parse in Go
-description: I had a bit of a hard time wrapping my head around parsing date and time in Go. Here's how I made sense of it.
-tags:
-    - uncategorized
+slug: writing-layouts-for-time-parse-in-go
+description: >-
+  I had a bit of a hard time wrapping my head around parsing date and time in
+  Go. Here's how I made sense of it.
 status: published
-createdAt: 2022-05-10
-publishedAt: 2022-05-10
-updatedAt: 2022-05-10
+createdAt: '2022-05-10'
+updatedAt: '2022-05-10'
+publishedAt: '2022-05-10'
 ---
 
 I recently started learning Go on Exercism. One of the topics in their syllabus was time/date parsing and manipulation. This is done using the time package in Go

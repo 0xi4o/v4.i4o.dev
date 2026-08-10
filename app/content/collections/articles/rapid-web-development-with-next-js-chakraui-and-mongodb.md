@@ -1,12 +1,14 @@
 ---
-title: Rapid web development with Next.js, ChakraUI, and MongoDB
-description: Next.js when combined with Chakra UI and MongoDB is a great way to build powerful web applications while moving fast and has a good developer experience.
-tags:
-    - uncategorized
+title: 'Rapid web development with Next.js, ChakraUI, and MongoDB'
+slug: rapid-web-development-with-next-js-chakraui-and-mongodb
+description: >-
+  Next.js when combined with Chakra UI and MongoDB is a great way to build
+  powerful web applications while moving fast and has a good developer
+  experience.
 status: published
-createdAt: 2021-08-27
-publishedAt: 2021-08-27
-updatedAt: 2022-01-06
+createdAt: '2021-08-27'
+updatedAt: '2022-01-06'
+publishedAt: '2021-08-27'
 ---
 
 When working on multiple projects, I try to save as much time as I can and move as fast as possible without getting stuck. I'd rather spend time writing logic and moving the product forward than fighting the frameworks that I use. The following are the tools and techniques I've been using and they're working really well for me. It's completely changed the way I used to do web development. It's a simple setup, it's flexible enough to scale with the needs of the application, and developing with this setup allows me to ship fast.

@@ -1,12 +1,13 @@
 ---
 title: Diving deeper into Remix Stacks
-description: I recently updated my Remix Stack, called Synthwave Stack. Here are some of the choices I made and why I made them.
-tags:
-    - uncategorized
+slug: diving-deeper-into-remix-stacks
+description: >-
+  I recently updated my Remix Stack, called Synthwave Stack. Here are some of
+  the choices I made and why I made them.
 status: published
-createdAt: 2022-06-27
-publishedAt: 2022-06-27
-updatedAt: 2022-06-27
+createdAt: '2022-06-27'
+updatedAt: '2022-06-27'
+publishedAt: '2022-06-27'
 ---
 
 As I covered in an [earlier article](https://i4o.dev/blog/exploring-remix-stacks/), Remix Stacks provides as an easy way to start new projects. They're essentially starter code for web projects. Naturally, I set out to create a custom stack that has all the components that I need for a new project and all the boilerplate code written ahead of time.

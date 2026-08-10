@@ -1,12 +1,11 @@
 ---
 title: Why I like Remix
+slug: why-i-like-remix
 description: I've completely switched to using Remix for my projects. Here's why.
-tags:
-    - uncategorized
 status: published
-createdAt: 2022-07-28
-publishedAt: 2022-07-28
-updatedAt: 2022-07-28
+createdAt: '2022-07-28'
+updatedAt: '2022-07-28'
+publishedAt: '2022-07-28'
 ---
 
 Early this year, I wrote an [article that covers my tech stack for 2022](https://i4o.dev/blog/my-tech-stack-has-changed-for-2022/). In that article, I wrote that I'm learning [Remix](https://remix.run/) and would choose Remix for a couple of projects. I also said that I wouldn't be dropping [Next.js](https://nextjs.org/) completely since I have to maintain the stuff I've already built with it.

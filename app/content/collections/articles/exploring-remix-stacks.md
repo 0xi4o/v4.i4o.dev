@@ -1,12 +1,13 @@
 ---
 title: Exploring Remix Stacks
-description: With Remix Stacks, you can get a Remix application fully-configured and ready to deploy with one command!
-tags:
-    - uncategorized
+slug: exploring-remix-stacks
+description: >-
+  With Remix Stacks, you can get a Remix application fully-configured and ready
+  to deploy with one command!
 status: published
-createdAt: 2022-04-08
-publishedAt: 2022-04-08
-updatedAt: 2022-05-09
+createdAt: '2022-04-08'
+updatedAt: '2022-05-09'
+publishedAt: '2022-04-08'
 ---
 
 If you're like me, you have a list of web app ideas that you want to work on. But starting a new web project has always been a pain. There are many tools and libraries that I always tend to use in each of my projects — ESLint, Prettier, TypeScript, Chakra UI, etc. Not to mention the configuration required for the production and dev environments, testing, hosting, and database. Installing the required libraries and configuring all of these is a chore.

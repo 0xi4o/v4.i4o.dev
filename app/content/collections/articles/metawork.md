@@ -1,12 +1,11 @@
 ---
 title: Metawork
+slug: metawork
 description: What do I do before I start a project?
-tags:
-    - uncategorized
 status: published
-createdAt: 2021-09-27
-publishedAt: 2021-09-27
-updatedAt: 2021-10-10
+createdAt: '2021-09-27'
+updatedAt: '2021-10-10'
+publishedAt: '2021-09-27'
 ---
 
 Developers love to code. Most of us would rather spend time coding or learning about code than do anything else. I am no different. As a beginner web developer, whenever I start a side project, I dove straight into code. After doing this for a while, I realized that I'm going about it wrong.

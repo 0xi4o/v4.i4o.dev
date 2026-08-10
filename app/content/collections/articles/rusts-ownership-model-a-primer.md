@@ -1,12 +1,13 @@
 ---
-title: "Rust's Ownership Model: A Primer"
-description: Rust's Ownership model is a difficult concept for many newcomers to the language. In this article I attempt to explain the concept.
-tags:
-    - uncategorized
+title: 'Rust''s Ownership Model: A Primer'
+slug: rusts-ownership-model-a-primer
+description: >-
+  Rust's Ownership model is a difficult concept for many newcomers to the
+  language. In this article I attempt to explain the concept.
 status: published
-createdAt: 2021-10-12
-publishedAt: 2021-10-12
-updatedAt: 2022-05-09
+createdAt: '2021-10-12'
+updatedAt: '2022-05-09'
+publishedAt: '2021-10-12'
 ---
 
 Rust doesn't have a garbage collector. At first, this was a bit shocking to me. Garbage collection is usually one of those things that most programming languages implement for memory efficiency. But Rust is memory efficient and Rust code is considered safe. So how does Rust manage memory?

@@ -1,16 +1,17 @@
 ---
 title: 'Streamlining Go + Chi Development: generating code from an OpenAPI spec'
+slug: oapi-codegen-with-chi-router
 description: >-
-    In this post, I'll talk about how I'm building a RESTful API by generating Go
-    code from an OpenAPI specification.
+  In this post, I'll talk about how I'm building a RESTful API by generating Go
+  code from an OpenAPI specification.
 tags:
-    - side-projects
-    - productivity
-    - golang
+  - side-projects
+  - productivity
+  - golang
 status: published
-createdAt: 2024-09-27
-publishedAt: 2024-09-27
-updatedAt: 2024-09-29
+createdAt: '2024-09-27'
+updatedAt: '2024-09-29'
+publishedAt: '2024-09-27'
 ---
 
 That title is a mouthful. And up until a few weeks ago, I wouldn't have known what half those things are. I've been learning Go for a few weeks and recently, I've started building a side project with it. In this post, I'll talk about how I'm building a RESTful API by generating Go code from an OpenAPI specification.

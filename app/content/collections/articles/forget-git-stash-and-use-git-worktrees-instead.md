@@ -1,12 +1,13 @@
 ---
 title: Forget git stash and use git worktrees instead
-description: Git worktree is a feature that lets you check out more than one branch at a time. They've been such a gamechanger for my git workflow.
-tags:
-    - uncategorized
+slug: forget-git-stash-and-use-git-worktrees-instead
+description: >-
+  Git worktree is a feature that lets you check out more than one branch at a
+  time. They've been such a gamechanger for my git workflow.
 status: published
-createdAt: 2022-06-20
-publishedAt: 2022-06-20
-updatedAt: 2022-06-20
+createdAt: '2022-06-20'
+updatedAt: '2022-06-20'
+publishedAt: '2022-06-20'
 ---
 
 Here's a typical workflow in the life of a software engineer.

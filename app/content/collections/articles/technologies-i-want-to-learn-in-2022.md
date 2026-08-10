@@ -1,12 +1,13 @@
 ---
 title: Technologies I'm learning in 2022
-description: There are plenty of web technologies to learn and use in 2022. Here are my goals for learning web and related technologies this year.
-tags:
-    - uncategorized
+slug: technologies-i-want-to-learn-in-2022
+description: >-
+  There are plenty of web technologies to learn and use in 2022. Here are my
+  goals for learning web and related technologies this year.
 status: published
-createdAt: 2022-01-03
-publishedAt: 2022-01-03
-updatedAt: 2022-05-09
+createdAt: '2022-01-03'
+updatedAt: '2022-05-09'
+publishedAt: '2022-01-03'
 ---
 
 It's a new year and with it comes new goals and objectives. I've been a professional web developer for 7 years now. Over these years, I've seen a lot of change in the Javascript ecosystem. React is more popular than ever before but there are also worthy contenders like Vue and Svelte.

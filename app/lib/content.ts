@@ -7,6 +7,12 @@ import type { ComponentType } from 'react'
  */
 export type Frontmatter = {
 	title: string
+	/**
+	 * URL slug, pinned explicitly so the CMS round-trips it instead of deriving it from the title.
+	 * Distinct from `CollectionEntry.slug`, which is derived from the file path; for articles the
+	 * two are equal by construction and routing keeps using the derived one.
+	 */
+	slug?: string
 	description?: string
 	tags?: string[]
 	/** ISO date string, e.g. `2026-07-17`. Used for sorting collections. */

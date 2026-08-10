@@ -1,14 +1,15 @@
 ---
 title: How I pick what books to read
+slug: how-i-choose-books
 description: >-
-    After I finish a book, here are the things I consider when choosing what to
-    read next
+  After I finish a book, here are the things I consider when choosing what to
+  read next
 tags:
-    - Books
+  - books
 status: published
-createdAt: 2024-01-12
-publishedAt: 2024-01-12
-updatedAt: 2024-01-12
+createdAt: '2024-01-12'
+updatedAt: '2024-01-12'
+publishedAt: '2024-01-12'
 ---
 
 I remembered this tweet from last year.

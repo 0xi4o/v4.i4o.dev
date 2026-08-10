@@ -1,12 +1,11 @@
 ---
 title: Running on fumes
+slug: running-on-fumes
 description: I think I'm burnt out
-tags:
-    - uncategorized
 status: published
-createdAt: 2022-04-21
-publishedAt: 2022-04-21
-updatedAt: 2022-05-09
+createdAt: '2022-04-21'
+updatedAt: '2022-05-09'
+publishedAt: '2022-04-21'
 ---
 
 I've never had a problem with ideas for writing my blog posts. In fact, I have a huge Notion page filled with ideas for blog posts. But lately I've been struggling to write about anything. Yes, there's a backlog of ideas that I haven't written yet but they no longer reflect the things I want to write about.

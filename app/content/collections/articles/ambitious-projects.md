@@ -1,15 +1,16 @@
 ---
 title: Ambitious Projects
+slug: ambitious-projects
 description: >-
-    This is a small journal entry about a few ambitious projects that inspire me.
-    And also about my anxiety when I think about my own ambitious project ideas.
+  This is a small journal entry about a few ambitious projects that inspire me.
+  And also about my anxiety when I think about my own ambitious project ideas.
 tags:
-    - journal
-    - side-projects
+  - journal
+  - side-projects
 status: published
-createdAt: 2024-10-12
-publishedAt: 2024-10-12
-updatedAt: 2024-10-12
+createdAt: '2024-10-12'
+updatedAt: '2024-10-12'
+publishedAt: '2024-10-12'
 ---
 
 When Linus Torvalds built the first version of Linux he said that it was "just a hobby, won't be big and professional like gnu". Linux now runs on over 90% of cloud infrastructure today. While it may not have started out with such grand goals, it was still an ambitious project. How many developers today would attempt to write a kernel, even one with a drastically limited set of features?

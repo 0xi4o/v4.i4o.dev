@@ -1,12 +1,13 @@
 ---
 title: I built a component library
-description: I built my own React UI component library. It's called Catalyst UI. Here's why I decided to do it in 2023, when there are plenty of other options.
-tags:
-    - uncategorized
+slug: i-built-a-component-library
+description: >-
+  I built my own React UI component library. It's called Catalyst UI. Here's why
+  I decided to do it in 2023, when there are plenty of other options.
 status: published
-createdAt: 2023-01-13
-publishedAt: 2023-01-13
-updatedAt: 2023-01-19
+createdAt: '2023-01-13'
+updatedAt: '2023-01-19'
+publishedAt: '2023-01-13'
 ---
 
 In the past few months, I've prototyped several toy projects to explore ideas, learn new things, etc. Having a well-thought-out project starter is one of the crucial parts of being able to quickly build something and test out an idea. While I have a [pretty solid project starter](https://github.com/i4o-oss/synthwave-stack), one thing that always slowed me down is a collection of React components that I can use in my prototypes.

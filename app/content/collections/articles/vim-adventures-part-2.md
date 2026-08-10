@@ -1,12 +1,13 @@
 ---
-title: Vim Adventures, Part 2
-description: After over 6 months of using the IdeaVim plugin with WebStorm and learning Vim keybindings, I've finally made the move to Neovim, full time.
-tags:
-    - uncategorized
+title: 'Vim Adventures, Part 2'
+slug: vim-adventures-part-2
+description: >-
+  After over 6 months of using the IdeaVim plugin with WebStorm and learning Vim
+  keybindings, I've finally made the move to Neovim, full time.
 status: published
-createdAt: 2023-02-06
-publishedAt: 2023-02-06
-updatedAt: 2023-02-06
+createdAt: '2023-02-06'
+updatedAt: '2023-02-06'
+publishedAt: '2023-02-06'
 ---
 
 Time flies. The last time I wrote about my [adventures with Vim](https://i4o.dev/blog/vim-adventures/), was a little over 6 months ago. In my last post, I wrote about why I started using Vim keybindings in my IDE of choice, WebStorm.

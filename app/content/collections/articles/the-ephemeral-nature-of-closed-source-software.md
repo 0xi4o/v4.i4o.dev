@@ -1,16 +1,17 @@
 ---
 title: The ephemeral nature of closed-source software
+slug: the-ephemeral-nature-of-closed-source-software
 description: >-
-    An app that I was using everyday is shutting down. With nowhere to import the
-    data I exported from this app, I'm thinking about the ephemeral nature of
-    closed-source software and how open-source can mostly mitigate this problem.
+  An app that I was using everyday is shutting down. With nowhere to import the
+  data I exported from this app, I'm thinking about the ephemeral nature of
+  closed-source software and how open-source can mostly mitigate this problem.
 tags:
-    - opinion
-    - open-source
+  - opinion
+  - open-source
 status: published
-createdAt: 2024-02-29
-publishedAt: 2024-02-29
-updatedAt: 2024-02-28
+createdAt: '2024-02-29'
+updatedAt: '2024-02-28'
+publishedAt: '2024-02-29'
 ---
 
 Recently, I received an email from the creators of an app that I use regularly. This app played a crucial part in my life. The email said that they're shutting down the service by the end of the month and that I should export all my data. They were focusing on other products that they had released. Needless to say, I was quite irritated.

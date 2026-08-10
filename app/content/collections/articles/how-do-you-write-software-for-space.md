@@ -1,12 +1,14 @@
 ---
 title: How do you write software for space?
-description: I was curious about how software is written for space travel. Here are a series of stories answering the questions I had about the process, testing, conventions and more about software for space.
-tags:
-    - uncategorized
+slug: how-do-you-write-software-for-space
+description: >-
+  I was curious about how software is written for space travel. Here are a
+  series of stories answering the questions I had about the process, testing,
+  conventions and more about software for space.
 status: published
-createdAt: 2021-09-26
-publishedAt: 2021-09-26
-updatedAt: 2021-10-20
+createdAt: '2021-09-26'
+updatedAt: '2021-10-20'
+publishedAt: '2021-09-26'
 ---
 
 As web and mobile developers, it's easy to assume that resources available to our applications are unlimited. And to an extent they are. Our application probably won't exhaust the RAM in a user's computer (even when they're using Chrome) or on their phones, unless it's bloated with tons of memory leaks. Our applications probably won't use up entire CPU cores.

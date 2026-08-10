@@ -1,12 +1,13 @@
 ---
 title: Serving a Next.js application over HTTPS in localhost
-description: I recently set up a Next.js application to be served over HTTPS in localhost using mkcert. This is how I did it in under 5 minutes.
-tags:
-    - uncategorized
+slug: serving-a-next-js-application-over-https-in-localhost
+description: >-
+  I recently set up a Next.js application to be served over HTTPS in localhost
+  using mkcert. This is how I did it in under 5 minutes.
 status: published
-createdAt: 2021-09-06
-publishedAt: 2021-09-06
-updatedAt: 2021-10-10
+createdAt: '2021-09-06'
+updatedAt: '2021-10-10'
+publishedAt: '2021-09-06'
 ---
 
 ## Why HTTPS in localhost?

@@ -1,13 +1,14 @@
 ---
 title: The 1 App I Can’t Live Without For Learning & Research
+slug: the-1-app-i-cant-live-without-for-learning-and-research
 description: How I Use Perplexity AI for Learning & Research in 2025
 tags:
-    - journal
-    - learning
+  - journal
+  - learning
 status: published
-createdAt: 2025-10-28
-updatedAt: 2025-10-28
-publishedAt: 2025-10-28
+createdAt: '2025-10-28'
+updatedAt: '2025-10-28'
+publishedAt: '2025-10-28'
 ---
 
 When it comes to learning, there is 1 app I can't live without:

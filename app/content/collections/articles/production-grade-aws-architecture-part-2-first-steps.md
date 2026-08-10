@@ -1,12 +1,14 @@
 ---
 title: 'Production-grade AWS architecture [Part 2]: First Steps'
-description: In this article, I'll walk you through the first steps that I did after creating the AWS account. Some of these steps may seem unnecessary but they are good practices to follow when using AWS.
-tags:
-    - uncategorized
+slug: production-grade-aws-architecture-part-2-first-steps
+description: >-
+  In this article, I'll walk you through the first steps that I did after
+  creating the AWS account. Some of these steps may seem unnecessary but they
+  are good practices to follow when using AWS.
 status: published
-createdAt: 2020-04-23
-publishedAt: 2020-04-23
-updatedAt: 2021-10-10
+createdAt: '2020-04-23'
+updatedAt: '2021-10-10'
+publishedAt: '2020-04-23'
 ---
 
 In [part 1](*https://ilango.xyz/production-grade-aws-setup-for-startups-part-1-services/*), I listed the AWS services that are essential for any software application. In this article, I'll walk you through the first steps that I did after creating the AWS account. Some of these steps may seem unnecessary but they are good practices to follow when using AWS.

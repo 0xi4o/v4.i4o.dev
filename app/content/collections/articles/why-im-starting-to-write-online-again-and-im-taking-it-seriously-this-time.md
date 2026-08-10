@@ -1,13 +1,15 @@
 ---
 title: Why I'm Starting To Write Online Again (And I'm Taking It Seriously This Time)
-description: I'm doing Ship 30 for 30 — a 30-day writing challenge — to push
-    myself to write more and become better at sharing my work.
+slug: why-im-starting-to-write-online-again-and-im-taking-it-seriously-this-time
+description: >-
+  I'm doing Ship 30 for 30 — a 30-day writing challenge — to push myself to
+  write more and become better at sharing my work.
 tags:
-    - journal
+  - journal
 status: published
-createdAt: 2025-10-07
-updatedAt: 2025-10-09
-publishedAt: 2025-10-09
+createdAt: '2025-10-07'
+updatedAt: '2025-10-09'
+publishedAt: '2025-10-09'
 ---
 
 I recently signed up for Dickie Bush & Nicolas Cole's cohort-based course, Ship 30 for 30.
