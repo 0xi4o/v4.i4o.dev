@@ -11,7 +11,7 @@ import { pageMeta } from '~/lib/site'
 import type { Route } from './+types/series'
 
 export function loader() {
-	const entry = getContent('collections/series/index')
+	const entry = getContent('singletons/series')
 	if (!entry) throw data(null, { status: 404 })
 	const series = getCollection('collections/series/*/index')
 	const publishedSeries = series.filter(
@@ -44,7 +44,7 @@ export default function Series({ loaderData }: Route.ComponentProps) {
 	return (
 		<article className='typeset'>
 			<h1>{frontmatter.title}</h1>
-			<Content id='collections/series/index' className='border-border mb-10 border-b pb-10' />
+			<Content id='singletons/series' className='border-border mb-10 border-b pb-10' />
 			{series && series.length > 0 ? (
 				<ul className='flex list-none flex-col gap-3.5 p-0'>
 					{series.map((item) => (

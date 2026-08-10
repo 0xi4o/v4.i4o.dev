@@ -99,7 +99,7 @@ export type FeedItem = {
  */
 export function getFeedItems(): FeedItem[] {
 	const articles = getCollection('collections/articles')
-		.filter((e) => e.slug !== 'index' && e.frontmatter.status === 'published')
+		.filter((e) => e.frontmatter.status === 'published')
 		.map((e) => ({
 			url: abs(`/articles/${e.slug}`),
 			title: e.frontmatter.title,
@@ -145,7 +145,7 @@ export function getSitemapUrls(): SitemapUrl[] {
 	const urls: SitemapUrl[] = STATIC_ROUTES.map((loc) => ({ loc: abs(loc) }))
 
 	for (const e of getCollection('collections/articles')) {
-		if (e.slug === 'index' || e.frontmatter.status !== 'published') continue
+		if (e.frontmatter.status !== 'published') continue
 		urls.push({ loc: abs(`/articles/${e.slug}`), lastmod: lastmodOf(e.frontmatter) })
 	}
 

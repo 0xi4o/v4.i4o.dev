@@ -9,7 +9,7 @@ import { pageMeta } from '~/lib/site'
 import type { Route } from './+types/articles'
 
 export function loader() {
-	const entry = getContent('collections/articles/index')
+	const entry = getContent('singletons/articles')
 	if (!entry) throw data(null, { status: 404 })
 	const articles = getCollection('collections/articles')
 	const publishedArticles = articles.filter(
@@ -42,10 +42,7 @@ export default function Articles({ loaderData }: Route.ComponentProps) {
 	return (
 		<article className='typeset'>
 			<h1>{frontmatter.title}</h1>
-			<Content
-				id='collections/articles/index'
-				className='border-border mb-10 border-b pb-10'
-			/>
+			<Content id='singletons/articles' className='border-border mb-10 border-b pb-10' />
 			<ul className='flex list-none flex-col gap-3.5 p-0'>
 				{articles.map((article) => (
 					<li className='p-0' key={article.id}>

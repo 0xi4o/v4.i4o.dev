@@ -23,7 +23,7 @@ export function meta({ loaderData, location }: Route.MetaArgs) {
 }
 
 export function loader() {
-	const entry = getContent('collections/learning/index')
+	const entry = getContent('singletons/learning')
 	if (!entry) throw data(null, { status: 404 })
 	const topics = getCollection('collections/learning/*/index')
 	const currentTopics = topics.filter((topic) => topic.frontmatter.progress === 'current')
@@ -41,7 +41,7 @@ export default function Learning({ loaderData }: Route.ComponentProps) {
 		<article className='typeset flex flex-col gap-10'>
 			<header>
 				<h1>{frontmatter.title}</h1>
-				<Content id='collections/learning/index' className='border-border border-b pb-10' />
+				<Content id='singletons/learning' className='border-border border-b pb-10' />
 			</header>
 
 			<section className='typeset'>
