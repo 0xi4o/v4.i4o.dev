@@ -1,0 +1,65 @@
+{
+	"version": 1,
+	"basePath": "app/content/collections",
+	"collections": {
+		"articles": {
+			"label": "Articles",
+			"format": "md",
+			"features": {
+				"publish": true,
+				"timestamps": { "createdAt": true, "updatedAt": true }
+			},
+			"schema": {
+				"title": { "label": "Title", "type": "text", "required": true },
+				"slug": {
+					"label": "Slug",
+					"type": "slug",
+					"from": "title",
+					"required": true
+				},
+				"description": {
+					"label": "Description",
+					"type": "text",
+					"multiline": true,
+					"required": true
+				},
+				"tags": {
+					"label": "Tags",
+					"type": "multi_select",
+					"options": [
+						{ "label": "Books", "value": "books" },
+						{ "label": "Golang", "value": "golang" },
+						{ "label": "Journal", "value": "journal" },
+						{ "label": "Learning", "value": "learning" },
+						{ "label": "Local-first", "value": "local-first" },
+						{ "label": "Open source", "value": "open-source" },
+						{ "label": "Opinion", "value": "opinion" },
+						{ "label": "Productivity", "value": "productivity" },
+						{ "label": "Remix", "value": "remix" },
+						{ "label": "Side projects", "value": "side-projects" },
+						{ "label": "Vibe coding", "value": "vibe-coding" },
+						{ "label": "Workflow", "value": "workflow" }
+					]
+				},
+				"status": {
+					"label": "Status",
+					"type": "select",
+					"required": true,
+					"defaultSelected": { "label": "Draft", "value": "draft" },
+					"options": [
+						{ "label": "Draft", "value": "draft" },
+						{ "label": "Published", "value": "published" }
+					]
+				},
+				"createdAt": { "label": "Created at", "type": "date", "required": true },
+				"updatedAt": { "label": "Updated at", "type": "date" },
+				"publishedAt": {
+					"label": "Published at",
+					"type": "date",
+					"required": true
+				},
+				"content": { "label": "Content", "type": "document", "required": true }
+			}
+		}
+	}
+}
