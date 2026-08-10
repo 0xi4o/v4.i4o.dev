@@ -45,3 +45,17 @@ the single source of truth. Follow these rules for all UI work:
   render ink-blue — while **body text is warm dark-warm** (`--foreground`) and every other
   surface stays warm neutral. Introduce **no second chromatic hue** and no cool grays. Prefer
   subtle depth (borders, whisper shadow) over hard drop shadows.
+
+## Agent skills
+
+### Issue tracker
+
+Issues live in this repo's GitHub Issues (`0xi4o/v4.i4o.dev`), managed with the `gh` CLI. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+The five canonical triage roles, using the default label strings. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context — one `CONTEXT.md` and `docs/adr/` at the repo root. See `docs/agents/domain.md`.
