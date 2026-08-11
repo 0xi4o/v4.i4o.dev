@@ -18,14 +18,7 @@ export function loader() {
 		// @ts-ignore
 		(series) => series.frontmatter.status === 'published',
 	)
-	const publishedSeriesSorted = publishedSeries.sort(
-		(a, b) =>
-			// @ts-ignore
-			new Date(b.frontmatter.publishedAt) -
-			// @ts-ignore
-			new Date(a.frontmatter.publishedAt),
-	)
-	return { frontmatter: entry.frontmatter, series: publishedSeriesSorted }
+	return { frontmatter: entry.frontmatter, series: publishedSeries }
 }
 
 export function meta({ loaderData, location }: Route.MetaArgs) {

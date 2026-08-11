@@ -95,7 +95,9 @@ export type FeedItem = {
 
 /**
  * Published Articles + Series, newest first, as absolute-URL feed items. Mirrors the published
- * filter and `publishedAt` sort used by `routes/articles.tsx` and `routes/series.tsx`.
+ * filter that `routes/articles.tsx` and `routes/series.tsx` apply. The trailing sort is not
+ * redundant with `getCollection`'s: this merges two separately-sorted collections and has to
+ * re-order the combined list.
  */
 export function getFeedItems(): FeedItem[] {
 	const articles = getCollection('collections/articles')
@@ -122,7 +124,12 @@ export function getFeedItems(): FeedItem[] {
 /** A single sitemap URL. `lastmod` is a `YYYY-MM-DD` date when known. */
 export type SitemapUrl = { loc: string; lastmod?: string }
 
-/** Best-known modification date for a content entry, trimmed to `YYYY-MM-DD`. */
+/**
+ * Best-known modification date for a content entry, trimmed to `YYYY-MM-DD`. Deliberately leads
+ * with `updatedAt`, unlike `publicationDateOf` in `~/lib/content`, which excludes it: this answers
+ * "when did this last change" (sitemap `lastmod`), that one answers "when did this go public"
+ * (listing order). Keep the two chains apart.
+ */
 function lastmodOf(fm: {
 	updatedAt?: string
 	publishedAt?: string

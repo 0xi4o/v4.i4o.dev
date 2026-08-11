@@ -17,21 +17,13 @@ export function loader() {
 		// @ts-ignore
 		(article) => article.frontmatter.status === 'published',
 	)
-	const recentPublishedArticlesSorted = publishedArticles
-		.sort(
-			(a, b) =>
-				// @ts-ignore
-				new Date(b.frontmatter.publishedAt) -
-				// @ts-ignore
-				new Date(a.frontmatter.publishedAt),
-		)
-		.slice(0, 3)
+	const recentArticles = publishedArticles.slice(0, 3)
 	const projects = getCollection('collections/projects/*/index')
 	const currentProjects = projects.filter((project) => project.frontmatter.progress === 'current')
 	return {
 		currentProjects,
 		frontmatter: about.frontmatter,
-		recentArticles: recentPublishedArticlesSorted,
+		recentArticles,
 	}
 }
 
