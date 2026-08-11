@@ -1,11 +1,10 @@
-import { format } from 'date-fns'
 import { ArrowLeftIcon, NotebookTextIcon } from 'lucide-react'
 import { data, Link } from 'react-router'
 
 import { Content } from '~/components/content'
 import { Empty, EmptyHeader, EmptyTitle, EmptyDescription, EmptyMedia } from '~/components/ui/empty'
 import { getCollection, getContent } from '~/lib/content'
-import { pageMeta } from '~/lib/site'
+import { formatDate, pageMeta } from '~/lib/site'
 
 import type { Route } from './+types/learning-entry'
 
@@ -60,26 +59,25 @@ export default function LearningEntry({ loaderData }: Route.ComponentProps) {
 					<h2>Lessons</h2>
 					{lessons && lessons.length > 0 ? (
 						<ul className='flex list-none flex-col gap-3.5 p-0'>
-							{lessons.map((lesson, index) => (
-								<li className='p-0' key={lesson.id}>
-									<Link
-										className='flex items-center justify-between gap-4'
-										key={lesson.id}
-										to={`/learning/${slug}/lessons/${lesson.slug}`}
-									>
-										<span className='text-base leading-[1.5]'>
-											{`${index + 1}. ${lesson.frontmatter.title}`}
-										</span>
-										<time className='text-sm'>
-											{format(
-												// @ts-ignore
-												new Date(lesson.frontmatter.createdAt),
-												'MMMM dd, yyyy',
+							{lessons.map((lesson, index) => {
+								const createdAt = formatDate(lesson.frontmatter.createdAt)
+								return (
+									<li className='p-0' key={lesson.id}>
+										<Link
+											className='flex items-center justify-between gap-4'
+											key={lesson.id}
+											to={`/learning/${slug}/lessons/${lesson.slug}`}
+										>
+											<span className='text-base leading-[1.5]'>
+												{`${index + 1}. ${lesson.frontmatter.title}`}
+											</span>
+											{createdAt && (
+												<time className='text-sm'>{createdAt}</time>
 											)}
-										</time>
-									</Link>
-								</li>
-							))}
+										</Link>
+									</li>
+								)
+							})}
 						</ul>
 					) : (
 						<Empty className='border-border col-span-3 border'>

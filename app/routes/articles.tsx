@@ -1,10 +1,9 @@
-import { format } from 'date-fns'
 import { data, Link } from 'react-router'
 
 import { Content } from '~/components/content'
 import { profile } from '~/data/portfolio'
 import { getCollection, getContent } from '~/lib/content'
-import { pageMeta } from '~/lib/site'
+import { formatDate, pageMeta } from '~/lib/site'
 
 import type { Route } from './+types/articles'
 
@@ -37,29 +36,23 @@ export default function Articles({ loaderData }: Route.ComponentProps) {
 			<h1>{frontmatter.title}</h1>
 			<Content id='singletons/articles' className='border-border mb-10 border-b pb-10' />
 			<ul className='flex list-none flex-col gap-3.5 p-0'>
-				{articles.map((article) => (
-					<li className='p-0' key={article.id}>
-						<Link
-							className='flex items-baseline justify-between gap-4'
-							key={article.id}
-							to={`/articles/${article.slug}`}
-						>
-							<span className='text-base leading-[1.5]'>
-								{
-									// @ts-ignore
-									article.frontmatter.title
-								}
-							</span>
-							<time className='text-sm'>
-								{format(
-									// @ts-ignore
-									new Date(article.frontmatter.publishedAt),
-									'MMMM dd, yyyy',
-								)}
-							</time>
-						</Link>
-					</li>
-				))}
+				{articles.map((article) => {
+					const publishedAt = formatDate(article.frontmatter.publishedAt)
+					return (
+						<li className='p-0' key={article.id}>
+							<Link
+								className='flex items-baseline justify-between gap-4'
+								key={article.id}
+								to={`/articles/${article.slug}`}
+							>
+								<span className='text-base leading-[1.5]'>
+									{article.frontmatter.title}
+								</span>
+								{publishedAt && <time className='text-sm'>{publishedAt}</time>}
+							</Link>
+						</li>
+					)
+				})}
 			</ul>
 		</article>
 	)

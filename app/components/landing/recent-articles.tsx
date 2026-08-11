@@ -1,8 +1,10 @@
-import { format } from 'date-fns'
 import { ArrowRightIcon } from 'lucide-react'
 import { Link } from 'react-router'
 
-export function RecentArticles({ recentArticles }: { recentArticles: Array<unknown> }) {
+import type { CollectionEntry } from '~/lib/content'
+import { formatDate } from '~/lib/site'
+
+export function RecentArticles({ recentArticles }: { recentArticles: CollectionEntry[] }) {
 	return (
 		<section id='blog' className='mb-12'>
 			<div className='typeset mb-6 space-y-2'>
@@ -29,33 +31,22 @@ export function RecentArticles({ recentArticles }: { recentArticles: Array<unkno
 				</p>
 			</div>
 			<ul className='typeset flex list-none flex-col gap-3.5'>
-				{recentArticles.map((article) => (
-					<li
-						className='p-0'
-						// @ts-ignore
-						key={article.id}
-					>
-						<Link
-							className='flex items-baseline justify-between gap-4'
-							// @ts-ignore
-							to={`/articles/${article.slug}`}
-						>
-							<span className='text-base leading-[1.5]'>
-								{
-									// @ts-ignore
-									article.frontmatter.title
-								}
-							</span>
-							<time className='text-sm'>
-								{format(
-									// @ts-ignore
-									new Date(article.frontmatter.publishedAt),
-									'MMMM dd, yyyy',
-								)}
-							</time>
-						</Link>
-					</li>
-				))}
+				{recentArticles.map((article) => {
+					const publishedAt = formatDate(article.frontmatter.publishedAt)
+					return (
+						<li className='p-0' key={article.id}>
+							<Link
+								className='flex items-baseline justify-between gap-4'
+								to={`/articles/${article.slug}`}
+							>
+								<span className='text-base leading-[1.5]'>
+									{article.frontmatter.title}
+								</span>
+								{publishedAt && <time className='text-sm'>{publishedAt}</time>}
+							</Link>
+						</li>
+					)
+				})}
 			</ul>
 		</section>
 	)

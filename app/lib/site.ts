@@ -1,3 +1,5 @@
+import { format } from 'date-fns'
+
 import { hero, profile } from '~/data/portfolio'
 import { getCollection } from '~/lib/content'
 
@@ -119,6 +121,24 @@ export function getFeedItems(): FeedItem[] {
 		}))
 
 	return [...articles, ...series].sort((a, b) => b.date.localeCompare(a.date))
+}
+
+/**
+ * A content date as it is shown to a reader — `2026-08-11` → `August 11, 2026`. The third question
+ * in this file's date trio: `publicationDateOf` (`~/lib/content`) picks the field a listing sorts
+ * by, `lastmodOf` below picks the field the sitemap reports, and this one only renders — it picks
+ * no field at all, so each caller names the one its collection carries (`publishedAt` for
+ * articles/series, `createdAt`/`launchedAt` for learning/projects).
+ *
+ * Returns `null` for a missing or unparseable value so callers can drop the date line rather than
+ * crash. Every date in `Frontmatter` is optional and date-fns `format` throws `RangeError` on an
+ * `Invalid Date`; because these pages are prerendered, one hand-authored file with no date would
+ * otherwise fail the build. Use this instead of calling `format` on a `new Date(...)` directly.
+ */
+export function formatDate(value?: string): string | null {
+	if (!value) return null
+	const date = new Date(value)
+	return Number.isNaN(date.getTime()) ? null : format(date, 'MMMM dd, yyyy')
 }
 
 /** A single sitemap URL. `lastmod` is a `YYYY-MM-DD` date when known. */
