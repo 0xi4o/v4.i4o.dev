@@ -1,8 +1,8 @@
 import { ArrowRightIcon } from 'lucide-react'
 import { Link } from 'react-router'
 
+import { ContentRow } from '~/components/content-row'
 import type { CollectionEntry } from '~/lib/content'
-import { formatDate } from '~/lib/site'
 
 export function RecentArticles({ recentArticles }: { recentArticles: CollectionEntry[] }) {
 	return (
@@ -31,22 +31,14 @@ export function RecentArticles({ recentArticles }: { recentArticles: CollectionE
 				</p>
 			</div>
 			<ul className='typeset flex list-none flex-col gap-3.5'>
-				{recentArticles.map((article) => {
-					const publishedAt = formatDate(article.frontmatter.publishedAt)
-					return (
-						<li className='p-0' key={article.id}>
-							<Link
-								className='flex items-baseline justify-between gap-4'
-								to={`/articles/${article.slug}`}
-							>
-								<span className='text-base leading-[1.5]'>
-									{article.frontmatter.title}
-								</span>
-								{publishedAt && <time className='text-sm'>{publishedAt}</time>}
-							</Link>
-						</li>
-					)
-				})}
+				{recentArticles.map((article) => (
+					<ContentRow
+						key={article.id}
+						date={article.frontmatter.publishedAt}
+						title={article.frontmatter.title}
+						to={`/articles/${article.slug}`}
+					/>
+				))}
 			</ul>
 		</section>
 	)

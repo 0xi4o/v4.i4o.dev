@@ -1,11 +1,12 @@
 import { ListIcon } from 'lucide-react'
-import { data, Link } from 'react-router'
+import { data } from 'react-router'
 
 import { Content } from '~/components/content'
+import { ContentRow } from '~/components/content-row'
 import { Empty, EmptyHeader, EmptyTitle, EmptyDescription, EmptyMedia } from '~/components/ui/empty'
 import { profile } from '~/data/portfolio'
 import { getCollection, getContent } from '~/lib/content'
-import { formatDate, pageMeta } from '~/lib/site'
+import { pageMeta } from '~/lib/site'
 
 import type { Route } from './+types/series'
 
@@ -39,23 +40,14 @@ export default function Series({ loaderData }: Route.ComponentProps) {
 			<Content id='singletons/series' className='border-border mb-10 border-b pb-10' />
 			{series && series.length > 0 ? (
 				<ul className='flex list-none flex-col gap-3.5 p-0'>
-					{series.map((item) => {
-						const publishedAt = formatDate(item.frontmatter.publishedAt)
-						return (
-							<li className='p-0' key={item.id}>
-								<Link
-									className='flex items-baseline justify-between gap-4'
-									key={item.id}
-									to={`/series/${item.slug}`}
-								>
-									<span className='text-base leading-[1.5]'>
-										{item.frontmatter.title}
-									</span>
-									{publishedAt && <time className='text-sm'>{publishedAt}</time>}
-								</Link>
-							</li>
-						)
-					})}
+					{series.map((item) => (
+						<ContentRow
+							key={item.id}
+							date={item.frontmatter.publishedAt}
+							title={item.frontmatter.title}
+							to={`/series/${item.slug}`}
+						/>
+					))}
 				</ul>
 			) : (
 				<Empty className='border-border col-span-3 border'>

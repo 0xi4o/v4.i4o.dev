@@ -2,6 +2,7 @@ import { ArrowLeftIcon, ConstructionIcon, GlobeIcon, InfoIcon, RocketIcon } from
 import { data, Link } from 'react-router'
 
 import { Content } from '~/components/content'
+import { ContentRow } from '~/components/content-row'
 import { Empty, EmptyHeader, EmptyTitle, EmptyDescription, EmptyMedia } from '~/components/ui/empty'
 import { getCollection, getContent } from '~/lib/content'
 import { formatDate, pageMeta } from '~/lib/site'
@@ -88,19 +89,13 @@ export default function ProjectEntry({ loaderData }: Route.ComponentProps) {
 					<h2>Updates</h2>
 					{updates && updates.length > 0 ? (
 						<ul className='flex list-none flex-col gap-3.5 p-0'>
-							{updates.map((update, index) => {
-								const updateCreatedAt = formatDate(update.frontmatter.createdAt)
-								return (
-									<li className='p-0' key={update.id}>
-										<span className='text-base leading-[1.5]'>
-											{`${index + 1}. ${update.frontmatter.title}`}
-										</span>
-										{updateCreatedAt && (
-											<time className='text-sm'>{updateCreatedAt}</time>
-										)}
-									</li>
-								)
-							})}
+							{updates.map((update, index) => (
+								<ContentRow
+									key={update.id}
+									date={update.frontmatter.createdAt}
+									title={`${index + 1}. ${update.frontmatter.title}`}
+								/>
+							))}
 						</ul>
 					) : (
 						<Empty className='border-border col-span-3 border'>
