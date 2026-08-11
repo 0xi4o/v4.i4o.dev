@@ -88,13 +88,29 @@ export default function ProjectEntry({ loaderData }: Route.ComponentProps) {
 				<section className='typeset'>
 					<h2>Updates</h2>
 					{updates && updates.length > 0 ? (
-						<ul className='flex list-none flex-col gap-3.5 p-0'>
-							{updates.map((update, index) => (
+						/*
+						 * Updates are a dated stream, not a numbered sequence: unlike the other two ordered
+						 * listings, which sort on an ordinal the file itself declares (`lessonNumber` in
+						 * `learning-entry`, `order` in `series-entry`), these arrive newest-first from
+						 * `getCollection` and nothing re-sorts them here. An `index + 1` prefix would label
+						 * the newest one "1." and renumber every older one each time a new update lands, so
+						 * titles carry the row alone.
+						 *
+						 * Bodies render inline because updates have no route of their own — there is no
+						 * `projects/:slug/updates/:update` in `app/routes.ts`, so this is the only place the
+						 * prose can appear. `typeset={false}` because the ancestors above already style every
+						 * descendant; a third `.typeset` would only stack another 1.125x mobile size step on
+						 * the two this page already nests.
+						 */
+						<ul className='flex list-none flex-col gap-8 p-0'>
+							{updates.map((update) => (
 								<ContentRow
 									key={update.id}
 									date={update.frontmatter.createdAt}
-									title={`${index + 1}. ${update.frontmatter.title}`}
-								/>
+									title={update.frontmatter.title}
+								>
+									<Content id={update.id} typeset={false} />
+								</ContentRow>
 							))}
 						</ul>
 					) : (

@@ -5,7 +5,11 @@ import { cn } from '~/lib/utils'
 type ContentProps = {
 	/** Content id — the file's path under `app/content`, without extension (e.g. `pages/about`). */
 	id: string
-	/** Wrap in the `.typeset` prose styles. Disable for tight inline snippets. Defaults to `true`. */
+	/**
+	 * Wrap in the `.typeset` prose styles. Defaults to `true`. Disable for tight inline snippets,
+	 * and whenever a `.typeset` ancestor is already in play: the class styles every descendant, so
+	 * nesting it adds nothing but another 1.125x mobile size step (`app/typeset.css`).
+	 */
 	typeset?: boolean
 	className?: string
 }
