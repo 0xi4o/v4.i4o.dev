@@ -1,12 +1,13 @@
 ---
 title: Using Planetscale in a Next.js app with Prisma
-description: In this article, I explain how to set up a database on Planetscale and how to connect a Next.js app to the database using Prisma.
-tags:
-    - uncategorized
+slug: using-planetscale-in-a-next-js-app-with-prisma
+description: >-
+  In this article, I explain how to set up a database on Planetscale and how to
+  connect a Next.js app to the database using Prisma.
 status: published
-createdAt: 2022-04-12
-publishedAt: 2022-04-12
-updatedAt: 2022-04-13
+createdAt: '2022-04-12'
+updatedAt: '2022-04-13'
+publishedAt: '2022-04-12'
 ---
 
 Serverless databases are on the rise. And for good reason. Meta frameworks like Next.js, Remix, Nuxt.js, and Sveltekit are popular than ever and is often the choice for web projects. They're easy to deploy, a joy to work with, and have great communities.

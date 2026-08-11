@@ -1,8 +1,10 @@
-import { format } from 'date-fns'
 import { ArrowRightIcon } from 'lucide-react'
 import { Link } from 'react-router'
 
-export function RecentArticles({ recentArticles }: { recentArticles: Array<unknown> }) {
+import { ContentRow } from '~/components/content-row'
+import type { CollectionEntry } from '~/lib/content'
+
+export function RecentArticles({ recentArticles }: { recentArticles: CollectionEntry[] }) {
 	return (
 		<section id='blog' className='mb-12'>
 			<div className='typeset mb-6 space-y-2'>
@@ -30,31 +32,12 @@ export function RecentArticles({ recentArticles }: { recentArticles: Array<unkno
 			</div>
 			<ul className='typeset flex list-none flex-col gap-3.5'>
 				{recentArticles.map((article) => (
-					<li
-						className='p-0'
-						// @ts-ignore
+					<ContentRow
 						key={article.id}
-					>
-						<Link
-							className='flex items-baseline justify-between gap-4'
-							// @ts-ignore
-							to={`/articles/${article.slug}`}
-						>
-							<span className='text-base leading-[1.5]'>
-								{
-									// @ts-ignore
-									article.frontmatter.title
-								}
-							</span>
-							<time className='text-sm'>
-								{format(
-									// @ts-ignore
-									new Date(article.frontmatter.publishedAt),
-									'MMMM dd, yyyy',
-								)}
-							</time>
-						</Link>
-					</li>
+						date={article.frontmatter.publishedAt}
+						title={article.frontmatter.title}
+						to={`/articles/${article.slug}`}
+					/>
 				))}
 			</ul>
 		</section>

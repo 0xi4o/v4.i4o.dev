@@ -1,16 +1,17 @@
 ---
 title: Reviving Aurelius
+slug: reviving-aurelius
 description: >-
-    After a long time of not working on side projects, I started to miss it again
-    a few weeks back. This came almost right after realizing that all my side
-    projects were dead. So the first step was to revive my favorite project.
+  After a long time of not working on side projects, I started to miss it again
+  a few weeks back. This came almost right after realizing that all my side
+  projects were dead. So the first step was to revive my favorite project.
 tags:
-    - side-projects
-    - local-first
+  - side-projects
+  - local-first
 status: published
-createdAt: 2024-08-05
-publishedAt: 2024-08-05
-updatedAt: 2024-08-05
+createdAt: '2024-08-05'
+updatedAt: '2024-08-05'
+publishedAt: '2024-08-05'
 ---
 
 After a long time of not working on side projects, I started to miss it again a few weeks back. I missed building small, cool stuff. This came almost right after realizing that&nbsp;[**all my side projects were dead**](https://i4o.dev/blog/all-my-side-projects-are-dead). I hadn't updated any of them in a long time. Not using and working on Aurelius was especially hurting. Aurelius was absolutely my favorite project and I had let it die.

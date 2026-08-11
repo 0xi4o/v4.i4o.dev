@@ -1,7 +1,7 @@
-import { format } from 'date-fns'
-import { data, Link } from 'react-router'
+import { data } from 'react-router'
 
 import { Content } from '~/components/content'
+import { ContentRow } from '~/components/content-row'
 import { profile } from '~/data/portfolio'
 import { getCollection, getContent } from '~/lib/content'
 import { pageMeta } from '~/lib/site'
@@ -9,21 +9,14 @@ import { pageMeta } from '~/lib/site'
 import type { Route } from './+types/articles'
 
 export function loader() {
-	const entry = getContent('collections/articles/index')
+	const entry = getContent('singletons/articles')
 	if (!entry) throw data(null, { status: 404 })
 	const articles = getCollection('collections/articles')
 	const publishedArticles = articles.filter(
 		// @ts-ignore
 		(article) => article.frontmatter.status === 'published',
 	)
-	const publishedArticlesSorted = publishedArticles.sort(
-		(a, b) =>
-			// @ts-ignore
-			new Date(b.frontmatter.publishedAt) -
-			// @ts-ignore
-			new Date(a.frontmatter.publishedAt),
-	)
-	return { articles: publishedArticlesSorted, frontmatter: entry.frontmatter }
+	return { articles: publishedArticles, frontmatter: entry.frontmatter }
 }
 
 export function meta({ loaderData, location }: Route.MetaArgs) {
@@ -42,33 +35,15 @@ export default function Articles({ loaderData }: Route.ComponentProps) {
 	return (
 		<article className='typeset'>
 			<h1>{frontmatter.title}</h1>
-			<Content
-				id='collections/articles/index'
-				className='border-border mb-10 border-b pb-10'
-			/>
+			<Content id='singletons/articles' className='border-border mb-10 border-b pb-10' />
 			<ul className='flex list-none flex-col gap-3.5 p-0'>
 				{articles.map((article) => (
-					<li className='p-0' key={article.id}>
-						<Link
-							className='flex items-baseline justify-between gap-4'
-							key={article.id}
-							to={`/articles/${article.slug}`}
-						>
-							<span className='text-base leading-[1.5]'>
-								{
-									// @ts-ignore
-									article.frontmatter.title
-								}
-							</span>
-							<time className='text-sm'>
-								{format(
-									// @ts-ignore
-									new Date(article.frontmatter.publishedAt),
-									'MMMM dd, yyyy',
-								)}
-							</time>
-						</Link>
-					</li>
+					<ContentRow
+						key={article.id}
+						date={article.frontmatter.publishedAt}
+						title={article.frontmatter.title}
+						to={`/articles/${article.slug}`}
+					/>
 				))}
 			</ul>
 		</article>

@@ -1,16 +1,15 @@
 ---
 title: 'Production-grade AWS architecture [Part 1]: Services'
+slug: production-grade-aws-architecture-part-1-services
 description: >-
-    Amazon Web Services is one of the largest cloud service providers in the
-    world. Thousands of software companies around the world have hosted their
-    products on AWS. Netflix, Twitch, Airbnb, and Lyft use AWS to serve millions
-    of customers worldwide.
-tags:
-    - uncategorized
+  Amazon Web Services is one of the largest cloud service providers in the
+  world. Thousands of software companies around the world have hosted their
+  products on AWS. Netflix, Twitch, Airbnb, and Lyft use AWS to serve millions
+  of customers worldwide.
 status: published
-createdAt: 2020-10-10
-publishedAt: 2020-10-10
-updatedAt: 2020-04-22
+createdAt: '2020-10-10'
+updatedAt: '2020-04-22'
+publishedAt: '2020-10-10'
 ---
 
 Amazon Web Services is one of the largest cloud service provider in the world. Thousands of software companies around the world have hosted their products on AWS. Netflix, Twitch, Airbnb and Lyft use AWS to serve millions of customers worldwide. Odds are, if you're starting a software startup, you'll end up using AWS.

@@ -1,11 +1,10 @@
-import { format } from 'date-fns'
 import { ArrowLeftIcon } from 'lucide-react'
 import { data, Link } from 'react-router'
 
 import { MdxProvider } from '~/components/mdx-provider'
 import { profile } from '~/data/portfolio'
 import { getContent } from '~/lib/content'
-import { pageMeta } from '~/lib/site'
+import { formatDate, pageMeta } from '~/lib/site'
 
 import type { Route } from './+types/series-part-entry'
 
@@ -38,6 +37,7 @@ export default function SeriesPartEntry({ loaderData }: Route.ComponentProps) {
 	const entry = getContent(`collections/series/${slug}/${part}`)
 	if (!entry) return null
 	const { Component, frontmatter } = entry
+	const publishedAt = formatDate(frontmatter.publishedAt)
 
 	return (
 		<>
@@ -56,13 +56,11 @@ export default function SeriesPartEntry({ loaderData }: Route.ComponentProps) {
 						</p>
 					)}
 					<h1 className='mt-0'>{frontmatter.title}</h1>
-					<p className='mt-0 font-mono text-[12px] text-[var(--kami-stone)] uppercase'>
-						{format(
-							// @ts-ignore
-							new Date(frontmatter.publishedAt),
-							'MMMM dd, yyyy',
-						)}
-					</p>
+					{publishedAt && (
+						<p className='mt-0 font-mono text-[12px] text-[var(--kami-stone)] uppercase'>
+							{publishedAt}
+						</p>
+					)}
 				</header>
 				<MdxProvider>
 					<Component />

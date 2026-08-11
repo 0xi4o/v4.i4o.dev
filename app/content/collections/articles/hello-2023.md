@@ -1,12 +1,13 @@
 ---
-title: Hello, 2023!
-description: I have a few things I want to accomplish in 2023. Here are the ones that are related to software and development.
-tags:
-    - uncategorized
+title: 'Hello, 2023!'
+slug: hello-2023
+description: >-
+  I have a few things I want to accomplish in 2023. Here are the ones that are
+  related to software and development.
 status: published
-createdAt: 2023-01-05
-publishedAt: 2023-01-05
-updatedAt: 2023-01-19
+createdAt: '2023-01-05'
+updatedAt: '2023-01-19'
+publishedAt: '2023-01-05'
 ---
 
 Happy New Year!

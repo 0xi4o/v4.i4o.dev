@@ -1,14 +1,13 @@
 ---
 title: All the things you can do with Javascript optional chaining
+slug: all-the-things-you-can-do-with-javascript-optional-chaining
 description: >-
-    In this article, I talk about optional chaining and all the things that we can
-    do with it apart from reading nested object properties.
-tags:
-    - uncategorized
+  In this article, I talk about optional chaining and all the things that we can
+  do with it apart from reading nested object properties.
 status: published
-createdAt: 2021-08-28
-publishedAt: 2021-08-28
-updatedAt: 2021-10-10
+createdAt: '2021-08-28'
+updatedAt: '2021-10-10'
+publishedAt: '2021-08-28'
 ---
 
 A common problem when working with objects in Javascript is making sure nested properties are valid and available, not `undefined` or `null`. This usually occurs when reading a JSON response from a REST endpoint.

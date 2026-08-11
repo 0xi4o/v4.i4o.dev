@@ -1,16 +1,17 @@
 ---
 title: All my side projects are dead
+slug: all-my-side-projects-are-dead
 description: >-
-    I haven't updated any of my projects in a while and I also stopped using most
-    of them. Some of them are still useful but it's fine to move on from projects
-    that are no longer needed.
+  I haven't updated any of my projects in a while and I also stopped using most
+  of them. Some of them are still useful but it's fine to move on from projects
+  that are no longer needed.
 tags:
-    - side-projects
-    - journal
+  - side-projects
+  - journal
 status: published
-createdAt: 2024-05-06
-publishedAt: 2024-05-06
-updatedAt: 2024-05-06
+createdAt: '2024-05-06'
+updatedAt: '2024-05-06'
+publishedAt: '2024-05-06'
 ---
 
 I was recently updating my website. While I was checking out the projects page, I realized that all of my side projects are dead (or dying). Not in the sense that the internet will say a project is dead (which usually means that there has been no updates in a while). When I say they're dead it means they're not receiving updates (which is fine, sometimes) but I'm also not using them.

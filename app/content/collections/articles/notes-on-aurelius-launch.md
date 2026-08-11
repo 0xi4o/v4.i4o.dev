@@ -1,14 +1,15 @@
 ---
 title: Notes on Aurelius' launch
+slug: notes-on-aurelius-launch
 description: >-
-    I launched Aurelius last week. Here are a some notes on how I launched, how it
-    went, and how I would launch products in the future.
+  I launched Aurelius last week. Here are a some notes on how I launched, how it
+  went, and how I would launch products in the future.
 tags:
-    - side-projects
+  - side-projects
 status: published
-createdAt: 2024-10-20
-publishedAt: 2024-10-20
-updatedAt: 2024-10-20
+createdAt: '2024-10-20'
+updatedAt: '2024-10-20'
+publishedAt: '2024-10-20'
 ---
 
 I launched Aurelius last week. Here are a some notes on how I launched, how it went, and how I would launch products in the future.

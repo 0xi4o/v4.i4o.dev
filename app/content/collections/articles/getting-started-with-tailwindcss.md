@@ -1,12 +1,13 @@
 ---
 title: Getting started with TailwindCSS
-description: Tailwind works by exposing a ton of CSS utility classes. But that line doesn't even begin to cover how powerful it makes you as a web developer.
-tags:
-    - uncategorized
+slug: getting-started-with-tailwindcss
+description: >-
+  Tailwind works by exposing a ton of CSS utility classes. But that line doesn't
+  even begin to cover how powerful it makes you as a web developer.
 status: published
-createdAt: 2020-09-22
-publishedAt: 2020-09-22
-updatedAt: 2021-10-10
+createdAt: '2020-09-22'
+updatedAt: '2021-10-10'
+publishedAt: '2020-09-22'
 ---
 
 Unless you've been living under a rock, you know or know of [Tailwind CSS](*https://tailwindcss.com/*). It's like Batman's utility belt for frontend engineers but CSS classes instead of batarangs. Tailwind works by exposing a ton of CSS utility classes. But that line doesn't even begin to cover how powerful it makes you as a web developer.

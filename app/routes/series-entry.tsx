@@ -1,8 +1,8 @@
-import { format } from 'date-fns'
 import { ArrowLeftIcon, ListIcon } from 'lucide-react'
 import { data, Link } from 'react-router'
 
 import { Content } from '~/components/content'
+import { ContentRow } from '~/components/content-row'
 import { Empty, EmptyHeader, EmptyTitle, EmptyDescription, EmptyMedia } from '~/components/ui/empty'
 import { profile } from '~/data/portfolio'
 import { getCollection, getContent } from '~/lib/content'
@@ -62,24 +62,12 @@ export default function SeriesEntry({ loaderData }: Route.ComponentProps) {
 				{entries && entries.length > 0 ? (
 					<ul className='flex list-none flex-col gap-3.5 p-0'>
 						{entries.map((entry, index) => (
-							<li className='p-0' key={entry.id}>
-								<Link
-									className='flex items-baseline justify-between gap-4'
-									key={entry.id}
-									to={`/series/${slug}/${entry.slug}`}
-								>
-									<span className='text-base leading-[1.5]'>
-										{`${index + 1}. ${entry.frontmatter.title}`}
-									</span>
-									<time className='text-sm'>
-										{format(
-											// @ts-ignore
-											new Date(entry.frontmatter.publishedAt),
-											'MMMM dd, yyyy',
-										)}
-									</time>
-								</Link>
-							</li>
+							<ContentRow
+								key={entry.id}
+								date={entry.frontmatter.publishedAt}
+								title={`${index + 1}. ${entry.frontmatter.title}`}
+								to={`/series/${slug}/${entry.slug}`}
+							/>
 						))}
 					</ul>
 				) : (

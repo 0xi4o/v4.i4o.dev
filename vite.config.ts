@@ -20,6 +20,12 @@ const rehypePrettyCodeOptions = {
 
 export default defineConfig({
 	fmt: {
+		// Content markdown is CMS-owned, not hand-authored source. Its frontmatter is written by
+		// gray-matter (the writer Kobun uses), and oxfmt reformats frontmatter YAML on its own terms
+		// — 4-space sequences, double-quoted scalars. Letting both write the same bytes means every
+		// CMS save reflows the whole block, and the `staged` hook below would re-mangle it on every
+		// commit. Formatting a whole file is all-or-nothing, so the content tree opts out entirely.
+		ignorePatterns: ['app/content/**'],
 		jsdoc: true,
 		jsxSingleQuote: true,
 		quoteProps: 'consistent',

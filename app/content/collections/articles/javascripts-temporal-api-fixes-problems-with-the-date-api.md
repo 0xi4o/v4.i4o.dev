@@ -1,12 +1,14 @@
 ---
 title: JavaScript's Temporal API fixes problems with the Date API
-description: I recently heard about the Temporal API and how it fixes issues with the current date implementation in JavaScript. In this article I talk about Temporal API and its features, comparing it to Date.
-tags:
-    - uncategorized
+slug: javascripts-temporal-api-fixes-problems-with-the-date-api
+description: >-
+  I recently heard about the Temporal API and how it fixes issues with the
+  current date implementation in JavaScript. In this article I talk about
+  Temporal API and its features, comparing it to Date.
 status: published
-createdAt: 2021-09-20
-publishedAt: 2021-09-20
-updatedAt: 2022-01-04
+createdAt: '2021-09-20'
+updatedAt: '2022-01-04'
+publishedAt: '2021-09-20'
 ---
 
 ## Working with date and time in JavaScript

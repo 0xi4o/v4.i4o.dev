@@ -1,12 +1,11 @@
 ---
 title: My Tech Stack has changed for 2022
-description: This year, I've updated my tech stack for building web applications.
-tags:
-    - uncategorized
+slug: my-tech-stack-has-changed-for-2022
+description: 'This year, I''ve updated my tech stack for building web applications.'
 status: published
-createdAt: 2022-01-06
-publishedAt: 2022-01-06
-updatedAt: 2022-01-06
+createdAt: '2022-01-06'
+updatedAt: '2022-01-06'
+publishedAt: '2022-01-06'
 ---
 
 In a previous post, I talked about [my tech stack](https://i4o.dev/blog/rapid-web-development-with-next-js-chakraui-and-mongodb/) that lets me quickly start  projects and has a good developer experience. Over the second half of last year, however, I started exploring new technologies to add to my stack. I used them to build a couple of projects and [breakable toys](https://i4o.dev/blog/learning-by-building-breakable-toys/) that I'm excited to tell you about.

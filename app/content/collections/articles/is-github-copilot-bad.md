@@ -1,12 +1,13 @@
 ---
 title: I used GitHub Copilot for a month
-description: I've been using GitHub Copilot, since it became generally available a month ago. Here's my experience using it for the past month.
-tags:
-    - uncategorized
+slug: is-github-copilot-bad
+description: >-
+  I've been using GitHub Copilot, since it became generally available a month
+  ago. Here's my experience using it for the past month.
 status: published
-createdAt: 2022-07-25
-publishedAt: 2022-07-25
-updatedAt: 2022-07-25
+createdAt: '2022-07-25'
+updatedAt: '2022-07-25'
+publishedAt: '2022-07-25'
 ---
 
 I've been using GitHub Copilot since it [launched a month ago](https://github.blog/2022-06-21-github-copilot-is-generally-available-to-all-developers/). As you probably already know, Copilot is an AI pair programmer. It is powered by Open AI and is typically installed as an extension to your code editor or IDE (I use it with WebStorm).

@@ -1,12 +1,13 @@
 ---
 title: Getting started in Terraform
-description: A complete Terraform tutorial covering fundamental topics like infrastructure as code, terraform providers, state, terraform plan and terraform apply.
-tags:
-    - uncategorized
+slug: getting-started-in-terraform
+description: >-
+  A complete Terraform tutorial covering fundamental topics like infrastructure
+  as code, terraform providers, state, terraform plan and terraform apply.
 status: published
-createdAt: 2021-06-13
-publishedAt: 2021-06-13
-updatedAt: 2021-10-10
+createdAt: '2021-06-13'
+updatedAt: '2021-10-10'
+publishedAt: '2021-06-13'
 ---
 
 Terraform is an open source tool for building and managing cloud infrastructure in a safe and efficient way. It can create servers, networks and more in popular cloud service providers. But before we can dive into Terraform, we should learn what "Infrastructure as Code (IaC)" means.

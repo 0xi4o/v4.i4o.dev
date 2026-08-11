@@ -1,8 +1,8 @@
-import { format } from 'date-fns'
 import { ArrowLeftIcon, NotebookTextIcon } from 'lucide-react'
 import { data, Link } from 'react-router'
 
 import { Content } from '~/components/content'
+import { ContentRow } from '~/components/content-row'
 import { Empty, EmptyHeader, EmptyTitle, EmptyDescription, EmptyMedia } from '~/components/ui/empty'
 import { getCollection, getContent } from '~/lib/content'
 import { pageMeta } from '~/lib/site'
@@ -61,24 +61,12 @@ export default function LearningEntry({ loaderData }: Route.ComponentProps) {
 					{lessons && lessons.length > 0 ? (
 						<ul className='flex list-none flex-col gap-3.5 p-0'>
 							{lessons.map((lesson, index) => (
-								<li className='p-0' key={lesson.id}>
-									<Link
-										className='flex items-center justify-between gap-4'
-										key={lesson.id}
-										to={`/learning/${slug}/lessons/${lesson.slug}`}
-									>
-										<span className='text-base leading-[1.5]'>
-											{`${index + 1}. ${lesson.frontmatter.title}`}
-										</span>
-										<time className='text-sm'>
-											{format(
-												// @ts-ignore
-												new Date(lesson.frontmatter.createdAt),
-												'MMMM dd, yyyy',
-											)}
-										</time>
-									</Link>
-								</li>
+								<ContentRow
+									key={lesson.id}
+									date={lesson.frontmatter.createdAt}
+									title={`${index + 1}. ${lesson.frontmatter.title}`}
+									to={`/learning/${slug}/lessons/${lesson.slug}`}
+								/>
 							))}
 						</ul>
 					) : (

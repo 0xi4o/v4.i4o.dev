@@ -7,10 +7,14 @@ import type { ComponentType } from 'react'
  */
 export type Frontmatter = {
 	title: string
+	/**
+	 * URL slug, pinned explicitly so the CMS round-trips it instead of deriving it from the title.
+	 * Distinct from `CollectionEntry.slug`, which is derived from the file path; for articles the
+	 * two are equal by construction and routing keeps using the derived one.
+	 */
+	slug?: string
 	description?: string
 	tags?: string[]
-	/** ISO date string, e.g. `2026-07-17`. Used for sorting collections. */
-	date?: string
 	/** Learning-topic progress. `current` = actively learning, `completed` = wrapped up. */
 	progress?: 'current' | 'completed'
 	/** Publication state for articles/series. Only `published` entries are listed/fed. */
@@ -108,12 +112,27 @@ export function getContent(id: string): ContentEntry | null {
 }
 
 /**
- * All entries matching a collection selector, newest first. The selector is either a plain
- * directory (`getCollection('collections/articles')` → every file beneath it, nested included) or a
- * glob with `*`/`**` wildcards — e.g. a selector of `collections/learning` followed by a
- * single-star segment and `index` picks each topic's `index`. For a glob, the `slug` is the text
- * the wildcards matched (`golang`); for a plain dir it's the id relative to the dir (`hello-2024`,
- * or `2026/hello` when nested). Returns frontmatter only, so it's safe to return from a loader.
+ * The date a collection entry became public — `getCollection`'s sort key. Falls through the date
+ * fields collections actually carry: articles and series have `publishedAt`; learning topics,
+ * lessons, and projects have `createdAt`; `launchedAt` is the last resort for a project that ships
+ * without one. Deliberately excludes `updatedAt`: that's a modification date, and it belongs to
+ * `lastmodOf` in `~/lib/site`, which answers the different question of when an entry last changed.
+ * Undated entries return `''`.
+ */
+function publicationDateOf(fm: Frontmatter): string {
+	return fm.publishedAt ?? fm.createdAt ?? fm.launchedAt ?? ''
+}
+
+/**
+ * All entries matching a collection selector, newest first by publication date (`publishedAt`, else
+ * `createdAt`, else `launchedAt` — see `publicationDateOf`), ties broken alphabetically by title,
+ * undated entries last. Callers wanting a different order (`lessonNumber`, `order`) re-sort. The
+ * selector is either a plain directory (`getCollection('collections/articles')` → every file
+ * beneath it, nested included) or a glob with `*`/`**` wildcards — e.g. a selector of
+ * `collections/learning` followed by a single-star segment and `index` picks each topic's `index`.
+ * For a glob, the `slug` is the text the wildcards matched (`golang`); for a plain dir it's the id
+ * relative to the dir (`hello-2024`, or `2026/hello` when nested). Returns frontmatter only, so
+ * it's safe to return from a loader.
  */
 export function getCollection(selector: string): CollectionEntry[] {
 	const matcher = selector.includes('*') ? globToRegExp(selector) : null
@@ -129,8 +148,12 @@ export function getCollection(selector: string): CollectionEntry[] {
 			entries.push({ id, slug: id.slice(prefix.length), frontmatter })
 		}
 	}
+	// Newest first. Every date in the tree is `YYYY-MM-DD`, so lexicographic order is chronological.
+	// Undated entries compare as `''` and settle at the end, alphabetical among themselves.
 	return entries.sort((a, b) => {
-		const byDate = (b.frontmatter.date ?? '').localeCompare(a.frontmatter.date ?? '')
+		const byDate = publicationDateOf(b.frontmatter).localeCompare(
+			publicationDateOf(a.frontmatter),
+		)
 		if (byDate !== 0) return byDate
 		return (a.frontmatter.title ?? '').localeCompare(b.frontmatter.title ?? '')
 	})

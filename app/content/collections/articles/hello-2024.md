@@ -1,13 +1,14 @@
 ---
-title: Hello, 2024
+title: 'Hello, 2024'
+slug: hello-2024
 description: Here are my 2024 goals for level up as a software engineer
 tags:
-    - learning
-    - journal
+  - learning
+  - journal
 status: published
-createdAt: 2024-01-05
-publishedAt: 2024-01-05
-updatedAt: 2024-01-05
+createdAt: '2024-01-05'
+updatedAt: '2024-01-05'
+publishedAt: '2024-01-05'
 ---
 
 In 2022, I wrote about how my tech stack has changed. Remix had just gone open-source so I naturally I tried it and I liked it so much that I switched to it as my default React framework. Along with it, I also switched out a few other things that I've been using till that point - Chakra UI, MongoDB, SWR, and Vercel/Netlify.

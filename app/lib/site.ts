@@ -1,3 +1,5 @@
+import { format } from 'date-fns'
+
 import { hero, profile } from '~/data/portfolio'
 import { getCollection } from '~/lib/content'
 
@@ -95,11 +97,13 @@ export type FeedItem = {
 
 /**
  * Published Articles + Series, newest first, as absolute-URL feed items. Mirrors the published
- * filter and `publishedAt` sort used by `routes/articles.tsx` and `routes/series.tsx`.
+ * filter that `routes/articles.tsx` and `routes/series.tsx` apply. The trailing sort is not
+ * redundant with `getCollection`'s: this merges two separately-sorted collections and has to
+ * re-order the combined list.
  */
 export function getFeedItems(): FeedItem[] {
 	const articles = getCollection('collections/articles')
-		.filter((e) => e.slug !== 'index' && e.frontmatter.status === 'published')
+		.filter((e) => e.frontmatter.status === 'published')
 		.map((e) => ({
 			url: abs(`/articles/${e.slug}`),
 			title: e.frontmatter.title,
@@ -119,10 +123,33 @@ export function getFeedItems(): FeedItem[] {
 	return [...articles, ...series].sort((a, b) => b.date.localeCompare(a.date))
 }
 
+/**
+ * A content date as it is shown to a reader — `2026-08-11` → `August 11, 2026`. The third question
+ * in this file's date trio: `publicationDateOf` (`~/lib/content`) picks the field a listing sorts
+ * by, `lastmodOf` below picks the field the sitemap reports, and this one only renders — it picks
+ * no field at all, so each caller names the one its collection carries (`publishedAt` for
+ * articles/series, `createdAt`/`launchedAt` for learning/projects).
+ *
+ * Returns `null` for a missing or unparseable value so callers can drop the date line rather than
+ * crash. Every date in `Frontmatter` is optional and date-fns `format` throws `RangeError` on an
+ * `Invalid Date`; because these pages are prerendered, one hand-authored file with no date would
+ * otherwise fail the build. Use this instead of calling `format` on a `new Date(...)` directly.
+ */
+export function formatDate(value?: string): string | null {
+	if (!value) return null
+	const date = new Date(value)
+	return Number.isNaN(date.getTime()) ? null : format(date, 'MMMM dd, yyyy')
+}
+
 /** A single sitemap URL. `lastmod` is a `YYYY-MM-DD` date when known. */
 export type SitemapUrl = { loc: string; lastmod?: string }
 
-/** Best-known modification date for a content entry, trimmed to `YYYY-MM-DD`. */
+/**
+ * Best-known modification date for a content entry, trimmed to `YYYY-MM-DD`. Deliberately leads
+ * with `updatedAt`, unlike `publicationDateOf` in `~/lib/content`, which excludes it: this answers
+ * "when did this last change" (sitemap `lastmod`), that one answers "when did this go public"
+ * (listing order). Keep the two chains apart.
+ */
 function lastmodOf(fm: {
 	updatedAt?: string
 	publishedAt?: string
@@ -145,7 +172,7 @@ export function getSitemapUrls(): SitemapUrl[] {
 	const urls: SitemapUrl[] = STATIC_ROUTES.map((loc) => ({ loc: abs(loc) }))
 
 	for (const e of getCollection('collections/articles')) {
-		if (e.slug === 'index' || e.frontmatter.status !== 'published') continue
+		if (e.frontmatter.status !== 'published') continue
 		urls.push({ loc: abs(`/articles/${e.slug}`), lastmod: lastmodOf(e.frontmatter) })
 	}
 

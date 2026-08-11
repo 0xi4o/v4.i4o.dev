@@ -1,12 +1,14 @@
 ---
 title: Running Node.js natively in the browser
-description: WebContainer is a new technology that lets us run Node.js natively in the browser. Built in webassembly, it's blazing fast, secure by default and enables seamless debugging in the Chrome DevTools.
-tags:
-    - uncategorized
+slug: running-node-js-natively-in-the-browser
+description: >-
+  WebContainer is a new technology that lets us run Node.js natively in the
+  browser. Built in webassembly, it's blazing fast, secure by default and
+  enables seamless debugging in the Chrome DevTools.
 status: published
-createdAt: 2021-06-16
-publishedAt: 2021-06-16
-updatedAt: 2022-04-12
+createdAt: '2021-06-16'
+updatedAt: '2022-04-12'
+publishedAt: '2021-06-16'
 ---
 
 Browsers have come a long way in the past decade, especially in the past 5 years. Tasks that once required dedicated, memory-guzzling desktop software — graphic design, video editing, and rich document editing — are possible in browsers now. The power of WebAssembly!

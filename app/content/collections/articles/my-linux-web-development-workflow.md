@@ -1,12 +1,13 @@
 ---
 title: My Linux web development workflow
-description: In this article, I write about all the tools and applications I use on Linux every day to build web applications and be productive.
-tags:
-    - uncategorized
+slug: my-linux-web-development-workflow
+description: >-
+  In this article, I write about all the tools and applications I use on Linux
+  every day to build web applications and be productive.
 status: published
-createdAt: 2021-09-04
-publishedAt: 2021-09-04
-updatedAt: 2021-10-10
+createdAt: '2021-09-04'
+updatedAt: '2021-10-10'
+publishedAt: '2021-09-04'
 ---
 
 In a previous article, I wrote about [the tech stack I use for rapidly building web applications](*https://ilango.hashnode.dev/rapid-web-development-with-nextjs-chakraui-and-mongodb*). Those frameworks and libraries are only part of the picture. That tech stack doesn't exist in a vacuum and is part of a larger workflow. This article is where I cover the rest of the picture.

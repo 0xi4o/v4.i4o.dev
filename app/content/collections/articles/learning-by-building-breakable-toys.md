@@ -1,12 +1,14 @@
 ---
 title: Learning by building Breakable Toys
-description: Building breakable toys is one of the best way I know, to learn a new programming language or technology. In this article I write about the features of a breakable toy.
-tags:
-    - uncategorized
+slug: learning-by-building-breakable-toys
+description: >-
+  Building breakable toys is one of the best way I know, to learn a new
+  programming language or technology. In this article I write about the features
+  of a breakable toy.
 status: published
-createdAt: 2021-09-15
-publishedAt: 2021-09-15
-updatedAt: 2021-10-10
+createdAt: '2021-09-15'
+updatedAt: '2021-10-10'
+publishedAt: '2021-09-15'
 ---
 
 ## What is a breakable toy?

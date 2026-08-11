@@ -1,14 +1,15 @@
 ---
 title: Just use a server
+slug: just-use-a-server
 description: >-
-    The server vs serverless argument is seemingly never ending but I haven't
-    changed my stance. Just use a server. It's not that hard.
+  The server vs serverless argument is seemingly never ending but I haven't
+  changed my stance. Just use a server. It's not that hard.
 tags:
-    - opinion
+  - opinion
 status: published
-createdAt: 2024-05-02
-publishedAt: 2024-05-02
-updatedAt: 2024-03-10
+createdAt: '2024-05-02'
+updatedAt: '2024-03-10'
+publishedAt: '2024-05-02'
 ---
 
 In the past couple of months, there's been a lot of discourse over serverless applications. It's kinda an argument that never ends but this time it seems to be caused by Vercel changing their billing. A few users have complained about their bills being increased multiple times. A few weeks before that there was another incident where a Netlify user shared their enormous Netflix bill on Reddit and subsequently on HackerNews.

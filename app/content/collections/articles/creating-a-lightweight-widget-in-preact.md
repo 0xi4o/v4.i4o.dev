@@ -1,12 +1,13 @@
 ---
 title: Creating a lightweight widget in Preact
-description: In this article, I talk about building a Preact widget, why I chose Preact, and the configuration required to set it all up.
-tags:
-    - uncategorized
+slug: creating-a-lightweight-widget-in-preact
+description: >-
+  In this article, I talk about building a Preact widget, why I chose Preact,
+  and the configuration required to set it all up.
 status: published
-createdAt: 2021-07-28
-publishedAt: 2021-07-28
-updatedAt: 2021-10-10
+createdAt: '2021-07-28'
+updatedAt: '2021-10-10'
+publishedAt: '2021-07-28'
 ---
 
 One of the features in [Stym](*https://stym.io*) is a profile management widget that can be embedded on any website. The widget is connected to our backend and lets users manage their profile, billing, and invoices. When I started to build it, I didn't want to code in vanilla JS. I wanted to use React but as something that will be embedded in other websites, the main requirement was a small size, preferably under 50kb. So I picked Preact.

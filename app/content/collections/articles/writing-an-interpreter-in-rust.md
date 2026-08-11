@@ -1,12 +1,14 @@
 ---
 title: Writing an interpreter in Rust
-description: How does the compiler/interpreter know how many variables there are, how to allocate memory, and what to do about that silly mistake you made? How do you design a programming language from scratch(-ish)?
-tags:
-    - uncategorized
+slug: writing-an-interpreter-in-rust
+description: >-
+  How does the compiler/interpreter know how many variables there are, how to
+  allocate memory, and what to do about that silly mistake you made? How do you
+  design a programming language from scratch(-ish)?
 status: published
-createdAt: 2022-01-04
-publishedAt: 2022-01-04
-updatedAt: 2022-05-09
+createdAt: '2022-01-04'
+updatedAt: '2022-05-09'
+publishedAt: '2022-01-04'
 ---
 
 Have you ever wondered how programming languages work? How do the words you type on a screen end up telling the computer what to do? How does the compiler/interpreter know how many variables there are, how to allocate memory, and what to do about that silly mistake you made? How do you design a programming language from scratch(-ish)?

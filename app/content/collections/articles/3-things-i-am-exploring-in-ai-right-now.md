@@ -1,14 +1,16 @@
 ---
 title: 3 Things I Am Exploring In AI Right Now
-description: 'There are 3 things I am actively thinking about and exploring a
-    lot these days:'
+slug: 3-things-i-am-exploring-in-ai-right-now
+description: >-
+  There are 3 things I am actively thinking about and exploring a lot these
+  days:
 tags:
-    - journal
-    - learning
+  - journal
+  - learning
 status: published
-createdAt: 2025-10-10
-updatedAt: 2025-10-10
-publishedAt: 2025-10-10
+createdAt: '2025-10-10'
+updatedAt: '2025-10-10'
+publishedAt: '2025-10-10'
 ---
 
 There are 3 things I am actively thinking about and exploring a lot these days:

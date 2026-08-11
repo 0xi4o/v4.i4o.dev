@@ -1,12 +1,13 @@
 ---
 title: Vim Adventures
-description: I decided that it's time I put in some effort and learn Vim. Here's how it went.
-tags:
-    - uncategorized
+slug: vim-adventures
+description: >-
+  I decided that it's time I put in some effort and learn Vim. Here's how it
+  went.
 status: published
-createdAt: 2022-06-23
-publishedAt: 2022-06-23
-updatedAt: 2022-06-23
+createdAt: '2022-06-23'
+updatedAt: '2022-06-23'
+publishedAt: '2022-06-23'
 ---
 
 Many years ago, I tried to learn Vim. I don't remember what prompted it but I tried it. But it didn't stick. There were too many keybindings to learn, and I kept forgetting them.

@@ -1,12 +1,14 @@
 ---
 title: 'Production-grade AWS architecture [Part 3]: Monoliths vs Microservices'
-description: When you build your software, should you go for monolithic or microservices architecture? This is one of the hottest arguments in developer circles. There are advocates for either side and the argument is never-ending.
-tags:
-    - uncategorized
+slug: production-grade-aws-architecture-part-3-monoliths-vs-microservices
+description: >-
+  When you build your software, should you go for monolithic or microservices
+  architecture? This is one of the hottest arguments in developer circles. There
+  are advocates for either side and the argument is never-ending.
 status: published
-createdAt: 2020-04-24
-publishedAt: 2020-04-24
-updatedAt: 2021-10-10
+createdAt: '2020-04-24'
+updatedAt: '2021-10-10'
+publishedAt: '2020-04-24'
 ---
 
 Before we get to it, let me start by saying that, by writing this article, I'm gonna ruffle a few feathers.

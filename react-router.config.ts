@@ -26,10 +26,11 @@ function globToRegExp(glob: string): RegExp {
 
 /**
  * Ordered rules mapping a content id (path under `app/content`, no extension) to its prerendered
- * URL. First matching rule wins; a rule may return `null` to skip a match (e.g. a collection's own
- * `index` singleton). Files matching no rule are intentionally NOT prerendered — internal notes
- * (`MISSION`/`NOTES`/`RESOURCES`), reference docs, and listing-intro `index` files live under
- * content but have no route. Keep these in sync with the dynamic routes in `app/routes.ts`.
+ * URL. First matching rule wins, so order is load-bearing: the series-landing rule must stay ahead
+ * of the series-parts rule, which would otherwise claim a series' own `index` file and prerender it
+ * as a part. Files matching no rule are intentionally NOT prerendered — internal notes
+ * (`MISSION`/`NOTES`/`RESOURCES`), reference docs, learning records, and vendored code samples live
+ * under content but have no route. Keep these in sync with the dynamic routes in `app/routes.ts`.
  *
  * There is intentionally no rule for project detail pages (`collections/projects/<slug>/index`):
  * there's no `projects/:slug` route (it's commented out in `routes.ts`), so they aren't
@@ -37,11 +38,11 @@ function globToRegExp(glob: string): RegExp {
  */
 const PRERENDER_RULES: {
 	glob: string
-	url: (caps: string[]) => string | null
+	url: (caps: string[]) => string
 }[] = [
 	{
 		glob: 'collections/articles/*',
-		url: ([s]) => (s === 'index' ? null : `/articles/${s}`),
+		url: ([s]) => `/articles/${s}`,
 	},
 	{
 		glob: 'collections/learning/*/index',
@@ -61,7 +62,7 @@ const PRERENDER_RULES: {
 	},
 	{
 		glob: 'collections/series/*/*',
-		url: ([slug, part]) => (part === 'index' ? null : `/series/${slug}/${part}`),
+		url: ([slug, part]) => `/series/${slug}/${part}`,
 	},
 ]
 const COMPILED_RULES = PRERENDER_RULES.map((rule) => ({
@@ -106,8 +107,7 @@ function contentUrls(): string[] {
 			for (const { re, url } of COMPILED_RULES) {
 				const match = re.exec(id)
 				if (!match) continue
-				const built = url(match.slice(1))
-				if (built) urls.add(built)
+				urls.add(url(match.slice(1)))
 				break
 			}
 		}

@@ -1,12 +1,11 @@
 ---
 title: Overcoming anxiety and launching early
+slug: overcoming-anxiety-and-launching-early
 description: I'm having trouble launching stuff
-tags:
-    - uncategorized
 status: published
-createdAt: 2021-10-25
-publishedAt: 2021-10-25
-updatedAt: 2021-10-25
+createdAt: '2021-10-25'
+updatedAt: '2021-10-25'
+publishedAt: '2021-10-25'
 ---
 
 This week I'm launching the open beta of Herald. It's been nearly a month since I started working on it. I don't think Herald is ready yet but that's exactly why I'm launching it right away.

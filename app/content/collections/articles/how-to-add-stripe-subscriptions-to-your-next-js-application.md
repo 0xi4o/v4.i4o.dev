@@ -1,12 +1,13 @@
 ---
 title: How to add Stripe subscriptions to your Next.js application
-description: In this article, I show how we can add Stripe subscriptions to a Next.js application.
-tags:
-    - uncategorized
+slug: how-to-add-stripe-subscriptions-to-your-next-js-application
+description: >-
+  In this article, I show how we can add Stripe subscriptions to a Next.js
+  application.
 status: published
-createdAt: 2021-09-26
-publishedAt: 2021-09-26
-updatedAt: 2021-10-10
+createdAt: '2021-09-26'
+updatedAt: '2021-10-10'
+publishedAt: '2021-09-26'
 ---
 
 *# *Outline

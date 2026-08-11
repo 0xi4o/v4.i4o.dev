@@ -1,10 +1,9 @@
-import { format } from 'date-fns'
 import { ArrowLeftIcon } from 'lucide-react'
 import { data, Link } from 'react-router'
 
 import { MdxProvider } from '~/components/mdx-provider'
 import { getContent } from '~/lib/content'
-import { pageMeta } from '~/lib/site'
+import { formatDate, pageMeta } from '~/lib/site'
 
 import type { Route } from './+types/article-entry'
 
@@ -28,6 +27,7 @@ export default function LearningEntry({ loaderData }: Route.ComponentProps) {
 	const entry = getContent(`collections/articles/${loaderData.slug}`)
 	if (!entry) return null
 	const { Component, frontmatter } = entry
+	const publishedAt = formatDate(frontmatter.publishedAt)
 
 	return (
 		<>
@@ -46,14 +46,12 @@ export default function LearningEntry({ loaderData }: Route.ComponentProps) {
 						</p>
 					)}
 					<h1 className='mt-0'>{frontmatter.title}</h1>
-					<p className='mt-0 font-mono text-[12px] text-[var(--kami-stone)] uppercase'>
-						{format(
-							// @ts-ignore
-							new Date(frontmatter.publishedAt),
-							'MMMM dd, yyyy',
-						)}
-						{/* &middot; 6 min read */}
-					</p>
+					{publishedAt && (
+						<p className='mt-0 font-mono text-[12px] text-[var(--kami-stone)] uppercase'>
+							{publishedAt}
+							{/* &middot; 6 min read */}
+						</p>
+					)}
 				</header>
 				<MdxProvider>
 					<Component />

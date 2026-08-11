@@ -1,12 +1,13 @@
 ---
 title: Supercharging data fetching in React with SWR
-description: The default way to fetch data in React applications is good. There is a better way and is super fun to use. It's called SWR.
-tags:
-    - uncategorized
+slug: supercharging-data-fetching-in-react-with-swr
+description: >-
+  The default way to fetch data in React applications is good. There is a better
+  way and is super fun to use. It's called SWR.
 status: published
-createdAt: 2021-08-25
-publishedAt: 2021-08-25
-updatedAt: 2022-01-04
+createdAt: '2021-08-25'
+updatedAt: '2022-01-04'
+publishedAt: '2021-08-25'
 ---
 
 ## What is SWR?

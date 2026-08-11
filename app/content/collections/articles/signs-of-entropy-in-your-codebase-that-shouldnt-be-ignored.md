@@ -1,12 +1,14 @@
 ---
 title: 3 signs of entropy in your codebase that shouldn't be ignored
-description: Do you know what I think the coolest law of physics is? It's the second law of thermodynamics — entropy. In this article, I talk about entropy in software and how to mitigate it.
-tags:
-    - uncategorized
+slug: signs-of-entropy-in-your-codebase-that-shouldnt-be-ignored
+description: >-
+  Do you know what I think the coolest law of physics is? It's the second law of
+  thermodynamics — entropy. In this article, I talk about entropy in software
+  and how to mitigate it.
 status: published
-createdAt: 2020-04-29
-publishedAt: 2020-04-29
-updatedAt: 2021-10-10
+createdAt: '2020-04-29'
+updatedAt: '2021-10-10'
+publishedAt: '2020-04-29'
 ---
 
 Do you know what I think the coolest law of physics is? It's the second law of thermodynamics.

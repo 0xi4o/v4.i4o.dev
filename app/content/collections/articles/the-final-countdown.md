@@ -1,17 +1,18 @@
 ---
 title: The Final Countdown
+slug: the-final-countdown
 description: >-
-    Reflecting on regrets and wins of 2024. Reviving projects, learning new
-    things, and setting personal challenges for the year's final stretch. A
-    self-reminder to push harder.
+  Reflecting on regrets and wins of 2024. Reviving projects, learning new
+  things, and setting personal challenges for the year's final stretch. A
+  self-reminder to push harder.
 tags:
-    - productivity
-    - learning
-    - journal
+  - productivity
+  - learning
+  - journal
 status: published
-createdAt: 2024-10-02
-publishedAt: 2024-10-02
-updatedAt: 2024-10-02
+createdAt: '2024-10-02'
+updatedAt: '2024-10-02'
+publishedAt: '2024-10-02'
 ---
 
 Well, this year went by in a flash. When I think about where the time went, I think about regret — time I spent doing things that didn't matter but seemed urgent then. I think about all the things I said I would do but didn't end up doing it. Goals that ended up taking the backseat while I let myself be pulled away in directions of whatever caught my attention at that moment.

@@ -1,16 +1,17 @@
 ---
 title: Moving a little bit away from JS land
+slug: moving-a-little-bit-away-from-js-land
 description: >-
-    For my entire professional career I've only worked in the JavaScript
-    ecosystem. It was great — for the most part — but recently I've been kinda
-    looking for something different.
+  For my entire professional career I've only worked in the JavaScript
+  ecosystem. It was great — for the most part — but recently I've been kinda
+  looking for something different.
 tags:
-    - golang
-    - learning
+  - golang
+  - learning
 status: published
-createdAt: 2024-08-12
-publishedAt: 2024-08-12
-updatedAt: 2024-08-12
+createdAt: '2024-08-12'
+updatedAt: '2024-08-12'
+publishedAt: '2024-08-12'
 ---
 
 For my entire professional career I've only worked in the JavaScript ecosystem. It was great — for the most part — but recently I've been kinda looking for something different. I've made several attempts in the past to learn a different language. I learned Rust and got pretty far. I did two Advent of Code with Rust. Each time I learned it again. I even built a tiny CLI tool with it. But it didn't stick. I made another attempt with Elixir but I didn't get far there. I dropped the course I was doing halfway, partly due to it being outdated but also because I lost interest.
