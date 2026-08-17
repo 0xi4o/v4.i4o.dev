@@ -35,6 +35,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
 				{children}
 				<ScrollRestoration />
 				<Scripts />
+				<script
+					defer
+					src='https://x.i4o.dev/script.js'
+					data-website-id='6fe2c807-c6e2-4ddb-bac8-ba5a8c8049ef'
+				/>
 			</body>
 		</html>
 	)
