@@ -41,23 +41,6 @@
 						{ "label": "Workflow", "value": "workflow" }
 					]
 				},
-				"status": {
-					"label": "Status",
-					"type": "select",
-					"required": true,
-					"defaultSelected": { "label": "Draft", "value": "draft" },
-					"options": [
-						{ "label": "Draft", "value": "draft" },
-						{ "label": "Published", "value": "published" }
-					]
-				},
-				"createdAt": { "label": "Created at", "type": "date", "required": true },
-				"updatedAt": { "label": "Updated at", "type": "date" },
-				"publishedAt": {
-					"label": "Published at",
-					"type": "date",
-					"required": true
-				},
 				"content": { "label": "Content", "type": "document", "required": true }
 			}
 		}
