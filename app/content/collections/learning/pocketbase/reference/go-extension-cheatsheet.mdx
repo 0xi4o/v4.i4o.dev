@@ -1,0 +1,89 @@
+---
+courseTitle: Building with PocketBase
+title: Go extension — cheat sheet
+description: The minimal main.go, hook timing, and route registration, compressed
+createdAt: 2026-08-11
+updatedAt: 2026-08-11
+---
+
+import { LessonLayout, KeyIdea } from '../assets/LessonLayout'
+
+<LessonLayout>
+
+# Go extension — cheat sheet
+
+<KeyIdea>
+	Your app = `pocketbase.New()` + your hooks + your routes + `app.Start()`. The prebuilt binary is
+	this with zero hooks and zero routes.
+</KeyIdea>
+
+## Skeleton
+
+```go
+package main
+
+import (
+	"log"
+
+	"github.com/pocketbase/pocketbase"
+	"github.com/pocketbase/pocketbase/core"
+)
+
+func main() {
+	app := pocketbase.New()
+
+	// routes
+	app.OnServe().BindFunc(func(se *core.ServeEvent) error {
+		se.Router.GET("/api/stats", func(e *core.RequestEvent) error {
+			return e.JSON(200, map[string]any{"ok": true})
+		})
+		return se.Next()
+	})
+
+	// hooks — optional collection names scope the hook
+	app.OnRecordCreate("posts").BindFunc(func(e *core.RecordEvent) error {
+		// before validation + INSERT
+		return e.Next()
+		// after would run post-INSERT
+	})
+
+	if err := app.Start(); err != nil {
+		log.Fatal(err)
+	}
+}
+```
+
+Run with `go run . serve` — your binary inherits the full command tree
+(`serve`, `superuser`, `migrate`, …). `pb_data/` is created in the cwd.
+
+## Hook timing model
+
+| Hook family                            | Fires                                                      |
+| -------------------------------------- | ---------------------------------------------------------- |
+| `OnRecordCreate` / `Update` / `Delete` | Before validation and the DB write                         |
+| `OnRecord…Execute`                     | After validation, before the DB write                      |
+| `OnRecordAfter…Success` / `…Error`     | After the DB write settles                                 |
+| `OnRecord…Request`                     | On the REST endpoint — has request context (`e.Auth` etc.) |
+| `OnServe`                              | Once, at server start — where routes go                    |
+
+Conventions that bite if forgotten: always `return e.Next()` (forgetting it
+silently cancels the operation chain); inside handlers use `e.App`, not the
+`app` you closed over (avoids deadlocks); superusers bypass rules but **not**
+hooks — hooks are your server-side invariants.
+
+## Everyday snippets
+
+```go
+e.Record.GetString("title")        // typed getters: GetBool, GetInt, …
+e.Record.Set("slug", v)            // set before e.Next() to persist
+e.App.CountRecords("posts")        // query helpers on the app
+e.App.FindRecordById("posts", id)
+```
+
+## Sources
+
+[Go overview](https://pocketbase.io/docs/go-overview/) ·
+[Go event hooks](https://pocketbase.io/docs/go-event-hooks/) ·
+[Go routing](https://pocketbase.io/docs/go-routing/)
+
+</LessonLayout>

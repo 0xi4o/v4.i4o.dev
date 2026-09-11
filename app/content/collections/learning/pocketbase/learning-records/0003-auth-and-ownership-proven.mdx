@@ -1,0 +1,22 @@
+---
+courseTitle: Building with PocketBase
+title: Auth and ownership rules proven hands-on
+description: Lesson 2 completed — JWT auth, @request.auth, owner-only rules verified with two users
+createdAt: 2026-08-11
+updatedAt: 2026-08-11
+---
+
+# Auth and ownership rules proven hands-on
+
+Ilango completed lesson 2 with all exercises and a 3/3 quiz: registered two
+users via the API, authenticated with password for stateless JWTs, and wrote
+ownership rules (`author = @request.auth.id`) that he verified from both the
+owner's and a stranger's perspective, including the 404-for-hidden-records
+behaviour.
+
+## Implications
+
+- The configuration layer of PocketBase (collections, rules, auth) is working
+  knowledge now. Stop teaching it; reference it.
+- Next frontier is the Go extension path — the mission's core. He writes Go
+  daily, so the teaching load is PocketBase's hook/router model, not the language.

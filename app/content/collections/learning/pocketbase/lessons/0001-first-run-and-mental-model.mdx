@@ -1,0 +1,150 @@
+---
+courseTitle: Building with PocketBase
+title: 'First run and the mental model'
+description: Get PocketBase running, build a collection, and hit its API — in about 20 minutes
+lessonNumber: 1
+createdAt: 2026-08-11
+updatedAt: 2026-08-11
+---
+
+import { Aside, KeyIdea } from '../assets/LessonLayout'
+import { Quiz } from '../assets/Quiz'
+
+**The win for today:** a PocketBase server running on your machine, a real
+collection with API rules, and a JSON response from its API in your terminal.
+Roughly twenty minutes.
+
+<KeyIdea>
+	PocketBase is a single Go binary wrapping an embedded SQLite database. Run it and you get an
+	admin dashboard, a REST API, and authentication — before writing any code. Your new product's
+	backend starts as *configuration*, and becomes *Go code* only where you need it to.
+</KeyIdea>
+
+## 1. Run it (5 min)
+
+Download the binary from the [official docs](https://pocketbase.io/docs)
+(or `brew install pocketbase`), then:
+
+```sh
+./pocketbase serve
+```
+
+That's the whole deployment story locally: one process on
+`127.0.0.1:8090`, storing everything — schema, data, uploaded files — in a
+`pb_data/` directory it creates beside itself.
+
+<Aside>
+	Coming from Go, this will feel familiar: it's the same "one static binary, state in a directory"
+	shape as your own Ink. That's not a coincidence — it's why the deployment section of this course
+	will be short.
+</Aside>
+
+Open `http://127.0.0.1:8090/_/` and create your first superuser when prompted
+(or run `./pocketbase superuser create you@example.com yourpassword`).
+
+## 2. Model something (7 min)
+
+In the dashboard, create a **collection** called `posts`. A collection is a
+SQLite table with a typed schema — PocketBase's unit of data modelling
+([Collections docs](https://pocketbase.io/docs/collections)).
+
+Give it three fields: `title` (text, required), `body` (editor or text), and
+`published` (bool). Save, then add two or three records by hand in the UI.
+
+## 3. Hit the API (5 min)
+
+Every collection automatically gets REST endpoints
+([Web APIs reference](https://pocketbase.io/docs/api-records)). Try:
+
+```sh
+curl http://127.0.0.1:8090/api/collections/posts/records
+```
+
+You'll get `403` or an empty result — and that's the most important lesson of
+the day. Access is governed by **API rules** on the collection, and new
+collections start locked to superusers.
+
+Open the `posts` collection settings → **API rules**. Set the _List_ and
+_View_ rules to allow only published posts:
+
+```
+published = true
+```
+
+Re-run the `curl`. Your published records come back as JSON; unpublished ones
+don't exist as far as the public API is concerned.
+
+<KeyIdea>
+	Rules are filter expressions attached to collections — authorisation as data, not middleware.
+	`null` (locked) means superusers only; an empty rule means anyone; an expression is evaluated
+	per request against the record and `@request.*` context ([API rules and
+	filters](https://pocketbase.io/docs/api-rules-and-filters)). This one idea does the work that a
+	stack of auth middleware does elsewhere.
+</KeyIdea>
+
+## Check yourself
+
+<Quiz
+	questions={[
+		{
+			prompt: 'What does a PocketBase collection correspond to under the hood?',
+			options: [
+				'A SQLite database table',
+				'A JSON document store',
+				'A folder of files',
+				'A Go struct definition',
+			],
+			answerIndex: 0,
+			explanation:
+				'Collections are typed SQLite tables; records are rows. PocketBase wraps SQLite, not a document store.',
+		},
+		{
+			prompt: "Where does PocketBase's authorisation logic primarily live?",
+			options: [
+				'On each collection itself',
+				'In Go middleware code',
+				'In a config file',
+				'On the client side',
+			],
+			answerIndex: 0,
+			explanation:
+				'The five API rules (list/view/create/update/delete) are filter expressions stored on the collection.',
+		},
+		{
+			prompt: "A collection's rule is null (locked). Who can access it via the API?",
+			options: [
+				'Only superusers allowed',
+				'Everyone is allowed',
+				'Nobody is allowed',
+				'Authenticated users allowed',
+			],
+			answerIndex: 0,
+			explanation:
+				'Locked (null) means superusers only. An empty-string rule is the one that means everyone.',
+		},
+	]}
+/>
+
+## Primary source
+
+Read the official [Introduction](https://pocketbase.io/docs) and skim
+[Collections](https://pocketbase.io/docs/collections) — together about ten
+minutes, and the highest-trust material there is (it's the maintainer's own
+writing, kept current with the pre-1.0 releases).
+
+## Keep for reference
+
+The compressed version of everything above lives in
+[the mental-model cheat sheet](../reference/pocketbase-mental-model.mdx) —
+that's the one to come back to.
+
+## Next
+
+Lesson 2 will make rules real: an auth collection, users owning their own
+records, and the `@request.auth` context — the foundation the React Router
+frontend will authenticate against.
+
+<Aside>
+	Stuck, or curious about anything here — why SQLite, how rules are compiled, whether views can
+	join? Ask me in the session. I'm the teacher; the lesson is just the trail map.
+</Aside>

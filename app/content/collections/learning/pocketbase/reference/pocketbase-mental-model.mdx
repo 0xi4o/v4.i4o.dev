@@ -1,0 +1,85 @@
+---
+courseTitle: Building with PocketBase
+title: PocketBase mental model — cheat sheet
+description: The core concepts and commands, compressed for quick reference
+createdAt: 2026-08-11
+updatedAt: 2026-08-11
+---
+
+import { LessonLayout, KeyIdea } from '../assets/LessonLayout'
+
+<LessonLayout>
+
+# PocketBase mental model — cheat sheet
+
+<KeyIdea>
+	PocketBase is **one Go binary** wrapping an embedded **SQLite** database, and it gives you three
+	things for free: a REST(-ish) API over your data, authentication, and an admin dashboard.
+	Everything else is configuration or Go code you add.
+</KeyIdea>
+
+## The pieces
+
+| Piece      | What it is                    | Closest familiar thing               |
+| ---------- | ----------------------------- | ------------------------------------ |
+| Collection | A typed schema + its data     | A SQLite table                       |
+| Record     | One row in a collection       | A table row                          |
+| API rules  | Per-collection access filters | Authorisation middleware, as data    |
+| Admin UI   | Web dashboard at `/_/`        | Schema editor + DB browser           |
+| `pb_data/` | Directory beside the binary   | The entire database + uploaded files |
+
+## Collection types
+
+- **Base** — ordinary data tables.
+- **Auth** — base + built-in email/password, OAuth2, OTP auth. Users are just records here.
+- **View** — read-only collection defined by a SQL `SELECT`.
+
+## API rules in one paragraph
+
+Each collection has five rules — `listRule`, `viewRule`, `createRule`,
+`updateRule`, `deleteRule` — each a filter expression evaluated per request.
+`null` (locked) means **superusers only**; empty string means **anyone**;
+an expression like `@request.auth.id != "" && author = @request.auth.id`
+means "authenticated, and only on their own records". Rules are the
+authorisation layer — you mostly don't write auth middleware.
+
+## Commands you'll type constantly
+
+```sh
+./pocketbase serve                      # start on 127.0.0.1:8090
+./pocketbase superuser create EMAIL PW  # create a dashboard superuser
+./pocketbase update                     # self-update the binary
+```
+
+- Admin dashboard: `http://127.0.0.1:8090/_/`
+- REST API base: `http://127.0.0.1:8090/api/`
+- Records endpoint pattern: `GET /api/collections/{name}/records`
+
+## Auth in one block
+
+Users live in **auth collections**; registration is a normal record create.
+Tokens are **stateless JWTs** — no sessions, no logout endpoint; send them as
+`Authorization: TOKEN`. Rules see the caller as `@request.auth`
+(empty when anonymous). Superusers bypass rules entirely, and records a rule
+hides return **404**, not 403.
+
+```sh
+POST /api/collections/users/records              # register (it's just a create)
+POST /api/collections/users/auth-with-password   # {"identity": "...", "password": "..."} → token
+POST /api/collections/users/auth-refresh         # new token; needs Authorization header
+```
+
+## Version note
+
+PocketBase is **pre-1.0** (v0.39.x as of August 2026). Minor versions can break
+things — read the [release notes](https://github.com/pocketbase/pocketbase/releases)
+before upgrading, and keep `pb_data/` backed up.
+
+## Sources
+
+[Introduction](https://pocketbase.io/docs) ·
+[Collections](https://pocketbase.io/docs/collections) ·
+[API rules and filters](https://pocketbase.io/docs/api-rules-and-filters) ·
+[Web APIs reference](https://pocketbase.io/docs/api-records)
+
+</LessonLayout>

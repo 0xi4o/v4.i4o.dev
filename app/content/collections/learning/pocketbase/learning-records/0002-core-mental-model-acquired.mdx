@@ -1,0 +1,26 @@
+---
+courseTitle: Building with PocketBase
+title: Core mental model acquired
+description: Lesson 1 completed with a perfect quiz — collections, rules-as-data, locked vs open
+createdAt: 2026-08-11
+updatedAt: 2026-08-11
+---
+
+# Core mental model acquired
+
+Ilango completed lesson 1 (first run, a `posts` collection, rule-gated API
+access) and answered all three quiz questions correctly: collections are SQLite
+tables, authorisation lives on the collection as rules, and a `null` rule means
+superusers only.
+
+## Evidence
+
+Quiz 3/3 on first attempt, plus the hands-on steps (server running, collection
+built, `published = true` rule verified via curl).
+
+## Implications
+
+- Safe to build on rules without re-explaining them; next frontier is the
+  `@request.auth` context and ownership patterns.
+- Teach auth next — it is both the mission's frontend prerequisite and the
+  natural extension of the rules model he just proved he holds.

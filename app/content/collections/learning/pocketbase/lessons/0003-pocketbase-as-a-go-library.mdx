@@ -1,0 +1,183 @@
+---
+courseTitle: Building with PocketBase
+title: 'PocketBase as a Go library'
+description: Replace the prebuilt binary with your own Go program — a custom route and your first event hook, in about 30 minutes
+lessonNumber: 3
+createdAt: 2026-08-11
+updatedAt: 2026-08-11
+---
+
+import { Aside, KeyIdea } from '../assets/LessonLayout'
+import { Quiz } from '../assets/Quiz'
+
+**The win for today:** the binary you've been running gets retired. In its
+place, _your own_ Go program — same admin UI, same API, same `pb_data/` — plus
+one custom route and one event hook that the prebuilt binary could never have.
+Roughly thirty minutes. This is the lesson the mission has been pointing at.
+
+<KeyIdea>
+	The prebuilt binary is nothing special: it's roughly `pocketbase.New()` + `app.Start()` compiled
+	for you. Import the same package in your own `main.go` and you get everything from lessons 1–2,
+	with your code attached at two extension points: **hooks** (run inside PocketBase's lifecycle)
+	and **routes** (new endpoints on its router) ([Go
+	overview](https://pocketbase.io/docs/go-overview/)).
+</KeyIdea>
+
+## 1. The smallest possible PocketBase (10 min)
+
+In a fresh directory:
+
+```sh
+go mod init pbapp
+go get github.com/pocketbase/pocketbase
+```
+
+```go
+// main.go
+package main
+
+import (
+	"log"
+
+	"github.com/pocketbase/pocketbase"
+)
+
+func main() {
+	app := pocketbase.New()
+
+	if err := app.Start(); err != nil {
+		log.Fatal(err)
+	}
+}
+```
+
+```sh
+go run . serve
+```
+
+Open `http://127.0.0.1:8090/_/` — it's all there. `pb_data/` is created in the
+working directory; copy the one from lessons 1–2 in beside `main.go` (stop the
+old binary first) and your users, posts, and rules come with it.
+
+<Aside>
+	Notice `serve` is still a CLI argument — your program inherits PocketBase's whole command tree
+	(`serve`, `superuser`, `migrate`, …). You've built Ink as a single-binary Go tool; this is the
+	same pattern with an app server inside.
+</Aside>
+
+## 2. A custom route (10 min)
+
+Routes are registered in the `OnServe` hook, on `se.Router`
+([Go routing](https://pocketbase.io/docs/go-routing/)):
+
+```go
+import (
+	"github.com/pocketbase/pocketbase/core"
+)
+
+// inside main(), before app.Start():
+app.OnServe().BindFunc(func(se *core.ServeEvent) error {
+	se.Router.GET("/api/stats", func(e *core.RequestEvent) error {
+		total, err := e.App.CountRecords("posts")
+		if err != nil {
+			return err
+		}
+		return e.JSON(200, map[string]any{"posts": total})
+	})
+	return se.Next()
+})
+```
+
+Restart, then `curl http://127.0.0.1:8090/api/stats`. That endpoint doesn't
+exist in vanilla PocketBase — it's yours.
+
+## 3. Your first hook (10 min)
+
+Hooks intercept lifecycle events. Scope them to a collection by name, and
+always call `e.Next()` to let the chain continue — code before it runs before
+the operation, code after it runs after
+([Go event hooks](https://pocketbase.io/docs/go-event-hooks/)):
+
+```go
+app.OnRecordCreate("posts").BindFunc(func(e *core.RecordEvent) error {
+	if e.Record.GetString("slug") == "" {
+		e.Record.Set("slug", slugify(e.Record.GetString("title")))
+	}
+	return e.Next() // validation + INSERT happen here
+})
+```
+
+Add a `slug` text field to `posts` in the dashboard, write a five-line
+`slugify` (lowercase, spaces to hyphens — you've done this in Ink), restart,
+and create a post as Alice with no slug. Fetch it back: the server filled it
+in. No client — curl or SDK — can skip this logic, which is precisely what
+rules alone couldn't express.
+
+## Check yourself
+
+<Quiz
+	questions={[
+		{
+			prompt: 'What does your compiled Go program replace?',
+			options: [
+				'The prebuilt PocketBase binary',
+				'The SQLite database file',
+				'The admin dashboard UI',
+				'The JS client SDK',
+			],
+			answerIndex: 0,
+			explanation:
+				'The prebuilt binary is just pocketbase.New() + Start() precompiled. Your program is the same thing plus your hooks and routes.',
+		},
+		{
+			prompt: 'In a hook handler, when does code placed after e.Next() run?',
+			options: [
+				'After the operation completes',
+				'Before the operation starts',
+				'Only when errors occur',
+				'Never; it is unreachable',
+			],
+			answerIndex: 0,
+			explanation:
+				'e.Next() invokes the rest of the chain (validation, DB write). Code before it is pre-op; code after it is post-op.',
+		},
+		{
+			prompt: 'In app.OnRecordCreate("posts"), what does the argument do?',
+			options: [
+				'Scopes hook to that collection',
+				'Names the hook for logs',
+				"Sets the hook's run priority",
+				'Creates the collection if missing',
+			],
+			answerIndex: 0,
+			explanation:
+				'Hook constructors take optional collection names as filters; with no argument the hook fires for every collection.',
+		},
+	]}
+/>
+
+## Primary source
+
+Read the [Go overview](https://pocketbase.io/docs/go-overview/) and skim the
+[event hooks catalogue](https://pocketbase.io/docs/go-event-hooks/) — the
+catalogue is worth ten minutes just to know what exists: request hooks,
+lifecycle hooks, success/error variants, mailer and realtime hooks.
+
+## Keep for reference
+
+New cheat sheet for this layer:
+[the Go extension cheat sheet](../reference/go-extension-cheatsheet.mdx) —
+the minimal main.go, the hook timing model, and the route registration pattern.
+
+## Next
+
+Lesson 4 makes the Go layer production-shaped: **migrations as Go code**, so
+your collections live in version control instead of only in `pb_data/` — the
+thing that makes a PocketBase project reviewable and deployable like the rest
+of your work.
+
+<Aside>
+	Worth asking about if curious: why hooks take `e.App` instead of closing over `app`, what
+	priorities are for in `Bind`, or how `OnRecordCreate` differs from `OnRecordCreateRequest`. That
+	last one matters and lesson 4 will lean on it.
+</Aside>
