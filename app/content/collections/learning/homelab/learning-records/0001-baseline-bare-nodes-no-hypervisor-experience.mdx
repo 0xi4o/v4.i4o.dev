@@ -1,0 +1,39 @@
+---
+courseTitle: A three-node homelab I can run and reason about
+title: Baseline — bare nodes, strong Linux and Terraform, coming in blind on networking and hypervisors
+description: Ilango's starting point, established at workspace setup and corrected the same day
+createdAt: 2026-09-10
+updatedAt: 2026-09-10
+---
+
+# Baseline — bare nodes, strong Linux and Terraform, coming in blind on networking and hypervisors
+
+Ilango starts with three bare M710qs (8 GB, SATA SSD each, NVMe in two), a
+TL-SG2008 still in its box, and a home network he has not mapped. He is
+fluent on the Linux CLI and uses Terraform and AWS at work. He asked, after
+seeing a first draft that opened with "choose a hypervisor", for everything
+to be taught from first principles: he knows "a little" about homelabs,
+networking, Proxmox, DHCP and VLANs and wants the fundamentals of each thing
+before doing it. Chosen shape: infra first, apps as payoff, one hands-on
+evening a week.
+
+## Evidence
+
+The first draft of lesson 1 assumed subnets, DHCP pools and hypervisors as
+known vocabulary. He said so and asked for first principles. Treat that as
+the floor: nothing about networks, virtualisation or clustering is assumed.
+
+## Implications
+
+- Do not teach shell, ssh, Git or Terraform syntax. Teach every networking
+  and virtualisation concept the moment it is first needed, with a concrete
+  test he can run on his own network.
+- Concept before action, every lesson: a short first-principles section,
+  then hands-on that uses only what was just taught. No lesson may lean on
+  a term that has not been earned in an earlier lesson or the reference.
+- The rewritten lesson 1 is the home network (addresses, subnet, router,
+  DHCP, DNS) with the rack only placed on paper. The switch (lesson 2)
+  and the hypervisor decision plus install (lesson 3) come after.
+- Every lesson changes something real (a map, the switch, a node) and adds
+  to `RUNBOOK.md`.
+- The 8 GB per node constrains VM sizing until the RAM upgrade lands.

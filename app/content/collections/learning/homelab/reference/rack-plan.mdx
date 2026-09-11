@@ -1,0 +1,113 @@
+---
+courseTitle: A three-node homelab I can run and reason about
+title: The rack plan
+description: What is in the rack, the address plan, the stack decision with its reasons, the three Proxmox rules that bite, and the first-boot checklist for a node
+createdAt: 2026-09-10
+updatedAt: 2026-09-10
+---
+
+The one sheet to print and keep next to the rack. Correct it whenever reality
+changes; a stale plan is worse than none.
+
+## The network in six terms (lesson 1)
+
+| Term | What it is | On this network |
+| --- | --- | --- |
+| **MAC address** | Factory-set name of a network chip; only meaningful on the local wire | `arp -a` shows them |
+| **IP address** | Assigned name that says where a packet should go | four numbers, e.g. `192.168.1.37` |
+| **Subnet** | The set of addresses that are "local" — reachable without a router. `/24` = 256 addresses, `.0` and `.255` reserved | *fill in from lesson 1* |
+| **Gateway** | The router's inside address: where anything off-subnet is sent | conventionally `.1` |
+| **DHCP** | The router handing out address + mask + gateway + DNS as a timed lease, from a **pool** | pool: *fill in* · lease: *fill in* |
+| **DNS** | Names to addresses; the rack's names live under `home.arpa` | server: the router, for now |
+
+Rule that follows: **rack addresses are static, outside the DHCP pool,
+inside the subnet.**
+
+## Hardware
+
+| Item | Detail | Source |
+| --- | --- | --- |
+| 3 × ThinkCentre M710q Tiny | 7th-gen Intel Core (T-series), B250 chipset, no vPro | [PSREF](https://psref.lenovo.com/syspool/Sys/PDF/ThinkCentre/ThinkCentre_M710_Tiny/ThinkCentre_M710_Tiny_Spec.pdf), [STH](https://www.servethehome.com/lenovo-thinkcentre-m710q-tiny-guide-and-ce-review/) |
+| RAM | 8 GB now; 2 × DDR4-2400 SO-DIMM slots, 32 GB max | PSREF |
+| Disks | 256 GB SATA 2.5" in all three; 512 GB NVMe (PCIe 3.0 ×4) in two. Only one M.2 slot is populated | PSREF, STH |
+| NIC | Intel I219-V, 1 GbE, Wake-on-LAN | PSREF |
+| Switch | TP-Link TL-SG2008 V4, 8-port gigabit, L2+, no PoE; ships on `192.168.0.1`, `admin`/`admin` | [Omada support](https://support.omadanetworks.com/uk/product/tl-sg2008/), [QIG](https://static.tp-link.com/res/down/doc/TL-SG2008_V1_QIG.pdf) |
+| Upstream | ISP TP-Link router (living room), one long run to the office | — |
+
+## Address plan
+
+Placeholder subnet `192.168.1.0/24` until lesson 1 step 1 confirms the real
+one. Nodes sit outside the router's DHCP pool. Domain: `home.arpa`
+([RFC 8375](https://www.rfc-editor.org/rfc/rfc8375)).
+
+| Device | Hostname | Address |
+| --- | --- | --- |
+| ISP router (gateway, DNS) | — | `.1` |
+| TL-SG2008 | `sw1` | `.10` |
+| Node 1 | `pve1` | `.11` |
+| Node 2 | `pve2` | `.12` |
+| Node 3 | `pve3` | `.13` |
+| VMs | — | `.20–.49` |
+| DHCP pool (router) | — | *fill in* |
+
+## Stack decision (10 Sep 2026)
+
+**Proxmox VE on all three nodes, installed on the SATA SSD; Kubernetes (k3s)
+in VMs; NVMe as VM storage where present.**
+
+Reason: the mission is infra depth and Terraform practice. VMs give a reset
+button (snapshot, clone, destroy and recreate from code) that bare metal
+does not.
+Cost: ~2 GB RAM per node to the host; one more layer.
+Alternative rejected: bare Ubuntu + k3s — simpler, all 8 GB to Kubernetes,
+but every mistake is a USB-stick reinstall.
+Open: the RAM. One extra 8 GB SO-DIMM per node is the planned fix.
+
+## Three Proxmox rules that bite
+
+1. **Hostname and IP are fixed once a node joins a cluster.** Install with
+   the final values. ([Cluster Manager](https://pve.proxmox.com/wiki/Cluster_Manager))
+2. **Quorum is a majority of votes, one per node.** Three nodes tolerate one
+   failure; on loss of quorum the cluster goes read-only. Two nodes need a
+   QDevice. (Cluster Manager)
+3. **The installer formats the whole target disk.** `/dev/sda` is the SATA
+   drive, `/dev/nvme0n1` the NVMe. Look at the size before confirming.
+   ([Admin guide](https://pve.proxmox.com/pve-docs/pve-admin-guide.html))
+
+Also: cluster traffic (corosync) wants latency under 5 ms and UDP
+5405–5412 open between nodes — a gigabit switch in the same rack is fine.
+
+## First boot of any node
+
+1. Web UI at `https://<ip>:8006`, user `root`, realm Linux PAM.
+2. Disable the enterprise repo, add the no-subscription one
+   ([Package Repositories](https://pve.proxmox.com/wiki/Package_Repositories)):
+
+   ```
+   echo 'Enabled: no' >> /etc/apt/sources.list.d/pve-enterprise.sources
+   cat > /etc/apt/sources.list.d/proxmox.sources <<EOF
+   Types: deb
+   URIs: http://download.proxmox.com/debian/pve
+   Suites: trixie
+   Components: pve-no-subscription
+   Signed-By: /usr/share/keyrings/proxmox-archive-keyring.gpg
+   EOF
+   apt update && apt dist-upgrade -y && reboot
+   ```
+
+3. Runbook entry: date, ISO version and hash, BIOS changes, installer
+   answers, what you would do differently.
+
+## Writing the installer USB on macOS
+
+From the admin guide. `N` is the stick's disk number from `diskutil list`.
+
+```
+hdiutil convert proxmox-ve_9.2-1.iso -format UDRW -o proxmox-ve_9.2-1.dmg
+diskutil unmountDisk /dev/diskN
+sudo dd if=proxmox-ve_9.2-1.dmg bs=1m of=/dev/rdiskN status=progress
+```
+
+Lenovo keys: <kbd>F1</kbd> Setup, <kbd>F12</kbd> boot menu (the splash screen
+lists them). Enable Intel
+Virtualization Technology and Wake on LAN.

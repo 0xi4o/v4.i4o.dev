@@ -1,0 +1,374 @@
+---
+courseTitle: A three-node homelab I can run and reason about
+title: 'Choose the stack, plan the addresses, install node one'
+description: Decide Proxmox versus bare Ubuntu with the trade-offs on the table, write the rack's IP plan, and put Proxmox on the first M710q so its web UI answers from your laptop
+lessonNumber: 3
+createdAt: 2026-09-10
+updatedAt: 2026-09-10
+---
+
+import { Aside, KeyIdea } from '../assets/LessonLayout'
+import { BeforeAfter } from '../assets/BeforeAfter'
+import { Categorise } from '../assets/Categorise'
+import { Checklist } from '../assets/Checklist'
+import { Quiz } from '../assets/Quiz'
+import { Steps } from '../assets/Steps'
+
+<Aside>
+	<strong>Draft, written before lessons 1–2.</strong> It assumes the subnet, gateway and DHCP
+	pool from lesson 1 and the switch from lesson 2. It will be revised to explain what a
+	hypervisor is from first principles before it is the evening's lesson.
+</Aside>
+
+**The win for tonight:** the stack decided and written down, an IP plan for
+the rack, and Proxmox running on the first M710q with its web UI open in a
+browser on your laptop. About two hours: twenty minutes reading and deciding,
+the rest at the keyboard. Nodes two and three wait for lesson 3.
+
+<KeyIdea>
+	Two of the decisions you make tonight cannot be undone cheaply. Proxmox will not let a node
+	change its hostname or IP once it has joined a cluster, and the installer wipes whichever disk
+	you point it at. So the plan comes first, on paper, and the install follows the plan.
+</KeyIdea>
+
+## 1. Two ways to run three small boxes (8 min)
+
+You have three machines and want two things from them: a Kubernetes cluster
+to learn on, and services that stay up. There are two sensible shapes.
+
+**Bare Ubuntu, Kubernetes on the metal.** Ubuntu Server on each node, k3s
+on top, done. One layer fewer to learn. Every byte of the 8 GB goes to
+Kubernetes. The cost: the node *is* the cluster member. To try a different
+Kubernetes distribution, a different OS, or to recover from a bad upgrade,
+you reinstall the box with a USB stick and a monitor.
+
+**Proxmox on the metal, Kubernetes in VMs.** Proxmox VE — a Debian-based
+hypervisor with a web UI, KVM for virtual machines and LXC for containers
+([admin guide](https://pve.proxmox.com/pve-docs/pve-admin-guide.html)) — on
+each node. Kubernetes runs inside VMs that Proxmox creates. The cost: one more
+layer, and roughly 2 GB of each node's RAM go to the host
+([recommended requirements](https://pve.proxmox.com/pve-docs/pve-admin-guide.html)).
+What you get: a reset button. VMs snapshot, clone, and are destroyed and
+recreated from a Terraform file in minutes. Breaking the cluster becomes
+routine instead of an evening lost.
+
+<BeforeAfter
+	beforeLabel="Bare Ubuntu"
+	afterLabel="Proxmox"
+	before={
+		<>
+			Tuesday: a k3s upgrade leaves node 2 half-joined. You drive home, plug in the monitor,
+			reinstall Ubuntu, redo the static IP, rejoin the cluster. Two hours; nothing learned that
+			you did not already know.
+		</>
+	}
+	after={
+		<>
+			Tuesday: the same upgrade breaks the k3s VM on node 2. From the sofa: roll the VM back to
+			last night's snapshot, or <code>terraform apply</code> a fresh one. Fifteen minutes, and the
+			broken VM is still there to read the logs from.
+		</>
+	}
+	note="Same failure. The second version is why the hypervisor is worth its 2 GB — and it is also the Terraform practice the career plan asked for."
+/>
+
+For your mission — infra depth first, Terraform practice, apps as payoff —
+Proxmox is the right call, and the recommendation here is Proxmox on all
+three nodes with k3s in VMs. The one honest argument against it is the 8 GB:
+Proxmox takes ~2 GB, a k3s server VM wants at least 2 GB
+([k3s requirements](https://docs.k3s.io/installation/requirements)), and
+that leaves little for the apps. The fix is a second 8 GB DDR4-2400 SO-DIMM
+per node; the M710q has two slots and takes 32 GB
+([Lenovo PSREF](https://psref.lenovo.com/syspool/Sys/PDF/ThinkCentre/ThinkCentre_M710_Tiny/ThinkCentre_M710_Tiny_Spec.pdf)).
+Order it this week; it does not block tonight.
+
+<Aside>
+	If you would rather go bare Ubuntu, that is a legitimate choice and the course adapts: lessons
+	4–5 (VMs and Terraform) get replaced by Ansible, and the "rebuild a node in under an hour"
+	target gets harder. Say so before you install.
+</Aside>
+
+## 2. Three facts to hold before you touch anything (5 min)
+
+**Hostname and IP are permanent.** From the
+[Cluster Manager](https://pve.proxmox.com/wiki/Cluster_Manager) docs:
+each node must be "installed with the final hostname and IP configuration",
+because changing either after joining the cluster is not supported. So the
+name and address you type into the installer tonight are the ones the node
+keeps.
+
+**Three nodes is the right number.** Proxmox gives each node one vote and
+needs a majority to write to its cluster config; lose quorum and "the cluster
+switches to read-only mode". Three nodes survive one failure. Two do not,
+which is why the docs offer a QDevice for two-node setups. You bought the
+right count by accident.
+
+**The installer takes the whole disk.** Two of your nodes have both a 256 GB
+SATA SSD and a 512 GB NVMe. Install Proxmox on the SATA disk on every node
+so all three look the same; the NVMe becomes VM storage later. The installer
+lists disks by device name — the SATA drive is `/dev/sda`, the NVMe is
+`/dev/nvme0n1`. Check the size shown next to it before you confirm.
+
+### The IP plan
+
+Your ISP router hands out addresses by DHCP. Proxmox nodes want fixed
+addresses, so they live *outside* the DHCP pool but *inside* the router's
+subnet — same network, no VLANs yet. Step 1 below finds the real subnet and
+pool; until then this uses `192.168.1.0/24` as a placeholder. Correct it in
+the [reference sheet](../reference/rack-plan) once you know.
+
+| Device | Hostname | Address | Note |
+| --- | --- | --- | --- |
+| ISP router | — | `192.168.1.1` | Gateway and DNS for everything |
+| TL-SG2008 | `sw1` | `192.168.1.10` | Set in lesson 2 (ships on `192.168.0.1`) |
+| Node 1 | `pve1` | `192.168.1.11` | Tonight |
+| Node 2 | `pve2` | `192.168.1.12` | Lesson 3 |
+| Node 3 | `pve3` | `192.168.1.13` | Lesson 3 |
+| Reserved | — | `.20–.49` | VMs, later |
+
+Use `home.arpa` as the domain — it is the name reserved for exactly this
+([RFC 8375](https://www.rfc-editor.org/rfc/rfc8375)) and will never collide
+with a real one. So node 1 is `pve1.home.arpa`.
+
+<Categorise
+	title="Drill: which of these can you change later without a reinstall?"
+	categories={['Change any time', 'Fixed after clustering', 'Fixed at install']}
+	items={[
+		{ text: 'The root password', answer: 0, note: 'passwd on the node, or the web UI. Nothing depends on it.' },
+		{ text: 'The node’s hostname', answer: 1, note: 'Corosync and pmxcfs key on it. Set it right in the installer.' },
+		{ text: 'Which disk holds the OS', answer: 2, note: 'The installer formats the whole target disk. Moving later means reinstalling.' },
+		{ text: 'The node’s IP address', answer: 1, note: 'Same reason as the hostname. Docs: install with the final IP.' },
+		{ text: 'Which apt repository it updates from', answer: 0, note: 'A file in /etc/apt/sources.list.d. You will edit it tonight.' },
+		{ text: 'The root filesystem (ext4 vs ZFS)', answer: 2, note: 'Chosen under Options in the installer; changing it is a reinstall.' },
+	]}
+/>
+
+## 3. Hands on (90 min)
+
+Work through these in order on your Mac and node 1. Keep a terminal open with
+a file called `RUNBOOK.md` and paste every command you actually run, with the
+node name — this file is what lesson 12's "rebuild in under an hour" is
+measured against.
+
+<Steps
+	title="Install Proxmox on node 1"
+	steps={[
+		{
+			title: 'Find the router’s subnet and DHCP range',
+			body: (
+				<>
+					On the Mac, get your own address and gateway. Then log in to the ISP router (the
+					gateway address in a browser) and find the DHCP settings page: note the start and end
+					of the pool. Pick node addresses outside it and rewrite the IP plan above if the
+					subnet is not <code>192.168.1.0/24</code>.
+				</>
+			),
+			commands: ['ipconfig getifaddr en0        # your IP', 'netstat -rn | grep default    # the gateway'],
+			check: 'You can say the subnet, the gateway and the DHCP pool out loud, and pve1’s address is outside the pool.',
+		},
+		{
+			title: 'Download the ISO and verify it',
+			body: (
+				<>
+					Get{' '}
+					<a href="https://www.proxmox.com/en/downloads/proxmox-virtual-environment/iso/proxmox-ve-9-2-iso-installer">
+						Proxmox VE 9.2-1
+					</a>{' '}
+					(1.71 GB) and compare the SHA256 on the download page with what you compute.
+				</>
+			),
+			commands: ['shasum -a 256 ~/Downloads/proxmox-ve_9.2-1.iso'],
+			check: 'The two hashes match character for character.',
+		},
+		{
+			title: 'Write the USB stick',
+			body: (
+				<>
+					The{' '}
+					<a href="https://pve.proxmox.com/pve-docs/pve-admin-guide.html">admin guide</a> gives
+					the macOS recipe: convert the ISO to a raw <code>.dmg</code>, find the stick with{' '}
+					<code>diskutil list</code>, unmount it, then <code>dd</code> to the <em>raw</em>{' '}
+					device (<code>rdiskN</code>, which is much faster). Triple-check <code>N</code> — dd
+					does not ask twice. Etcher is the documented alternative if you prefer a GUI.
+				</>
+			),
+			commands: [
+				'cd ~/Downloads',
+				'hdiutil convert proxmox-ve_9.2-1.iso -format UDRW -o proxmox-ve_9.2-1.dmg',
+				'diskutil list                      # find the stick, e.g. /dev/disk4',
+				'diskutil unmountDisk /dev/diskN',
+				'sudo dd if=proxmox-ve_9.2-1.dmg bs=1m of=/dev/rdiskN status=progress',
+			],
+			check: 'dd finishes without error; macOS may say the disk is unreadable — that is expected, eject it.',
+		},
+		{
+			title: 'Check the BIOS, boot the stick',
+			body: (
+				<>
+					Plug node 1 into the switch, a monitor and keyboard. Power on and press <kbd>F1</kbd>{' '}
+					for Setup (the Lenovo splash screen lists the keys if these differ). Confirm <em>Intel Virtualization Technology</em> is enabled (Proxmox needs
+					VT-x) and that <em>Wake on LAN</em> is on. Save, reboot, press <kbd>F12</kbd> for the
+					boot menu and pick the USB stick.
+				</>
+			),
+			check: 'The Proxmox boot menu appears. Choose "Install Proxmox VE (Graphical)"; if the screen stays black, reboot and pick the Terminal UI installer instead.',
+		},
+		{
+			title: 'Run the installer with the plan beside you',
+			body: (
+				<>
+					Accept the EULA. <strong>Target disk:</strong> the 256 GB SATA drive (<code>/dev/sda</code>),
+					not the NVMe. Leave the filesystem at ext4 (the default; ZFS later, when there is a
+					reason). Country, timezone <code>Asia/Kolkata</code>, keyboard. Root password: 12+
+					characters, into your password manager. Email: yours. <strong>Network:</strong>{' '}
+					hostname <code>pve1.home.arpa</code>, IP <code>192.168.1.11/24</code> (your real
+					subnet), gateway and DNS both the router. Read the summary page twice. Install.
+				</>
+			),
+			check: 'The node reboots off the SATA disk and shows a login prompt with the URL https://192.168.1.11:8006.',
+		},
+		{
+			title: 'Open the web UI from your laptop',
+			body: (
+				<>
+					Unplug the monitor — you will not need it again for this node. In a browser on the
+					Mac open <code>https://192.168.1.11:8006</code>, accept the self-signed certificate,
+					log in as <code>root</code> with realm <em>Linux PAM</em>. Dismiss the "no valid
+					subscription" dialogue; it is a notice, not an error.
+				</>
+			),
+			check: 'You see pve1 in the left-hand tree with a green tick, and Summary shows the CPU and 8 GB (well, ~7.7 GB) of RAM.',
+		},
+		{
+			title: 'Point apt at the no-subscription repository and update',
+			body: (
+				<>
+					The install ships with the enterprise repo enabled, which needs a key you do not
+					have. Per{' '}
+					<a href="https://pve.proxmox.com/wiki/Package_Repositories">Package Repositories</a>,
+					disable it and add the no-subscription one (fine for a lab; the docs say not
+					production). The web UI can do it — node → <em>Updates</em> → <em>Repositories</em>,
+					disable the enterprise entry, <em>Add</em> → No-Subscription — but do it by hand
+					once so the runbook has the file contents.
+				</>
+			),
+			commands: [
+				'ssh root@192.168.1.11',
+				"echo 'Enabled: no' >> /etc/apt/sources.list.d/pve-enterprise.sources",
+				'cat > /etc/apt/sources.list.d/proxmox.sources <<EOF',
+				'Types: deb',
+				'URIs: http://download.proxmox.com/debian/pve',
+				'Suites: trixie',
+				'Components: pve-no-subscription',
+				'Signed-By: /usr/share/keyrings/proxmox-archive-keyring.gpg',
+				'EOF',
+				'apt update && apt dist-upgrade -y && reboot',
+			],
+			check: 'apt update reports no errors, and after the reboot the web UI comes back on its own.',
+		},
+		{
+			title: 'Write the runbook entry',
+			body: (
+				<>
+					In <code>RUNBOOK.md</code>: the date, the ISO version and hash, the BIOS settings you
+					changed, the exact installer answers (disk, filesystem, hostname, IP), and the repo
+					fix. Then the one line you will thank yourself for: what you would do differently.
+				</>
+			),
+			check: 'Someone with the USB stick and this file could reproduce node 1 without you.',
+		},
+	]}
+/>
+
+<Checklist
+	title="Before you call it a night"
+	items={[
+		{
+			question: 'Is pve1’s address outside the router’s DHCP pool?',
+			why: 'If not, the router will one day hand that address to a phone and the node goes dark. Fix it now: it means a reinstall later.',
+		},
+		{
+			question: 'Is Proxmox on the SATA disk, with the NVMe untouched?',
+			why: 'Check Disks in the web UI. If it went on the NVMe, reinstall tonight while nothing depends on it.',
+		},
+		{
+			question: 'Did you write the stack decision down, with the reason and the cost?',
+			why: 'Two lines in the runbook. In six months you will wonder why there is a hypervisor in the way.',
+		},
+		{
+			question: 'Is the RAM ordered?',
+			why: 'One 8 GB DDR4-2400 SO-DIMM per node. It is the cheapest upgrade the rack will ever get.',
+		},
+	]}
+/>
+
+## 4. Retrieval (3 min)
+
+No looking back.
+
+<Quiz
+	questions={[
+		{
+			prompt: 'Why does the course put Kubernetes inside VMs rather than on the metal?',
+			options: [
+				'VMs are faster than bare Ubuntu',
+				'Snapshots and rebuilds are cheap',
+				'k3s does not run on Ubuntu',
+				'Proxmox requires it for clusters',
+			],
+			answerIndex: 1,
+			explanation:
+				'The hypervisor costs ~2 GB per node and buys a reset button: snapshot, clone, destroy and recreate from Terraform.',
+		},
+		{
+			prompt: 'What happens to a three-node Proxmox cluster when two nodes are off?',
+			options: [
+				'It carries on as normal',
+				'It goes read-only',
+				'It elects a new master',
+				'It shuts the last node down',
+			],
+			answerIndex: 1,
+			explanation:
+				'One vote of three is not a majority. Docs: on loss of quorum the cluster switches to read-only mode.',
+		},
+		{
+			prompt: 'Which installer answer can you not change afterwards without a reinstall?',
+			options: [
+				'The root password you typed',
+				'The email address given',
+				'The hostname and IP address',
+				'The timezone you chose',
+			],
+			answerIndex: 2,
+			explanation:
+				'Cluster Manager docs: install with the final hostname and IP configuration; neither can change after joining.',
+		},
+		{
+			prompt: 'Why did node 1 get an address outside the DHCP pool?',
+			options: [
+				'So the router cannot reassign it',
+				'Because Proxmox refuses DHCP',
+				'Static addresses are much faster',
+				'The switch needs it to be static',
+			],
+			answerIndex: 0,
+			explanation:
+				'Same subnet as everything else, but an address the router will never hand to another device.',
+		},
+	]}
+/>
+
+## Read next
+
+The primary source for this lesson is the
+[Installation page of the Proxmox VE wiki](https://pve.proxmox.com/wiki/Installation)
+(the same text as chapter 2 of the admin guide, plus the LVM sizing options).
+Twenty minutes. Read it *after* the install, and notice what the installer
+did that you did not have to decide.
+
+<Aside>
+	Stuck at any step — a black screen after boot, an installer that cannot see the disk, a web UI
+	that will not load — stop and ask. Tell me the step number and what the screen says. Do not
+	reinstall on a guess.
+</Aside>

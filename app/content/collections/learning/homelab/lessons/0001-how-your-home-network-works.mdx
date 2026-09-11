@@ -1,0 +1,354 @@
+---
+courseTitle: A three-node homelab I can run and reason about
+title: 'How your home network works, from the cable up'
+description: The five ideas every later lesson leans on — addresses, subnets, the router, DHCP and DNS — learned by mapping the network you already have, with real numbers, before a single node is switched on
+lessonNumber: 1
+createdAt: 2026-09-10
+updatedAt: 2026-09-10
+---
+
+import { Aside, KeyIdea } from '../assets/LessonLayout'
+import { Categorise } from '../assets/Categorise'
+import { Quiz } from '../assets/Quiz'
+import { Steps } from '../assets/Steps'
+
+**The win for tonight:** a hand-drawn map of your home network with every
+number on it real — your Mac's address, the router's, the range the router
+hands out, and where the rack will sit — and the ability to explain each
+number. Nothing gets installed. About ninety minutes: forty reading, fifty at
+the terminal.
+
+<KeyIdea>
+	A homelab is a small network with some computers on it. Every hard problem later — "why can't
+	I reach the node", "why did its address change", "why does the cluster think a node is gone" —
+	is a networking question. So the course starts with the network you already have, and only
+	adds the rack once you can read it.
+</KeyIdea>
+
+## 1. Two computers and a cable (5 min)
+
+Start with the smallest possible network: your Mac and your gaming desktop,
+joined by one Ethernet cable. For one to talk to the other, each needs a way
+to say *who* it is and *who it wants*. Every network device carries two
+different kinds of name for this, and confusing them is the root of most
+beginner networking pain.
+
+**The MAC address** is stamped into the network chip at the factory —
+twelve hex digits like `a4:83:e7:2b:91:0c`. It never changes and it is only
+meaningful on the local wire: it says *which physical port* a frame is for.
+Think of it as the chassis number on a car.
+
+**The IP address** is assigned when the device joins a network, and can
+change every time it joins — four numbers like `192.168.1.37`. It says *where
+in the world* a packet should go, and it is what everything you type or
+configure uses. Think of it as which parking bay the car is in today.
+
+On that one cable, the Mac already knows the desktop's MAC address (it asks:
+"who has 192.168.1.40?", the desktop answers "me, at `a4:83:…`"). This
+question-and-answer is called ARP, and you will see its cache tonight.
+
+## 2. Subnets: who counts as a neighbour (8 min)
+
+Now add more devices. An IP address on its own does not tell a device
+whether another address is *next door* (reachable by shouting on the local
+wire) or *far away* (has to go via the router). The subnet answers that.
+
+An IPv4 address is 32 bits. A subnet says "the first *n* bits are the
+network; the rest identify the device inside it". You will see it written two
+ways that mean the same thing:
+
+| Notation | Meaning |
+| --- | --- |
+| `192.168.1.0/24` | first 24 bits fixed (`192.168.1`), last 8 bits vary |
+| mask `255.255.255.0` | same thing: 255 = "fixed", 0 = "varies" |
+
+A `/24` therefore has 256 addresses, `192.168.1.0` to `192.168.1.255`. Two
+of them are unusable by convention: `.0` names the network itself, `.255` is
+the *broadcast* address — send to it and every device on the subnet hears
+you. By convention (not rule) the router takes `.1`. That leaves 253
+addresses for devices, which is why almost every home network is a `/24`.
+
+Cloudflare's definition is the one to keep:
+["a subnet, or subnetwork, is a network inside a network"](https://www.cloudflare.com/learning/network-layer/what-is-a-subnet/).
+The test for "same subnet" is mechanical: mask both addresses with the
+subnet mask; if the results match, they are neighbours and talk directly.
+If not, the packet goes to the router.
+
+<Aside>
+	Why <code>192.168.x.x</code> and not something memorable? Because{' '}
+	<a href="https://www.rfc-editor.org/rfc/rfc1918">RFC 1918</a> reserves three ranges for private
+	networks that are never routed on the public Internet: <code>10.0.0.0/8</code>,{' '}
+	<code>172.16.0.0/12</code> and <code>192.168.0.0/16</code>. Every home in the world can use{' '}
+	<code>192.168.1.0/24</code> at the same time without conflict, because those addresses never
+	leave the house. Your rack will live in one of these ranges.
+</Aside>
+
+## 3. The router: one foot in each network (6 min)
+
+Cloudflare again: ["a router is a device that connects two or more
+packet-switched networks or subnetworks"](https://www.cloudflare.com/learning/network-layer/what-is-a-router/).
+Your ISP's TP-Link box has exactly two: your `/24` on the inside, and the
+ISP's network on the outside. It has an address on each.
+
+When your Mac wants `142.250.x.x` (a Google server), it masks the address,
+sees it is not on the local subnet, and hands the packet to its *default
+gateway* — the router's inside address, `192.168.1.1`. That is all "gateway"
+means: *the address I send things to when I don't know where else to send
+them.*
+
+Going out, the router does one more thing. The whole house shares a single
+public address from the ISP, so the router rewrites the source of every
+outgoing packet to its own public address and remembers who asked, so it can
+rewrite the replies back. That is NAT, network address translation
+([MDN's one-paragraph version](https://developer.mozilla.org/en-US/docs/Glossary/NAT)).
+Two consequences matter for the homelab: nothing outside can reach a device
+inside unless the router is told to forward a port (you will never do this —
+lessons 8 and 10 use tunnels instead), and your ISP router is a single point
+that everything in the house passes through.
+
+## 4. DHCP: who hands out the addresses (8 min)
+
+Nobody typed `192.168.1.37` into your Mac. The router runs a DHCP server —
+Dynamic Host Configuration Protocol,
+["a standard protocol … that allows a server to dynamically distribute IP
+addressing and configuration information to clients"](https://learn.microsoft.com/en-us/windows-server/troubleshoot/dynamic-host-configuration-protocol-basics).
+
+When a device joins, it broadcasts *discover* ("anyone got an address for
+me?"), the router broadcasts an *offer*, the device *requests* it, the router
+*acknowledges*. Four steps, always in that order, and the answer contains
+four things: an IP address, the subnet mask, the gateway, and the DNS server
+to use. So one DHCP reply is what tells a device everything from sections 2
+and 3.
+
+The address is a **lease**: it expires, typically after a day, and the device
+renews it. Usually you get the same address back. *Usually.* The router
+hands addresses out from a **pool** — say `.100` to `.199` — and the rest of
+the subnet it leaves alone.
+
+That last fact is the whole reason the rack needs a plan. A server whose
+address might change is a server you will lose. There are two ways to pin it:
+
+- **A DHCP reservation** on the router: "this MAC address always gets
+  `.11`". The node still asks; it just always gets the same answer.
+- **A static address** typed into the node itself, chosen from *outside* the
+  pool so the router never gives it to someone else.
+
+The course uses static addresses for the nodes, because the hypervisor you
+install in lesson 3 requires the address to never change, and a static
+address does not depend on the ISP router staying configured. Outside the
+pool, inside the subnet. That sentence is the IP plan.
+
+## 5. DNS: names for the numbers (4 min)
+
+You type `google.com`, not `142.250.x.x`.
+[DNS is "the phonebook of the Internet"](https://www.cloudflare.com/learning/dns/what-is-dns/):
+it turns names into addresses. Your Mac asks whichever DNS server DHCP told
+it about — usually the router, which forwards the question to the ISP.
+
+For the rack you want names too (`pve1` beats `192.168.1.11`), and there is
+a domain reserved for exactly this: `home.arpa`
+([RFC 8375](https://www.rfc-editor.org/rfc/rfc8375)). It will never clash
+with a real website. So node one will be `pve1.home.arpa`. Who answers for
+that name is a later lesson; for now, just know that the name is yours to
+use.
+
+## 6. And the switch? (2 min)
+
+The TL-SG2008 is an eight-way cable. Frames come in one port; the switch
+learns which MAC address lives on which port and sends each frame only
+there. It works at the MAC layer and does not care about IP addresses at
+all — which is why you could plug it in tonight with zero configuration and
+it would just work. What "managed" and "L2+" buy you, and why it has an IP
+address of its own anyway, is lesson 2.
+
+<Categorise
+	title="Drill: which layer is each of these?"
+	categories={['MAC / the local wire', 'IP / addressing', 'DHCP / DNS services']}
+	items={[
+		{ text: 'a4:83:e7:2b:91:0c', answer: 0, note: 'Twelve hex digits, factory-set. Only meaningful on the local network.' },
+		{ text: '192.168.1.0/24', answer: 1, note: 'A subnet: the network part is 24 bits, 256 addresses.' },
+		{ text: 'A lease that expires after 24 hours', answer: 2, note: 'DHCP hands out addresses for a fixed time, then the device renews.' },
+		{ text: 'The switch learning which port a device is on', answer: 0, note: 'Switches track MAC addresses per port; they do not look at IP.' },
+		{ text: 'Turning pve1.home.arpa into an address', answer: 2, note: 'DNS: names to numbers.' },
+		{ text: 'The default gateway', answer: 1, note: 'An IP address — the router’s inside address — that receives everything not on the local subnet.' },
+		{ text: '"Who has 192.168.1.40?"', answer: 0, note: 'ARP: finding the MAC address for an IP on the local wire.' },
+	]}
+/>
+
+## 7. Hands on: map your network (50 min)
+
+Every command below runs on your Mac; the desktop equivalents are noted.
+Write the answers on paper as you go — a box per device, its address inside,
+lines for cables, a cloud for Wi-Fi. That drawing is tonight's deliverable.
+
+<Steps
+	title="Draw the map"
+	steps={[
+		{
+			title: 'Read your own DHCP lease',
+			body: (
+				<>
+					<code>ipconfig getpacket</code> prints the actual DHCP reply your Mac received. Find
+					the four things from section 4: <code>yiaddr</code> (your address),{' '}
+					<code>subnet_mask</code>, <code>router</code> (the gateway) and{' '}
+					<code>domain_name_server</code>. Note <code>lease_time</code> too — it is in seconds.
+					Use <code>en0</code> for Wi-Fi on a MacBook; on the desktop, <code>ipconfig /all</code>{' '}
+					in PowerShell shows the same fields.
+				</>
+			),
+			commands: ['ipconfig getpacket en0', 'ipconfig getifaddr en0          # just the address'],
+			check: 'You can write down your address, the mask, the gateway and the DNS server, and say which of them came from the router.',
+		},
+		{
+			title: 'Work out the subnet',
+			body: (
+				<>
+					From the address and mask, write the subnet in <code>/n</code> form. Mask{' '}
+					<code>255.255.255.0</code> is <code>/24</code>; if yours is different, count the
+					fixed bits (each 255 is eight). Then write the first and last usable address.
+				</>
+			),
+			check: 'You have one line like "192.168.1.0/24 — usable .1 to .254" on the map.',
+		},
+		{
+			title: 'Log in to the router and find the DHCP pool',
+			body: (
+				<>
+					Open the gateway address in a browser. The login is usually printed on the
+					router's label. Find the DHCP settings page (TP-Link calls it{' '}
+					<em>Network → DHCP Server</em> or <em>Advanced → Network → DHCP</em>) and note the{' '}
+					<em>start</em> and <em>end</em> of the pool and the lease time. Change nothing.
+				</>
+			),
+			check: 'The pool is drawn on the map as a shaded range, e.g. ".100–.199". Everything outside it is free for the rack.',
+		},
+		{
+			title: 'See who else is on the subnet',
+			body: (
+				<>
+					Ping the broadcast address so every device answers, then dump the ARP cache: it lists
+					each IP your Mac has recently resolved, with its MAC. Match what you can (the router,
+					the desktop, phones, the TV). Anything you cannot name is worth a note.
+				</>
+			),
+			commands: ['ping -c 3 192.168.1.255      # your broadcast address', 'arp -a'],
+			check: 'Each device you know is a box on the map with its IP; the router is the one whose IP matches the gateway.',
+		},
+		{
+			title: 'Watch a packet leave the house',
+			body: (
+				<>
+					<code>traceroute</code> prints every router a packet passes through. The first hop is
+					your gateway; the second is the ISP. Count the hops to a public address, then to a
+					name, and notice that the name works only because DNS resolved it first.
+				</>
+			),
+			commands: ['traceroute -m 8 1.1.1.1', 'traceroute -m 8 one.one.one.one'],
+			check: 'Hop 1 on the map is your router; you can point at where the house ends and the ISP begins.',
+		},
+		{
+			title: 'Place the rack on the map',
+			body: (
+				<>
+					Draw the long cable from the router to the office, the switch at its end, and three
+					boxes hanging off the switch. Give them addresses <em>outside the DHCP pool</em>:
+					the course convention is switch <code>.10</code>, nodes <code>.11</code>,{' '}
+					<code>.12</code>, <code>.13</code>, with <code>.20–.49</code> reserved for VMs. If
+					your pool covers those, pick another free run and write it down.
+				</>
+			),
+			check: 'Five addresses for the rack, none inside the pool, all inside the subnet. Copy them into the rack-plan reference sheet.',
+		},
+		{
+			title: 'Start the runbook',
+			body: (
+				<>
+					Create <code>RUNBOOK.md</code> in this folder (or your vault). First entry: the date,
+					the subnet, gateway, DNS, DHCP pool and lease time, the router model and its admin
+					address, and the rack address plan. Every lesson from here adds to it.
+				</>
+			),
+			check: 'A stranger could read the file and tell you your subnet and which addresses are free.',
+		},
+	]}
+/>
+
+## 8. Retrieval (3 min)
+
+No looking back.
+
+<Quiz
+	questions={[
+		{
+			prompt: 'A device with address 192.168.1.37/24 wants to reach 192.168.1.200. What happens?',
+			options: [
+				'It sends the packet to the router',
+				'It talks to the device directly',
+				'It asks the DNS server first',
+				'It broadcasts to every device',
+			],
+			answerIndex: 1,
+			explanation:
+				'Same subnet after masking, so it resolves the MAC with ARP and sends on the local wire. The router is only for addresses off the subnet.',
+		},
+		{
+			prompt: 'Why give the Proxmox nodes addresses outside the DHCP pool?',
+			options: [
+				'Addresses in the pool are slower',
+				'The router can never reassign them',
+				'DHCP does not work on servers',
+				'The switch requires static addresses',
+			],
+			answerIndex: 1,
+			explanation:
+				'The router only hands out pool addresses. A static address outside it can never collide with a lease.',
+		},
+		{
+			prompt: 'Which of these does a switch look at when forwarding a frame?',
+			options: [
+				'The destination MAC address',
+				'The destination IP address',
+				'The DNS name of the target',
+				'The DHCP lease of the sender',
+			],
+			answerIndex: 0,
+			explanation:
+				'A switch works at the MAC layer, learning which port each MAC is on. IP addresses are the router’s business.',
+		},
+		{
+			prompt: 'What does a DHCP reply contain besides an IP address?',
+			options: [
+				'Subnet mask, gateway, DNS server',
+				'MAC address, hostname, port number',
+				'Public IP, ISP name, lease owner',
+				'Router password, SSID, channel',
+			],
+			answerIndex: 0,
+			explanation:
+				'One reply configures the whole stack: address, mask (who is local), gateway (where else goes), DNS (names).',
+		},
+		{
+			prompt: 'How many usable device addresses does a /24 have?',
+			options: ['256', '255', '254', '253'],
+			answerIndex: 2,
+			explanation:
+				'256 addresses minus the network (.0) and broadcast (.255). The router conventionally takes one of the 254.',
+		},
+	]}
+/>
+
+## Read next
+
+Cloudflare's Learning Center pieces on
+[subnets](https://www.cloudflare.com/learning/network-layer/what-is-a-subnet/)
+and [routers](https://www.cloudflare.com/learning/network-layer/what-is-a-router/)
+are short and accurate; read them after the mapping exercise, with your map
+beside you, and check each claim against a number you found. Then the
+[rack plan](../reference/rack-plan) has the terms from tonight compressed to
+one sheet.
+
+<Aside>
+	If a number on your network does not match the story here — a mask that is not 255.255.255.0,
+	a gateway that is not .1, a pool that covers the whole subnet — that is interesting, not wrong.
+	Tell me what you found and we will work out why before lesson 2.
+</Aside>
