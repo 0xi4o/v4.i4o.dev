@@ -1,0 +1,246 @@
+---
+courseTitle: Command-line tools for systems work
+title: 'ripgrep and fd: search that skips what you would have skipped'
+description: Replace grep -r and find for everyday codebase searches, and learn the one default that makes both tools lie to you
+lessonNumber: 1
+createdAt: 2026-09-02
+updatedAt: 2026-09-02
+---
+
+import { Aside, KeyIdea } from '../assets/LessonLayout'
+import { Drill } from '../assets/Drill'
+import { Platform } from '../assets/Platform'
+import { Quiz } from '../assets/Quiz'
+
+**The win for today:** search a real Go repo with `rg` and `fd` instead of
+`grep -r` and `find`, and explain — without looking it up — why a search that
+should have matched came back empty. About twenty minutes.
+
+<KeyIdea>
+	`rg` and `fd` are fast mostly because they search *less*. Both walk the directory tree in
+	parallel and skip whatever `.gitignore` excludes, plus hidden files. You would have skipped
+	those anyway. The catch: sometimes the thing you're looking for is in the pile they skipped.
+</KeyIdea>
+
+## 1. Install (2 min)
+
+<Platform
+	mac={<code>brew install ripgrep fd</code>}
+	linux={
+		<>
+			<code>sudo apt install ripgrep fd-find</code>. Debian already has a package called
+			<code>fd</code>, so the binary is <code>fdfind</code>. Fix it once:{' '}
+			<code>ln -s $(which fdfind) ~/.local/bin/fd</code>.
+		</>
+	}
+/>
+
+Both are single static binaries. Sources: [ripgrep README](https://github.com/BurntSushi/ripgrep/blob/master/README.md),
+[fd README](https://github.com/sharkdp/fd/blob/master/README.md).
+
+## 2. ripgrep: grep with the defaults you'd have set (6 min)
+
+`cd` into any Go repo you have locally — Ink is a good one — and type:
+
+```sh
+rg ListenAndServe
+```
+
+Compare with what you'd have typed before: `grep -rn ListenAndServe .`. rg is
+recursive by default, searches the current directory by default, prints line
+numbers, colours the match, and groups results by file. That's the whole
+pitch for daily use.
+
+Now the part that matters. From the [official guide](https://github.com/BurntSushi/ripgrep/blob/master/GUIDE.md#automatic-filtering),
+rg skips four things unless told otherwise:
+
+1. Anything matched by `.gitignore` (and `.ignore`, `.rgignore`).
+2. Hidden files and directories (anything starting with `.`).
+3. Binary files — anything containing a NUL byte.
+4. Symbolic links.
+
+Each has an off switch, and one flag turns them off in stages: `-u` stops
+honouring ignore files, `-uu` also searches hidden files, `-uuu` also searches
+binaries. So the rule for the rest of your career:
+
+<KeyIdea>
+	When rg says there are no matches and you don't believe it, run it again with <code>-uu</code>.
+	If the match appears, it was in an ignored or hidden path — usually <code>vendor/</code>,
+	<code>node_modules/</code>, <code>.git/</code> or a build directory.
+</KeyIdea>
+
+<Aside>
+	This is the mirror image of the grep problem. <code>grep -r</code> shows you everything, including
+	the twelve thousand hits inside <code>node_modules</code>. rg shows you nothing from there and
+	makes you ask. Both are surprises; rg's is the one you can fix with two characters.
+</Aside>
+
+The flags worth knowing today, all from the [guide](https://github.com/BurntSushi/ripgrep/blob/master/GUIDE.md):
+
+| Flag | Meaning |
+| --- | --- |
+| `-t go` / `-T go` | Only, or never, files of a type. `rg --type-list` shows the types. |
+| `-g '*.md'` / `-g '!vendor/**'` | Include or exclude by glob. Same syntax as `.gitignore`. Quote it. |
+| `-F` | Treat the pattern as a literal string. Reach for it the moment the pattern has a dot or bracket. |
+| `-w` | Word boundaries, so `id` stops matching `uuid`. |
+| `-l` | Filenames only. |
+| `-C 3` | Three lines of context either side. |
+| `--files` | List the files rg *would* search, without searching. |
+| `-r 'x'` | Show what replacing the match with `x` would look like. |
+
+That last one comes with a sentence to memorise, straight from the guide:
+*"ripgrep will never modify your files."* `-r` only changes the output. There
+is no in-place flag.
+
+<Drill
+	task={<>Every file in the repo that contains <code>func main</code>, filenames only.</>}
+	hint="One flag. Think 'list'."
+	answer="rg -l 'func main'"
+	explanation={<>-l prints paths with at least one match and suppresses the matched lines. Handy as input to other commands: <code>rg -l 'func main' | xargs wc -l</code>.</>}
+/>
+
+<Drill
+	task={<>All calls to a method literally called <code>.Get(</code> — the dot and bracket are part of the search.</>}
+	hint="Escaping regex metacharacters is a losing game. There's a flag that turns regex off."
+	answer="rg -F '.Get('"
+	explanation={<>Without -F, <code>.</code> means "any character" and <code>(</code> opens a group — you'd get a regex parse error or wrong matches. -F makes the pattern a plain string.</>}
+/>
+
+<Drill
+	task={<>Search for <code>TODO</code> in Go files only, skipping test files, with two lines of context either side.</>}
+	hint="Type filter for Go, a negated glob for tests, and context."
+	answer="rg -t go -g '!*_test.go' -C 2 TODO"
+	explanation={<>-t go restricts to the Go type; the <code>!</code> glob removes tests; -C 2 adds context. Globs and types combine — each is an extra filter.</>}
+/>
+
+<Drill
+	task={<>Something you know is in <code>vendor/</code> (or <code>node_modules/</code>, or a <code>dist/</code> folder) that a plain <code>rg</code> can't find. Make it find it.</>}
+	hint="Which of the four default filters is stopping you?"
+	answer="rg -uu 'the thing'   # or rg -u if it's only gitignored, not hidden"
+	explanation={<>Ignored paths need -u; hidden paths need -uu. If you don't have a vendored repo handy, search for a string inside <code>.git/</code> — <code>rg -uu 'ref: refs/heads'</code> finds the HEAD file that plain rg skips.</>}
+/>
+
+## 3. fd: find, but the pattern is a regex on the filename (6 min)
+
+`find` takes a directory and a chain of predicates. `fd` takes a pattern and
+matches it against the *filename* — not the full path — as a regex, with the
+same ignore rules as rg ([fd README](https://github.com/sharkdp/fd/blob/master/README.md)).
+So:
+
+```sh
+fd router          # any file or directory whose name contains "router"
+fd '^main\.go$'    # exactly main.go
+fd                 # no pattern: list everything rg would search
+```
+
+Two defaults that differ from `find`: the search is case-insensitive unless
+your pattern has an uppercase letter (the README calls this smart case), and
+hidden and gitignored entries are skipped. `-H` shows hidden, `-I` ignores the
+ignore files, and `-HI` (or `-u`) is "actually everything" — the fd spelling of
+`rg -uu`.
+
+The flags to know:
+
+| Flag | Meaning |
+| --- | --- |
+| `-e go` | By extension. Repeatable. |
+| `-t f` / `-t d` / `-t x` | File, directory, executable. Also `l` symlink, `e` empty. |
+| `-p` | Match the pattern against the full path instead of the filename. |
+| `-d 2` | Maximum depth. |
+| `-E node_modules` | Exclude by glob. |
+| `--changed-within 1d` | Modified in the last day. Also `--changed-before`. |
+| `-x cmd {}` | Run `cmd` once *per result*, in parallel. |
+| `-X cmd` | Run `cmd` *once*, with every result as an argument. |
+
+The `-x` / `-X` distinction is the one people get wrong. `fd -e go -x gofmt -l {}`
+starts one `gofmt` per file; `fd -e go -X gofmt -l` starts one `gofmt` with
+all the files. For anything that's cheap to start, `-X` is faster; for anything
+where one bad file shouldn't stop the others, `-x`. The README's own safety
+rule applies to both: if the command deletes things, run the `fd` on its own
+first and look at the list.
+
+<Drill
+	task={<>Count the Go files in the repo two ways — once with fd, once with rg — and check the numbers agree.</>}
+	hint="fd filters by extension. rg can list the files it would search, by type."
+	answer={"fd -e go | wc -l\nrg --files -t go | wc -l"}
+	explanation={<>They agree because both tools apply the same ignore rules. If they ever disagree, one of them has a different idea of what's hidden or ignored — <code>-H</code>/<code>-uu</code> is where to look.</>}
+/>
+
+<Drill
+	task={<>Every file you've touched in the last 24 hours, excluding anything under <code>.git</code>.</>}
+	hint="A time filter, a type filter, and an exclude."
+	answer="fd --changed-within 1d -t f -E .git"
+	explanation={<>Good end-of-day habit: it answers "what did I actually change today" without git, which matters for files git isn't tracking yet.</>}
+/>
+
+<Drill
+	task={<>Run <code>gofmt -l</code> across every Go file with a single gofmt process.</>}
+	hint="One process for all results — which of the two exec flags is that?"
+	answer="fd -e go -X gofmt -l"
+	explanation={<>-X batches. Prints the files that aren't formatted; empty output is the good outcome. Try the -x version too and notice it works but is slower to start.</>}
+/>
+
+<Drill
+	task={<>List the dotfiles and dot-directories at the top level of your home directory — nothing deeper.</>}
+	hint="Hidden must be switched on, and depth capped at one. The pattern is a regex on the name."
+	answer={"fd -H -d 1 '^\\.' ~"}
+	explanation={<>-H shows hidden entries, -d 1 stops at the first level, and the regex anchors on a leading dot. This is <code>ls -a ~ | grep '^\.'</code> but you can now pipe it into <code>-x</code>.</>}
+/>
+
+## 4. Where the old tools still win (1 min)
+
+Two honest limits. First, `rg` and `fd` won't be on the box you SSH into at
+2am; keep `grep -rnI --exclude-dir={.git,vendor,node_modules}` and
+`find . -type f -name '*.log' -mtime +30` in your head as the floor. Second,
+`find` is still better for predicate-heavy or destructive jobs — `-newer`
+against a reference file, `-size`, `-perm`, `-delete` — because it is explicit
+about every step.
+
+## 5. Check yourself
+
+Options are deliberately the same length. Answer from memory.
+
+<Quiz
+	questions={[
+		{
+			prompt: 'You search a Go repo with rg and get nothing, but the string is in vendor/, which .gitignore lists. Shortest fix?',
+			options: ['Re-run with -u flag', 'Re-run with -a flag', 'Re-run with -F flag', 'Re-run with -w flag'],
+			answerIndex: 0,
+			explanation: '-u disables ignore-file handling. -a searches binaries, -F is literal matching, -w is word boundaries.',
+		},
+		{
+			prompt: "What does rg -r 'bar' foo do to the files on disk?",
+			options: ['Nothing, it only prints', 'Rewrites every matching file', 'Rewrites after asking first', 'Creates .bak backup copies'],
+			answerIndex: 0,
+			explanation: 'The guide is explicit: ripgrep never modifies your files. --replace only changes the output.',
+		},
+		{
+			prompt: 'fd router — what is the pattern matched against, by default?',
+			options: ['The filename only, regex', 'The full path, regex', 'The filename only, glob', 'The full path, glob'],
+			answerIndex: 0,
+			explanation: 'Regex by default; -p switches to the full path, --glob switches to glob syntax.',
+		},
+		{
+			prompt: 'fd -e md -X wc -l — how many wc processes start?',
+			options: ['One, with all files', 'One per matching file', 'One per directory found'],
+			answerIndex: 0,
+			explanation: '-X is exec-batch: one command, all results as arguments. -x is one command per result.',
+		},
+	]}
+/>
+
+## Read next
+
+The primary source for this lesson is the
+[ripgrep user guide](https://github.com/BurntSushi/ripgrep/blob/master/GUIDE.md).
+Read the "Automatic filtering" and "Manual filtering" sections — ten minutes,
+and you'll never be surprised by an empty result again. The
+[fd README](https://github.com/sharkdp/fd/blob/master/README.md) is the whole
+fd manual and reads in five.
+
+Compressed version for later: [rg and fd cheat sheet](../reference/rg-fd-cheatsheet.mdx).
+
+<Aside>
+	Anything unclear, or a search that didn't behave the way this lesson says it should? Ask me —
+	I'm the teacher for this course, and a surprising result is the best possible question.
+</Aside>

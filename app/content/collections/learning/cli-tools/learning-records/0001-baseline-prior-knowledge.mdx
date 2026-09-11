@@ -1,0 +1,27 @@
+---
+courseTitle: Command-line tools for systems work
+title: Baseline — fluent with grep/find/sed/awk, zero on the six tool groups
+description: Ilango's starting point, established at workspace setup
+createdAt: 2026-09-02
+updatedAt: 2026-09-02
+---
+
+# Baseline — fluent with grep/find/sed/awk, zero on the six tool groups
+
+Ilango is a working full-stack engineer (Go, TypeScript, React) who is
+comfortable with grep, find, sed and awk and uses a terminal all day (Ghostty,
+tmux, Emacs). He asked that the course assume no knowledge of ripgrep, fd, jq,
+yq, ps/pgrep/lsof, dtrace, du/tar/lsblk, or the networking set — even though
+he has a reference document of his own on the same tools — so lessons start
+from the mental model of each tool, not from its flags.
+
+## Implications
+
+- Teach every new tool by contrast with the POSIX tool he already knows
+  (`rg` against `grep -r`, `fd` against `find`, `jq` against `awk`).
+- Never re-teach the shell, pipes, regex, or xargs.
+- He practises on macOS and a local Linux box, so every lesson must say where
+  the two differ; Linux-only tools (`lsblk`, `ss`, `bpftrace`) get a Mac
+  equivalent or an explicit "Linux box only".
+- First lesson (rg + fd) is the zone: familiar problem, new tool, one
+  non-obvious default to learn.

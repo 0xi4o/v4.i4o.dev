@@ -1,0 +1,106 @@
+---
+courseTitle: Command-line tools for systems work
+title: rg and fd — cheat sheet
+description: The flags that matter, the grep/find translations, and the one rule about empty results
+createdAt: 2026-09-02
+updatedAt: 2026-09-02
+---
+
+import { LessonLayout, KeyIdea } from '../assets/LessonLayout'
+
+<LessonLayout>
+
+# rg and fd — cheat sheet
+
+<KeyIdea>
+	Both skip gitignored and hidden paths by default. Empty result you don't believe →
+	<code>rg -uu</code> / <code>fd -HI</code>. rg never writes to files.
+</KeyIdea>
+
+## Install
+
+| | macOS | Debian / Ubuntu |
+| --- | --- | --- |
+| ripgrep | `brew install ripgrep` | `apt install ripgrep` |
+| fd | `brew install fd` | `apt install fd-find` → binary is `fdfind`; `ln -s $(which fdfind) ~/.local/bin/fd` |
+
+## rg
+
+Recursive, current directory, line numbers, colour — all default.
+
+| Task | Command |
+| --- | --- |
+| Basic search | `rg pattern` |
+| Literal string (dots, brackets) | `rg -F 'cfg.DB.Host'` |
+| Whole word | `rg -w id` |
+| Filenames only | `rg -l pattern` |
+| Count per file | `rg -c pattern` |
+| Context | `rg -C 3 pattern` (`-A`/`-B` for one side) |
+| Only Go files / not Go files | `rg -t go pattern` / `rg -T go pattern` |
+| Glob include / exclude | `rg -g '*.md' pattern` / `rg -g '!vendor/**' pattern` |
+| Case-insensitive / smart case | `rg -i` / `rg -S` |
+| Search ignored files | `rg -u` |
+| …and hidden files | `rg -uu` |
+| …and binaries | `rg -uuu` |
+| Files rg would search | `rg --files` (`rg --files -t go`) |
+| Preview a replacement | `rg -r 'new' 'old'` — output only, never writes |
+| Multiline | `rg -U 'a\nb'` |
+| Lookarounds | `rg -P '(?<=foo)bar'` (PCRE2) |
+| Machine-readable | `rg --json pattern` |
+| Known types | `rg --type-list` |
+
+Ignore-file precedence: `.rgignore` > `.ignore` > `.gitignore`. Hidden means the
+name starts with `.`. Binary means the file contains a NUL byte.
+
+## fd
+
+Pattern is a **regex** matched against the **filename**. Case-insensitive
+unless the pattern has an uppercase letter.
+
+| Task | Command |
+| --- | --- |
+| Name contains | `fd router` |
+| Exact name | `fd '^main\.go$'` |
+| Everything (respecting ignores) | `fd` |
+| By extension | `fd -e go -e templ` |
+| Files / dirs / executables | `fd -t f` / `fd -t d` / `fd -t x` |
+| Match full path | `fd -p 'internal/.*handler'` |
+| Max depth | `fd -d 2` |
+| Include hidden | `fd -H` |
+| Ignore ignore-files | `fd -I` |
+| Actually everything | `fd -HI` or `fd -u` |
+| Exclude | `fd -E node_modules -E '*.bak'` |
+| Modified recently | `fd --changed-within 2d` / `--changed-before 1w` |
+| Run per result (parallel) | `fd -e go -x gofmt -l {}` |
+| Run once with all results | `fd -e go -X gofmt -l` |
+| Null-separated for xargs | `fd -0 … \| xargs -0 …` |
+| Glob instead of regex | `fd --glob '*.go'` |
+
+Placeholders for `-x`/`-X`: `{}` path, `{.}` without extension, `{/}` basename,
+`{//}` parent directory.
+
+## Translations
+
+| You used to type | Now |
+| --- | --- |
+| `grep -rn foo .` | `rg foo` |
+| `grep -rnl foo .` | `rg -l foo` |
+| `grep -rn --include='*.go' foo .` | `rg -t go foo` |
+| `grep -rnF '.Get(' .` | `rg -F '.Get('` |
+| `find . -name '*.go'` | `fd -e go` |
+| `find . -type d -name '*test*'` | `fd -t d test` |
+| `find . -iname 'readme*'` | `fd '^readme'` |
+| `find . -mtime -1 -type f` | `fd --changed-within 1d -t f` |
+| `find . -name '*.go' -exec gofmt -l {} +` | `fd -e go -X gofmt -l` |
+
+## When to fall back
+
+Neither tool is on a stock server. The floor:
+`grep -rnI --exclude-dir={.git,vendor,node_modules} foo .` and
+`find . -type f -name '*.log' -mtime +30`. Keep `find` for anything with
+`-newer`, `-size`, `-perm` or `-delete`.
+
+Sources: [ripgrep guide](https://github.com/BurntSushi/ripgrep/blob/master/GUIDE.md) ·
+[fd README](https://github.com/sharkdp/fd/blob/master/README.md)
+
+</LessonLayout>
