@@ -1,0 +1,245 @@
+---
+courseTitle: Design and architecture docs for POCs and features
+title: 'The one-page design doc: an argument, not a manual'
+description: Write a one-page design doc for a real feature using five sections, and learn the one test that separates a design doc from a to-do list
+lessonNumber: 1
+createdAt: 2026-09-07
+updatedAt: 2026-09-10
+---
+
+import { Aside, KeyIdea } from '../assets/LessonLayout'
+import { BeforeAfter } from '../assets/BeforeAfter'
+import { Checklist } from '../assets/Checklist'
+import { Quiz } from '../assets/Quiz'
+
+**The win for today:** a one-page design doc for the DocuDex MVP — the
+dev-tools CLI that is still only an idea — written in five sections and
+checked against a short list before anyone else sees it. About
+forty minutes, thirty of them writing.
+
+<KeyIdea>
+	A design doc is an argument, not a manual. It exists to convince a reader (you first) that this
+	design is the right one given the trade-offs — so the sections that carry weight are the ones a
+	to-do list would never have: what you are <em>not</em> doing, and what you rejected.
+</KeyIdea>
+
+## 1. What it is for (4 min)
+
+Malte Ubl's [Design Docs at Google](https://www.industrialempathy.com/posts/design-docs-at-google/)
+lists why the docs exist, and none of the reasons is "so we know what to code".
+They are there to find problems while changing course is still cheap, to get
+the people who have to live with the decision to agree to it, to make sure
+security, privacy and observability were thought about, to let senior engineers
+weigh in without reading every diff, and to leave a record of *why*.
+
+The same post gives the failure mode in one line: if a doc says "this is how we
+are going to implement it" without trade-offs, alternatives or reasoning, "it
+would probably have been a better idea to write the actual program right away".
+
+Grant Slatton's [How to write a good design document](https://grantslatton.com/how-to-design-document)
+puts the purpose more sharply. A design doc is like a proof: its job is to
+convince, and "the most important person to convince is the author". Writing
+the doc is how a vague intuition gets tested before it costs three weeks.
+
+<Aside>
+	Ubl also says when <em>not</em> to write one: when the design is not ambiguous. His test is
+	three questions — are you unsure of the right design, would a senior engineer's input change
+	it, and is it contentious enough that agreement matters? If all three are no, build it.
+</Aside>
+
+## 2. The five sections (6 min)
+
+This course uses Google's skeleton throughout. The
+[reference sheet](../reference/design-doc-skeleton) has the full version; here
+is each section as the one question it answers.
+
+**Context and scope.** *What does a reader need to know to follow the rest?*
+Facts, not opinions: what exists today, what is being asked for, what is
+already decided. Two or three sentences for a small feature.
+
+**Goals and non-goals.** *What must be true when this ships, and what are we
+deliberately leaving out?* Bullets. Non-goals are things that a reader might
+reasonably expect and that you are choosing not to do — Ubl's example is a
+storage system listing "ACID compliance" as a non-goal. "We won't write bad
+code" is not a non-goal; nobody expected you to.
+
+**Design.** *What are we building, and what did it cost us?* Overview first,
+then only as much detail as the trade-offs need. A system-context sketch, an
+API sketch, a note on data — not a schema dump. Every paragraph should be
+saying "we chose X over Y because Z".
+
+**Alternatives considered.** *What else would have worked, and why not that?*
+One or two real options with the trade-off that lost. If you cannot name an
+alternative, you have not designed anything yet; you have picked the first
+thing that came to mind.
+
+**Cross-cutting concerns.** *What would security, privacy, observability or
+ops ask?* For a one-pager this can be two sentences, but it has to be there, so
+the question was at least asked.
+
+<BeforeAfter
+	beforeLabel="Manual"
+	afterLabel="Argument"
+	before={
+		<>
+			We will add a <code>jobs</code> table with <code>id</code>, <code>status</code>,{' '}
+			<code>payload</code> and <code>run_at</code>. A worker polls it every second and runs due
+			jobs. Failed jobs are retried three times.
+		</>
+	}
+	after={
+		<>
+			Jobs live in Postgres rather than a queue: we already run Postgres, the volume is tens of
+			jobs a minute, and one store means one backup and one thing to reason about in a
+			transaction. The cost is polling latency of up to a second, which is fine for email but
+			would not be for anything user-facing. Retries are capped at three so a poison job cannot
+			loop; the cap is a guess and is called out under open questions.
+		</>
+	}
+	note="Same design. The second version says what was chosen instead of what, what it cost, and where the author is unsure — which is what a reviewer can actually respond to."
+/>
+
+## 3. Order it so the reader is never surprised (3 min)
+
+Slatton's structural rule: arrange the doc so "the reader is never surprised".
+Each paragraph should follow from the one before, and a good reader should
+never think "wait, but what about—" because you got there first. His practical
+test: every paragraph should be summarisable in a single sentence. If you
+cannot do that for a paragraph, it is two paragraphs, or it is padding.
+
+For a one-pager that means the five sections in the order above, and within
+the design section: the choice, the reason, the cost, the open question. In
+that order.
+
+## 4. Write one (25 min)
+
+The subject is the DocuDex MVP. Because nothing exists yet, context becomes
+"what problem, for whom, and what already exists that this is not" — still
+facts, still short. Your career notes already hold most of the non-goals
+(hosted / multi-tenant is design-only for now; the Q&A agent comes after the
+CLI); lift them in. Open a Markdown file in Emacs and write the five headings. Word budgets, so it
+stays a page:
+
+| Section | Budget | Prompt |
+| --- | --- | --- |
+| Context and scope | 60–100 words | What is true today? What was asked for? |
+| Goals and non-goals | 3–5 bullets each | What must ship? What might they expect that you are not doing? |
+| Design | 150–250 words | Choice, reason, cost, open question. One sketch if it helps. |
+| Alternatives considered | 2 options, 40 words each | What else would work? Which trade-off lost? |
+| Cross-cutting concerns | 30–60 words | What would the on-call person, or security, ask first? |
+
+Write the design section first if the others feel like homework — it is the
+one you already have in your head. Then go back and fill in context and goals,
+and notice how many of your "goals" were actually design choices in disguise.
+
+One trap specific to an MVP doc: it drifts into a product spec — features,
+users, positioning. Ask of every paragraph "is this a decision with a cost?"
+If not, it belongs in a separate problem statement, not here.
+
+Now check it against this before showing anyone.
+
+<Checklist
+	title="Self-review: does it argue or describe?"
+	items={[
+		{
+			question: 'Could a colleague who was not in the meetings follow the context section without asking you anything?',
+			why: 'If not, the reader will spend their review asking for background instead of reviewing the design.',
+		},
+		{
+			question: 'Is every non-goal something a reader might reasonably have expected?',
+			why: '"We will not rewrite the frontend" is a non-goal. "We will not ship bugs" is not.',
+		},
+		{
+			question: 'Does every paragraph in the design section name a trade-off — what you gave up?',
+			why: 'A paragraph with no cost is describing, not deciding. Ubl: that is the implementation manual failure.',
+		},
+		{
+			question: 'Is at least one alternative a real option you would have accepted if the trade-off had gone the other way?',
+			why: 'A straw-man alternative convinces nobody, including you.',
+		},
+		{
+			question: 'Can you summarise each paragraph in one sentence?',
+			why: "Slatton's test. If not, split it or cut it.",
+		},
+		{
+			question: 'Is there at least one thing you have written down as unsure about?',
+			why: 'A doc with no open questions reads as either finished or unexamined. Reviewers know which.',
+		},
+		{ question: 'Is it one page?', why: 'Ubl: one to three pages for a mini design doc. Cut before you add.' },
+	]}
+/>
+
+Keep the file. Lessons 2 and 3 work on the same doc — goals and non-goals
+first, then the alternatives section — so by the end of the fortnight it is
+finished and reviewed, not a worksheet.
+
+## 5. Retrieval (2 min)
+
+No looking back at the lesson.
+
+<Quiz
+	questions={[
+		{
+			prompt: 'A reviewer says your doc "reads like an implementation manual". What is missing?',
+			options: [
+				'Sequence diagrams for every flow',
+				'Trade-offs and the rejected alternatives',
+				'A full API schema listing',
+				'Estimates for each work item',
+			],
+			answerIndex: 1,
+			explanation:
+				'Ubl: a doc that says how without trade-offs, alternatives or reasoning would have been better written as code.',
+		},
+		{
+			prompt: 'Which of these is a well-formed non-goal?',
+			options: [
+				'The system must be fast',
+				'We will write good tests',
+				'Multi-region failover is not handled',
+				'Support for all our customers',
+			],
+			answerIndex: 2,
+			explanation:
+				'A non-goal is something a reader could reasonably expect and you are choosing to leave out. The others are goals, or nothing at all.',
+		},
+		{
+			prompt: "Google's guidance says skip the design doc when:",
+			options: [
+				'the team is under time pressure',
+				'the feature is a small prototype',
+				'nobody senior is available to review',
+				'the right design is already obvious',
+			],
+			answerIndex: 3,
+			explanation:
+				'The doc pays for itself only when the design is ambiguous, senior input would change it, or agreement is needed.',
+		},
+		{
+			prompt: "Slatton's test for a paragraph in a design doc:",
+			options: [
+				'it can be summarised in one sentence',
+				'it cites at least one primary source',
+				'it contains a diagram or code sample',
+				'it is shorter than a hundred words',
+			],
+			answerIndex: 0,
+			explanation:
+				'Readers compress as they go. A paragraph that will not compress to one sentence is two paragraphs or padding.',
+		},
+	]}
+/>
+
+## Read next
+
+The primary source for this lesson is
+[Design Docs at Google](https://www.industrialempathy.com/posts/design-docs-at-google/)
+— fifteen minutes, and it covers the review lifecycle we will get to in lesson
+7. Read it after you have written your page, not before, so you notice what you
+already reached for on your own.
+
+<Aside>
+	Anything unclear — a section that would not come out, a trade-off you cannot phrase, a doc you
+	want a second pair of eyes on — ask. Paste the page and I will review it against the checklist
+	above, as a reviewer would.
+</Aside>

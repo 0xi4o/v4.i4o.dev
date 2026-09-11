@@ -1,0 +1,41 @@
+---
+courseTitle: Design and architecture docs for POCs and features
+title: First design doc written — structure is there, goals are design choices in disguise
+description: Evidence from the DocuDex MVP doc after lesson 1, and what it says about lessons 2 and 3
+createdAt: 2026-09-10
+updatedAt: 2026-09-10
+---
+
+# First design doc written — structure is there, goals are design choices in disguise
+
+Ilango wrote the DocuDex MVP design doc after lesson 1, self-reviewed it and
+scored 4/4 on the retrieval quiz. The doc has all five sections, non-goals
+that a reader could reasonably have expected (hosted version, other
+ecosystems, scrapers, a TUI), alternatives he would have accepted (scraping,
+hosted, TypeScript support) and four open questions raised unprompted. The
+shape and the habit are in place after one lesson.
+
+## Evidence
+
+- Goals section: five bullets, four of which are means rather than outcomes
+  ("ship as a CLI", "offline web app", "manifest in source control", "via
+  godoc"). A goal the prose states — versioned docs per dependency — is not
+  in the list.
+- Design section: every paragraph gives a reason; almost none gives a cost.
+  Storage choice (SQLite + Markdown) is asserted, not argued.
+- Open questions are inline inside paragraphs rather than collected; one is a
+  business-model question, the product-spec drift predicted at setup.
+- Alternatives are about scope and sources, not about the design decisions
+  (storage, serving) — so the design section has no competing option to
+  argue against.
+
+## Implications
+
+- Lesson 2 (goals and non-goals) should use his own bullets as the sorting
+  material: goal vs design choice vs non-goal. Zone is exact.
+- Lesson 3 (alternatives and trade-offs) should target the storage and
+  serving paragraphs, where the cost is missing.
+- He does not need to be taught to raise open questions; he needs the
+  convention of collecting them at the end.
+- Reviewer content note passed on: for Go, docs derive from source already in
+  the module cache (`go/doc`), which may remove the fetcher from the MVP.

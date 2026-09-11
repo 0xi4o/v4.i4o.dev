@@ -1,0 +1,99 @@
+---
+courseTitle: Design and architecture docs for POCs and features
+title: The design doc skeleton
+description: The five sections, the question each answers, the one-page word budgets, the skip-it test and the self-review checklist
+createdAt: 2026-09-07
+updatedAt: 2026-09-10
+---
+
+The skeleton every doc in this course uses. Sources:
+[Ubl, Design Docs at Google](https://www.industrialempathy.com/posts/design-docs-at-google/);
+[Slatton, How to write a good design document](https://grantslatton.com/how-to-design-document).
+
+## Should you write one?
+
+Three questions ([Ubl](https://www.industrialempathy.com/posts/design-docs-at-google/)).
+Any yes means write it; three noes means build it.
+
+1. Are you unsure of the right design?
+2. Would a senior engineer's input change it?
+3. Is it contentious enough that agreement matters?
+
+## The five sections
+
+| Section | The question it answers | One-pager budget |
+| --- | --- | --- |
+| **Context and scope** | What does a reader need to know to follow the rest? Facts only. | 60–100 words |
+| **Goals and non-goals** | What must be true when this ships? What might a reader expect that we are leaving out? | 3–5 bullets each |
+| **Design** | What are we building, and what did it cost us? Choice → reason → cost → open question. | 150–250 words, one sketch |
+| **Alternatives considered** | What else would have worked, and which trade-off lost? | 2 options, ~40 words each |
+| **Cross-cutting concerns** | What would security, privacy, observability or on-call ask first? | 30–60 words |
+
+Optional, when they earn their place: a system-context diagram, an API sketch
+(not a schema), a note on data storage, pseudo-code only for a novel
+algorithm, and an **open questions** list at the end.
+
+Length ([Ubl](https://www.industrialempathy.com/posts/design-docs-at-google/)):
+one to three pages for a feature or sub-task; ten to twenty for a large
+project. Cut before you add.
+
+## Goal or design choice?
+
+Ask: *could a different design satisfy this bullet?* No → it is a design
+choice; move it to the design section and write the outcome underneath it as
+the goal. A goal should also be checkable without asking the author, and a
+non-goal should surprise at least one reasonable reader and carry a clause on
+why it is out. Collect open questions in their own section at the end, each
+with what would resolve it.
+
+## Ordering
+
+[Slatton](https://grantslatton.com/how-to-design-document): arrange it so the
+reader is never surprised. Each paragraph follows from the last; objections
+are answered before the reader raises them; every paragraph can be summarised
+in one sentence. Long calculations go in an appendix.
+
+## Section-by-section tells
+
+**Context** is wrong if it contains an opinion or a decision. Move those down.
+
+**Goals** are wrong if they are design choices in disguise ("use Postgres" is
+a decision, not a goal — the goal is what Postgres buys you).
+
+**Non-goals** are wrong if nobody would have expected them anyway.
+
+**Design** is wrong if a paragraph has no cost in it. "We chose X" needs
+"over Y, because Z, at the price of W".
+
+**Alternatives** are wrong if you would never have picked any of them. A real
+alternative is one you would have accepted had the trade-off gone the other way.
+
+**Cross-cutting concerns** are wrong if absent. Two sentences is enough for a
+one-pager; zero is not.
+
+## Self-review before sharing
+
+- Could someone outside the meetings follow the context without asking you?
+- Is every non-goal something a reader might reasonably have expected?
+- Does every design paragraph name what you gave up?
+- Is at least one alternative a real option?
+- Can each paragraph be summarised in one sentence?
+- Is there at least one open question?
+- Is it one page?
+
+## Where other processes differ
+
+Noted here so the skeleton travels; taught in later lessons.
+
+- **Rust RFC** ([template](https://github.com/rust-lang/rfcs/blob/master/0000-template.md))
+  adds *Drawbacks*, *Rationale and alternatives*, *Prior art*, *Unresolved
+  questions*, *Future possibilities*. The drawbacks section is worth stealing.
+- **Kubernetes KEP** ([template](https://github.com/kubernetes/enhancements/blob/master/keps/NNNN-kep-template/README.md))
+  adds named reviewers/approvers and a production-readiness questionnaire.
+- **Oxide RFD** ([RFD 1](https://rfd.shared.oxide.computer/rfd/0001)) adds a
+  state: prediscussion → ideation → discussion → published → committed →
+  abandoned. "Abandoned" is a legitimate ending.
+- **HashiCorp** ([writing practices](https://www.hashicorp.com/en/how-hashicorp-works/articles/writing-practices-and-culture))
+  splits the problem (PRD) from the solution (RFC) into two docs.
+- **Sourcegraph** ([handbook, archived](https://github.com/sourcegraph/handbook/blob/main/content/company-info-and-process/communication/rfcs/index.md))
+  reviews the problem statement before the solution, with explicit status labels.

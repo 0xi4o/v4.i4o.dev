@@ -1,0 +1,256 @@
+---
+courseTitle: Design and architecture docs for POCs and features
+title: 'Goals and non-goals: the section a reviewer approves first'
+description: Tell a goal from a design choice wearing a goal's clothes, rewrite the DocuDex goals as outcomes, and collect the open questions where a reviewer can find them
+lessonNumber: 2
+createdAt: 2026-09-10
+updatedAt: 2026-09-10
+---
+
+import { Aside, KeyIdea } from '../assets/LessonLayout'
+import { BeforeAfter } from '../assets/BeforeAfter'
+import { Categorise } from '../assets/Categorise'
+import { Checklist } from '../assets/Checklist'
+import { Quiz } from '../assets/Quiz'
+
+**The win for today:** the goals section of the DocuDex doc rewritten so a
+reviewer can agree with every goal and still argue with the design — plus an
+open-questions list at the end. About thirty minutes; the material is your own
+doc from [lesson 1](./0001-the-one-page-design-doc).
+
+<KeyIdea>
+	A goal is an outcome that must be true when you ship. A design choice is a way of making it
+	true. The test: <em>could a different design satisfy this bullet?</em> If not, it is a design
+	choice, and it belongs one section down.
+</KeyIdea>
+
+## 1. Why the goals section is reviewed first (4 min)
+
+Sourcegraph's RFC process, as captured in their
+[handbook](https://github.com/sourcegraph/handbook/blob/main/content/company-info-and-process/communication/rfcs/index.md),
+moves a doc through explicit labels. Under "Reviewing problem", the RFC "has a
+firm problem statement, and reviews should focus on confirming that the
+problem definition is correct". Only once "the problem is well understood"
+does it move to "Reviewing solution". The same handbook wants the problem
+statement to say "why this problem is worth solving now", and the background
+to be "indisputable facts, not opinion" — the context-section rule from
+lesson 1, stated by the reference employer. HashiCorp goes further
+and splits the two into separate documents, a PRD for the problem and an RFC
+for the solution
+([writing practices and culture](https://www.hashicorp.com/en/how-hashicorp-works/articles/writing-practices-and-culture)).
+Either way, the goals section is the contract the design is judged against.
+
+That is why a design choice disguised as a goal is a problem and not a
+nitpick. If "ship as a CLI" is a goal, then agreeing with the goals means
+agreeing with the CLI, and nobody ever gets to ask whether a CLI was the
+right call. You have smuggled the solution past the problem review. It also
+weakens the alternatives section later: you cannot honestly consider
+alternatives to something you have already declared mandatory.
+
+Ubl's [Design Docs at Google](https://www.industrialempathy.com/posts/design-docs-at-google/)
+gives the flip side for non-goals: they are goals you could reasonably have
+had and are explicitly rejecting — his example is a storage system listing
+"ACID compliance" as a non-goal. A good non-goal makes a reader think "oh, I'd
+assumed that was in".
+
+## 2. Sort your own bullets (6 min)
+
+These are the bullets from your DocuDex doc, plus two lifted out of the prose.
+Sort each one. No looking back at the doc.
+
+<Categorise
+	title="Goal, design choice, or non-goal?"
+	categories={['Goal', 'Design choice', 'Non-goal']}
+	items={[
+		{
+			text: 'Ship as a CLI',
+			answer: 1,
+			note: 'A means. The outcome underneath is something like "humans and coding agents can both drive it from the terminal they already work in" — and a CLI is one way to get there.',
+		},
+		{
+			text: 'Docs pinned to the dependency version the project actually uses',
+			answer: 0,
+			note: 'An outcome, and one your prose states ("we need versioned docs") but the goals list does not. Several storage designs could satisfy it.',
+		},
+		{
+			text: 'Manifest file committed to source control',
+			answer: 1,
+			note: 'A means. The goal is that everyone on a team gets the same docs for a repo with no server and no account. A lockfile-style manifest is one design that does that.',
+		},
+		{
+			text: 'Hosted version with team features',
+			answer: 2,
+			note: 'A real non-goal: a reader of "team sharing" would reasonably expect a hosted product, and you are saying no.',
+		},
+		{
+			text: 'Local, fully offline web app for viewing docs, with a rich UI',
+			answer: 1,
+			note: 'A means. The goal is "browse and search the docs with no network"; the local web app is how, and a TUI would be another how.',
+		},
+		{
+			text: 'Support Go standard library and third-party packages',
+			answer: 0,
+			note: 'Scope, which is a goal: what must be covered when you ship. "…via godoc" was the design choice bolted onto it.',
+		},
+		{
+			text: 'No Markdown rendered in the CLI or a TUI',
+			answer: 2,
+			note: 'A real non-goal: a terminal-first tool invites the expectation of terminal-rendered docs, and you are ruling it out for the MVP.',
+		},
+		{
+			text: 'Store docs as Markdown files plus a SQLite index',
+			answer: 1,
+			note: 'A means, and one your doc asserts rather than argues. Lesson 3 is about what this one costs.',
+		},
+		{
+			text: 'A new user can init, add and serve without reading a manual',
+			answer: 0,
+			note: 'An outcome, and a testable one. This is what "few necessary commands" was reaching for.',
+		},
+	]}
+/>
+
+## 3. Rewrite a design choice as the goal underneath (5 min)
+
+The move is always the same: ask "what would be true for the user if this
+worked?", write that, and push the means down into the design section where
+it can be argued with.
+
+<BeforeAfter
+	beforeLabel="Design choice as goal"
+	afterLabel="Goal, with the design where it belongs"
+	before={<>Manifest file committed to source control so it's available across a team.</>}
+	after={
+		<>
+			<strong>Goal:</strong> everyone working in a repo gets the same set of docs, with no server
+			and no account.
+			<br />
+			<strong>Design (later):</strong> a manifest file in the repo, lockfile-style, is the source of
+			truth; <code>sync</code> reads it. Cost: the manifest can drift from <code>go.mod</code>{' '}
+			unless <code>add</code> keeps them in step.
+		</>
+	}
+	note="Now a reviewer can accept the goal and still ask whether the manifest should be generated from go.mod rather than kept by hand — which is a better conversation than yes/no on the whole bullet."
+/>
+
+Two more things a goal should carry. It should be testable — "few necessary
+commands" is a feeling, "init, add and serve without reading a manual" is a
+test someone can run. And where a goal is not obvious, one clause of why:
+"docs pinned to the dependency version, because stale docs are worse than no
+docs for an agent".
+
+## 4. Do it (15 min)
+
+Open the DocuDex doc and rewrite the goals and non-goals section.
+
+1. For each bullet, run the test: could a different design satisfy it? If
+   not, move the bullet to the design section and write the outcome that was
+   underneath it as the goal.
+2. Add the missing goal about versioned docs.
+3. Make each goal testable. If you cannot say how you would check it, it is
+   either a design choice or a wish.
+   Also add one line to the context section on why now — Sourcegraph's
+   "worth solving now" — since agents reading docs offline is the timing
+   argument and the doc never quite says so.
+4. Non-goals: keep the four you have. For each, add a short clause on why, so
+   a reader does not assume you forgot ("no TUI for the MVP — the web app
+   gives search and navigation for less work; a TUI can come once the storage
+   format is stable").
+5. Add a final section, **Open questions**, and move the four questions that
+   are currently inside paragraphs there: the agent interface, how to fetch
+   docs beyond Go, user-defined sources, and the business model. Give each a
+   line on what would resolve it. Lesson 3 comes back to the first one.
+
+<Checklist
+	title="Self-review: goals"
+	items={[
+		{
+			question: 'For every goal, could at least two different designs satisfy it?',
+			why: 'If only one design fits, the bullet is that design. Move it down.',
+		},
+		{
+			question: 'Could someone check each goal without asking you what you meant?',
+			why: '"Usable every day" cannot be checked. "Init, add, serve without a manual" can.',
+		},
+		{
+			question: 'Is the goal your prose relied on (versioned docs) now in the list?',
+			why: 'A goal that lives only in the design section is a goal the reviewer never approved.',
+		},
+		{
+			question: 'Would each non-goal surprise at least one reasonable reader?',
+			why: 'If nobody would have expected it, it is not a non-goal, it is noise.',
+		},
+		{
+			question: 'Does each non-goal say, in a clause, why it is out?',
+			why: 'Otherwise a reader assumes you forgot rather than decided.',
+		},
+		{
+			question: 'Are the open questions collected at the end, each with what would resolve it?',
+			why: 'Inline questions get lost; a list at the end is what a reviewer scans for.',
+		},
+	]}
+/>
+
+## 5. Retrieval (2 min)
+
+One of these is from lesson 1. No looking back.
+
+<Quiz
+	questions={[
+		{
+			prompt: 'Which of these is a goal rather than a design choice?',
+			options: [
+				'Store the docs in SQLite tables',
+				'Ship the tool as a CLI',
+				'Docs stay readable with no network',
+				'Keep a manifest in the repo',
+			],
+			answerIndex: 2,
+			explanation:
+				'Only the third is an outcome. The other three are ways of producing outcomes, and each could be swapped for a different way.',
+		},
+		{
+			prompt: 'The test for whether a bullet is a goal:',
+			options: [
+				'a different design could still satisfy it',
+				"it appears in the product's marketing copy",
+				'the author feels strongly that it matters',
+				'it can be finished in one sprint',
+			],
+			answerIndex: 0,
+			explanation: 'If exactly one design fits the bullet, the bullet is that design.',
+		},
+		{
+			prompt: 'Why review the goals before the design? (Sourcegraph, HashiCorp)',
+			options: [
+				"so the solution can't hide problems",
+				'because reviewers have little spare time',
+				'so estimates can be produced earlier',
+				'because goals are easier to write',
+			],
+			answerIndex: 0,
+			explanation:
+				'Agreeing the problem first means a design choice cannot be approved by accident inside the goals.',
+		},
+		{
+			prompt: "Ubl's example of a non-goal for a storage system:",
+			options: ['ACID compliance', 'Fast reads', 'Low cost', 'Easy setup'],
+			answerIndex: 0,
+			explanation: 'A goal a reader could reasonably have expected, explicitly rejected.',
+		},
+	]}
+/>
+
+## Read next
+
+Ryan Singer's [Write the pitch](https://basecamp.com/shapeup/1.5-chapter-06)
+from Shape Up — ten minutes. Its "no-gos" section is non-goals under another
+name, and its "appetite" is a constraint most design docs forget to state:
+how much time this is worth. Add an appetite line to the DocuDex doc if it
+changes anything.
+
+<Aside>
+	Paste the rewritten goals section here when it is done and I will review it before lesson 3,
+	which takes the storage and serving paragraphs and makes them argue: what each choice costs,
+	and what the alternative would have cost instead.
+</Aside>
