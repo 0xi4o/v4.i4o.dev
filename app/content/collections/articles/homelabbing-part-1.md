@@ -9,7 +9,7 @@ tags:
   - workflow
   - learning
 createdAt: 2026-09-16T07:11:56.013Z
-updatedAt: 2026-09-22T07:50:21.299Z
+updatedAt: 2026-09-22T07:57:35.549Z
 publishedAt: ""
 status: draft
 ---
@@ -26,8 +26,6 @@ Mini PCs are a great option for starting a homelab. They’re usually cheaper th
 A lot of Hardware Haven’s videos feature used mini PCs from Lenovo, Dell, and HP. These are those little enterprise workstations. Due to rising RAM and storage costs, these mini PCs have gotten quite expensive, if you buy new. For example, new Lenovo Thinkcentre mini PCs start at 70k INR for mid-range specs. Refurbished ones on Amazon and Flipkart were more affordable but I always felt sketchy about the sellers.
 
 Then I got an idea from a friend - Facebook Marketplace. And boy did I find a treasure trove of options. I started scouring listings of used Thinkcentre mini PCs and found a seller with good reviews and contacted him. He had a bunch of used but near-new condition Lenovo Thinkcentre M710Qs. 
-
-
 
 Here are their specs:
 
