@@ -1,0 +1,31 @@
+---
+courseTitle: Agent harness engineering in Go
+title: Glossary
+description: The course's terms, one line each, with pi's name for the same thing where it differs
+createdAt: 2026-09-20
+updatedAt: 2026-09-20
+---
+
+Terms are added as lessons are written; the number says which lesson earns it. Lessons stick to these words.
+Where pi uses a different name, it is in the last column, so its source reads
+cleanly.
+
+| Term | Meaning | In pi |
+| --- | --- | --- |
+| **Model call** (1) | One HTTP request carrying a list of messages; one assistant message comes back. The model keeps nothing between calls | `stream()` / `complete()` |
+| **Token** (1) | The unit a model reads and writes, roughly three-quarters of an English word. Limits and bills are in tokens | — |
+| **Usage** (1) | Input and output token counts for one model call | `Usage` |
+| **Harness** | Everything around the model that turns "text in, text out" into an agent: the provider layer plus the agent core | the `pi-ai` + `pi-agent-core` pair |
+| **Provider layer** | One set of types and one streaming call over many LLM APIs. Knows wire formats, auth, usage. Knows nothing about loops or running tools | `pi-ai` |
+| **Agent core** | The loop, tool execution, events, queues and hooks. Talks to models only through the provider layer | `pi-agent-core` |
+| **Wire format** | One vendor API's request and streaming response shape. Several providers can share one (OpenAI-compatible hosts) | `Api`, e.g. `anthropic-messages` |
+| **Provider** | A company or host you send requests to. Has a wire format, a base URL, auth and a model list | `Provider` |
+| **Transcript** | The ordered list of messages that is the whole state of a conversation. What is sent to the model every call | `Context.messages` |
+| **Message** | One transcript entry. Four roles: system, user, assistant, tool result | `Message` |
+| **Block** (1) | One piece of a message's content: text, thinking, image or tool call | `TextContent`, `ThinkingContent`, `ImageContent`, `ToolCall` |
+| **Tool** | A name, a description and a JSON Schema for arguments, declared to the model; plus, in the agent core, a function to run | `Tool` (pi-ai), `AgentTool` (agent core) |
+| **Tool call** | A block in an assistant message asking for a tool to be run with given arguments. Has an id | `ToolCall` |
+| **Tool result** | The message that answers one tool call, matched by id. May be an error | `ToolResultMessage` |
+| **Stop reason** (1) | Why the model stopped generating this message: ours: `stop`, `length`, `toolUse`, `error`, `aborted`; Anthropic's wire names: `end_turn`, `max_tokens`, `tool_use` | `StopReason` |
+| **Turn** | One model call plus the execution of any tool calls it made | `turn_start` … `turn_end` |
+| **Run** | Everything from a prompt until the agent core has nothing left to do: one or more turns | `agent_start` … `agent_end` |

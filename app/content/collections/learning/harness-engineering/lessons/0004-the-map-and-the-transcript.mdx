@@ -1,0 +1,395 @@
+---
+courseTitle: Agent harness engineering in Go
+title: 'The map and the transcript'
+description: What a harness is, why pi splits it into a provider layer and an agent core, and the one data structure both layers share — built in Go with a round-trip test as the first file of the module
+lessonNumber: 4
+createdAt: 2026-09-20
+updatedAt: 2026-09-20
+---
+
+import { Aside, KeyIdea } from '../assets/LessonLayout'
+import { Categorise } from '../assets/Categorise'
+import { CodeTask } from '../assets/CodeTask'
+import { Quiz } from '../assets/Quiz'
+
+**The win for this sitting:** the first file of your harness — the transcript
+types in Go — with a test that proves a conversation survives a trip through
+JSON. And a map in your head of where every later piece goes. About twenty
+minutes of reading, then an hour or so of Go.
+
+Lessons 1 to 3 got you to a working loop in one file, the same ground as
+Thorsten Ball's [How to Build an Agent](https://ampcode.com/notes/how-to-build-an-agent).
+His summary is fair: "an LLM, a loop, and enough tokens." The rest of the
+course is about the distance between that and something you would let other
+projects depend on.
+
+## 1. What the harness is (3 min)
+
+A model is a function: a list of messages goes in, one assistant message
+comes out. It has no memory, runs nothing and stops after one message. The
+**harness** is everything around that function that makes it behave like an
+agent: keeping the list, sending it, reading the reply as it streams, running
+the tools the reply asks for, putting the results back on the list, and
+deciding whether to call again.
+
+<KeyIdea>
+	The list of messages is the whole state of an agent. We call it the **transcript**. Every
+	feature in this course — streaming, tools, abort, steering, switching provider mid-conversation,
+	saving a session — is an operation on the transcript. Get its types right and the rest has
+	somewhere to stand.
+</KeyIdea>
+
+## 2. Two layers, one direction (5 min)
+
+pi splits the harness into two packages, and we will too.
+
+The **provider layer** ([`pi-ai`](https://github.com/earendil-works/pi/tree/b73412a/packages/ai))
+puts many LLM APIs behind one set of types and one streaming call. It knows
+wire formats, auth, token usage and cost. It knows nothing about loops and
+never runs a tool. Mario Zechner, pi's author,
+[counts four wire formats](https://mariozechner.at/posts/2025-11-30-pi-coding-agent/)
+worth speaking — OpenAI Completions, OpenAI Responses, Anthropic Messages and
+Google Generative AI — and nearly every other host copies one of them.
+
+The **agent core** ([`pi-agent-core`](https://github.com/earendil-works/pi/tree/b73412a/packages/agent))
+is the loop: it calls the provider layer, runs tools, emits events for a UI,
+and handles messages that arrive while it is busy. It is small.
+[`agent-loop.ts`](https://github.com/earendil-works/pi/blob/b73412a/packages/agent/src/agent-loop.ts)
+is 857 lines, and the loop proper is about 120 of them.
+
+```
+your app ──► agent core ──► provider layer ──► HTTPS ──► model
+```
+
+The arrow only points right. The agent core imports the provider layer; the
+provider layer imports neither. That rule is what lets you use the provider
+layer alone (a one-shot completion in a CLI) and test the agent core with a
+fake provider and no network.
+
+Armin Ronacher's advice after a year of building agents is to
+[own this abstraction yourself](https://lucumr.pocoo.org/2025/11/21/agents-are-hard/)
+because the differences between models leak through any generic SDK. That is
+the case for this course existing.
+
+<Categorise
+	title="Which layer owns it?"
+	categories={['Provider layer', 'Agent core']}
+	items={[
+		{
+			text: 'Turning Anthropic’s input_json_delta chunks into one tool call block',
+			answer: 0,
+			note: 'Wire format detail. The agent core only ever sees a finished tool call.',
+		},
+		{
+			text: 'Looking up the Go function registered under the name read_file',
+			answer: 1,
+			note: 'The provider layer declares tools to the model; it never runs them.',
+		},
+		{
+			text: 'Counting input and output tokens and pricing them',
+			answer: 0,
+			note: 'Usage comes off the wire, per response, in provider-specific fields.',
+		},
+		{
+			text: 'Deciding that two tool calls can run at the same time',
+			answer: 1,
+			note: 'Execution policy. pi defaults to parallel, with results kept in source order.',
+		},
+		{
+			text: 'Refusing to execute tool calls from a reply cut off by the token limit',
+			answer: 1,
+			note: 'The provider layer reports stop reason length; acting on it is the loop’s job.',
+		},
+		{
+			text: 'Replaying a thinking block’s opaque signature on the next request',
+			answer: 0,
+			note: 'The transcript stores it; the provider file for that wire format sends it back.',
+		},
+	]}
+/>
+
+## 3. The transcript is the contract (8 min)
+
+Both layers share one thing: the message types. pi defines them in
+[`packages/ai/src/types.ts`, lines 358–553](https://github.com/earendil-works/pi/blob/b73412a/packages/ai/src/types.ts#L358-L553).
+Stripped to what matters now:
+
+| Role | Content blocks | Extra fields |
+| --- | --- | --- |
+| `system` | text | — |
+| `user` | text, image | — |
+| `assistant` | text, thinking, tool call | provider, model, usage, stop reason, error message |
+| `toolResult` | text, image | tool call id, tool name, is-error |
+
+Three things in there are decisions, not accidents.
+
+**They are your types, not a vendor's.** Anthropic calls it `tool_use`, OpenAI
+calls it a `function_call` item, Google a `functionCall` part. If the agent
+core holds vendor types, it is a one-vendor agent core. Owning the types is
+also what makes
+[handing a conversation from one provider to another](https://github.com/earendil-works/pi/tree/b73412a/packages/ai#cross-provider-handoffs)
+possible, and what makes a saved session readable next year.
+
+**Content is a list of blocks, not a string.** One assistant message can
+think, say something and ask for two tools, in that order. The order is
+information. A thinking block also carries an opaque signature that the
+provider expects back unchanged; lose it and the next request can fail.
+
+**The stop reason is part of the message.** It is the model's hand signal to
+the loop:
+
+| Stop reason | Meaning | The loop's move |
+| --- | --- | --- |
+| `stop` | Finished | Nothing to run. End, unless something is queued |
+| `toolUse` | Wants tools run | Run them, append results, call again |
+| `length` | Hit the output token limit | Tool calls may be cut off mid-argument. Fail them all, run none, call again |
+| `error` | Request failed | End the run; partial content stays on the message |
+| `aborted` | Caller cancelled | Same as `error` |
+
+Read [lines 217–247 of `agent-loop.ts`](https://github.com/earendil-works/pi/blob/b73412a/packages/agent/src/agent-loop.ts#L217-L247)
+with that table beside you. One detail to notice: the loop finds work by
+looking for tool call blocks in the content, not by checking for `toolUse`.
+The stop reason only decides whether running them is safe. The loop from lesson 3
+executes a truncated tool call today.
+
+## 4. Saying it in Go (4 min)
+
+TypeScript gives pi tagged unions for free. Go does not, so there are two
+choices to make before typing anything.
+
+**Blocks: a sealed interface.** `type Block interface{ blockType() string }`
+with an unexported method, implemented by `Text`, `Thinking`, `Image` and
+`ToolCall`. The reason: a type switch is how Go code wants to consume a union,
+and the unexported method stops other packages adding block kinds the provider
+files do not know how to encode. The cost: `encoding/json` cannot decode into
+an interface, so `Message` needs hand-written `MarshalJSON` and
+`UnmarshalJSON` that read and write a `"type"` tag. Accept it; it is forty
+lines, written once.
+
+**Messages: one struct, optional fields.** A single `Message` with `Role`,
+`Content []Block` and the role-specific fields marked `omitempty`. The reason:
+`[]Message` is the type that appears in every signature in both packages, and
+a plain struct slice is pleasant to build, range over and serialise. The cost:
+the compiler will not stop you setting `ToolCallID` on a user message. A
+`Validate()` method can, later. The alternative — a sealed `Message` interface
+with four structs — is more correct and makes every call site noisier. This is
+reversible while the module is pre-v0.1, so take the simple one.
+
+Two smaller ones. Keep tool call arguments as `json.RawMessage`: the provider
+layer should not guess at their shape, and validation belongs to the tool.
+And store timestamps as `int64` Unix milliseconds, as pi does. `time.Time`
+does not survive a JSON round trip under `reflect.DeepEqual` (monotonic clock
+reading, location pointer), and you would find that out in the test below.
+
+## 5. Build it
+
+<CodeTask
+	title="The transcript types, with a round trip"
+	run={'go test ./llm/ -run "Transcript|Block|ToolCalls" -v'}
+	doneWhen={[
+		'All four tests pass',
+		'The JSON for a tool call block contains "type":"toolCall" and compact arguments',
+		'An unknown block type fails to decode with an error that names the type',
+		'You can say, without looking, which fields only an assistant message uses',
+	]}
+	hints={[
+		'Marshal each block on its own, then add the "type" tag. Either wrap it in a small struct per block kind, or splice the tag into the object’s opening brace.',
+		'For decoding, unmarshal content into []json.RawMessage first, peek at {"type": …} with a tiny struct, then switch on it and unmarshal the same bytes into the concrete type.',
+		'To reuse the default encoding for the other fields without recursing into your own MarshalJSON, declare `type messageAlias Message` and embed that in an anonymous struct beside a `Content []json.RawMessage` field. Tag the real Content field `json:"-"`.',
+	]}
+>
+	Add a package `llm` to the module. In
+	`llm/transcript.go` define `Role` and `StopReason` as string types with constants, the `Block`
+	interface and its four implementations, `Usage` with `Input` and `Output` counts, and
+	`Message`. Add one helper, `func (m Message) ToolCalls() []ToolCall`. Then save the test below
+	as `llm/transcript_test.go` and make it pass. The test is the spec: field and constant names
+	come from it.
+</CodeTask>
+
+```go
+package llm
+
+import (
+	"encoding/json"
+	"reflect"
+	"strings"
+	"testing"
+)
+
+func sampleTranscript() []Message {
+	return []Message{
+		{Role: RoleUser, Content: []Block{Text{Text: "Which Go version does this repo use?"}}, Timestamp: 1},
+		{
+			Role: RoleAssistant,
+			Content: []Block{
+				Thinking{Thinking: "I should read go.mod.", Signature: "sig-abc"},
+				Text{Text: "Let me check."},
+				ToolCall{ID: "call_1", Name: "read_file", Arguments: json.RawMessage(`{"path":"go.mod"}`)},
+			},
+			Provider:   "anthropic",
+			Model:      "claude-sonnet-4-6",
+			StopReason: StopToolUse,
+			Usage:      &Usage{Input: 120, Output: 45},
+			Timestamp:  2,
+		},
+		{
+			Role:       RoleToolResult,
+			ToolCallID: "call_1",
+			ToolName:   "read_file",
+			Content:    []Block{Text{Text: "module harness\n\ngo 1.24\n"}},
+			Timestamp:  3,
+		},
+		{
+			Role:       RoleAssistant,
+			Content:    []Block{Text{Text: "Go 1.24."}},
+			Provider:   "anthropic",
+			Model:      "claude-sonnet-4-6",
+			StopReason: StopEnd,
+			Usage:      &Usage{Input: 190, Output: 6},
+			Timestamp:  4,
+		},
+	}
+}
+
+func TestTranscriptRoundTrip(t *testing.T) {
+	want := sampleTranscript()
+
+	data, err := json.Marshal(want)
+	if err != nil {
+		t.Fatalf("marshal: %v", err)
+	}
+
+	var got []Message
+	if err := json.Unmarshal(data, &got); err != nil {
+		t.Fatalf("unmarshal: %v\njson: %s", err, data)
+	}
+	if !reflect.DeepEqual(got, want) {
+		t.Fatalf("round trip changed the transcript\n got: %#v\nwant: %#v", got, want)
+	}
+}
+
+func TestBlocksCarryATypeTag(t *testing.T) {
+	data, err := json.Marshal(sampleTranscript()[1])
+	if err != nil {
+		t.Fatalf("marshal: %v", err)
+	}
+	for _, tag := range []string{`"type":"thinking"`, `"type":"text"`, `"type":"toolCall"`} {
+		if !strings.Contains(string(data), tag) {
+			t.Errorf("missing %s in %s", tag, data)
+		}
+	}
+}
+
+func TestUnknownBlockTypeIsAnError(t *testing.T) {
+	in := `{"role":"user","content":[{"type":"hologram","text":"hi"}],"timestamp":1}`
+	var m Message
+	if err := json.Unmarshal([]byte(in), &m); err == nil {
+		t.Fatal("want an error for an unknown block type, got nil")
+	}
+}
+
+func TestToolCallsHelper(t *testing.T) {
+	msgs := sampleTranscript()
+	if got := msgs[1].ToolCalls(); len(got) != 1 || got[0].Name != "read_file" {
+		t.Errorf("ToolCalls() = %#v, want one read_file call", got)
+	}
+	if got := msgs[3].ToolCalls(); len(got) != 0 {
+		t.Errorf("ToolCalls() = %#v, want none", got)
+	}
+}
+```
+
+I have run this test against a reference implementation on Go 1.24, so it is
+passable as written. Paste me your `transcript.go` when it is green and I will
+review it the way a maintainer would.
+
+## 6. Without looking back
+
+Do this after the build, not straight after the reading. The gap is the point.
+
+<Quiz
+	questions={[
+		{
+			prompt: 'A reply stops with reason length and contains two tool call blocks. What does pi’s loop do?',
+			options: [
+				'Runs both calls, then continues',
+				'Runs the first call only',
+				'Fails both calls, then continues',
+				'Ends the run with error',
+			],
+			answerIndex: 2,
+			explanation:
+				'Arguments may be cut off mid-JSON, so every call gets an error result, none is executed, and the model is called again to retry.',
+		},
+		{
+			prompt: 'How does the loop decide there are tools to run?',
+			options: [
+				'The stop reason equals toolUse',
+				'Content contains tool call blocks',
+				'The provider sets a flag',
+				'The user names a tool',
+			],
+			answerIndex: 1,
+			explanation:
+				'It filters the content for tool call blocks. The stop reason is then used to judge whether executing them is safe.',
+		},
+		{
+			prompt: 'Which import would break the two-layer rule?',
+			options: [
+				'agent core imports provider layer',
+				'your app imports agent core',
+				'provider layer imports agent core',
+				'your app imports provider layer',
+			],
+			answerIndex: 2,
+			explanation:
+				'Dependencies point one way: app → agent core → provider layer. The provider layer must be usable, and testable, alone.',
+		},
+		{
+			prompt: 'Why must a thinking block keep its signature in the transcript?',
+			options: [
+				'The UI renders it for users',
+				'The provider expects it sent back',
+				'The loop matches results with it',
+				'The tool validates arguments with it',
+			],
+			answerIndex: 1,
+			explanation:
+				'It is opaque replay data for the provider. The provider file for that wire format returns it unchanged on the next request.',
+		},
+		{
+			prompt: 'Why are tool call arguments kept as raw JSON in the provider layer?',
+			options: [
+				'Decoding is slow in Go',
+				'Providers forbid parsing arguments early',
+				'Their shape belongs to tools',
+				'Raw bytes compress much better',
+			],
+			answerIndex: 2,
+			explanation:
+				'Only the tool knows its schema. The provider layer carries the object; the agent core validates it against the tool before running.',
+		},
+	]}
+/>
+
+## Read next
+
+The primary source for this lesson is Mario Zechner's
+[What I learned building an opinionated and minimal coding agent](https://mariozechner.at/posts/2025-11-30-pi-coding-agent/).
+Read the pi-ai and pi-agent-core sections only, and for each feature he lists,
+say which layer on your map it lives in. Then skim
+[`types.ts` lines 358–553](https://github.com/earendil-works/pi/blob/b73412a/packages/ai/src/types.ts#L358-L553)
+and note every field you left out of your `Message`. Each one is a lesson we
+have not reached yet, or a thing you have decided not to build.
+
+The [harness map](../reference/harness-map) has this lesson on one sheet, and
+the [glossary](../reference/glossary) has the terms. Next lesson: what comes
+back from a model call while it is still being generated — the stream
+contract — and a fake provider, so that everything after it can be tested
+with no network and no API key.
+
+<Aside>
+	Ask me anything that did not land, or that you disagree with. "Why not a sealed Message
+	interface?" and "why not just use the Anthropic SDK types?" are both fair fights, and the
+	answers shape the module. I am your teacher here, not just the author of the page.
+</Aside>

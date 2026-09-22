@@ -1,0 +1,31 @@
+---
+courseTitle: Agent harness engineering in Go
+title: Baseline — has built a basic tool-calling loop; streaming internals, multi-provider design and production concerns are new
+description: Ilango's starting point, as stated at workspace setup
+createdAt: 2026-09-20
+updatedAt: 2026-09-20
+status: superseded by LR-0002
+---
+
+# Baseline — has built a basic tool-calling loop; streaming internals, multi-provider design and production concerns are new
+
+Ilango has hand-written a tool-calling loop against one provider API and
+works on an agent builder platform by day, so the 400-line "LLM plus a loop"
+agent is known ground. He has not built a streaming parser, a multi-provider
+abstraction, or the production parts (abort with partial results, queues,
+hooks, retries, persistence). Fluent in Go and TypeScript. The harness ships
+as a standalone open-source Go module first; no consumer is fixed.
+
+## Evidence
+
+Self-reported on 20 Sep 2026 when choosing between "used, not built", "built a
+basic loop" and "deep on one stack". Not yet demonstrated in this workspace.
+
+## Implications
+
+- Lesson 1 starts at the architecture and the transcript types, not at "write
+  a loop". Do not teach what a tool call is.
+- The claim is untested. Lesson 1's quiz question on the `length` stop reason
+  and his review of `transcript.go` are the first evidence either way; adjust
+  the floor after seeing them.
+- With no consumer, API design, tests and the faux provider come early.

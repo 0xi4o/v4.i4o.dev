@@ -1,0 +1,31 @@
+---
+courseTitle: Agent harness engineering in Go
+title: Baseline corrected — start from an empty folder and the basics
+description: The "built a basic loop" baseline was too high; Ilango asked to start a Go project from scratch and be walked through
+createdAt: 2026-09-20
+updatedAt: 2026-09-20
+---
+
+# Baseline corrected — start from an empty folder and the basics
+
+Supersedes LR-0001. After seeing a first lesson that opened with the
+two-layer architecture and transcript types, Ilango said the loop he once
+wrote was a while ago and asked to start a Go project from scratch and be
+walked through from the basics. Treat agent internals as new: the model call,
+statelessness, tool calls and the loop are all taught, in that order, before
+any architecture.
+
+## Evidence
+
+His own words on 20 Sep 2026, minutes after choosing "built a basic loop".
+The same thing happened in the homelab course on 10 Sep. When he picks a
+baseline from a list, assume one notch lower.
+
+## Implications
+
+- Go, HTTP and JSON are still known ground. The gap is harness concepts, not
+  the language.
+- Lessons 1 to 3 rebuild the one-file agent. The architecture lesson (drafted
+  as 0004) comes after he has felt the problem it solves.
+- Walk through code; leave one function per lesson for him to write against
+  a test.

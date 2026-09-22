@@ -1,0 +1,550 @@
+---
+courseTitle: Agent harness engineering in Go
+title: 'Hello, model: one call, from an empty folder'
+description: A new Go module, one HTTP request to a model with nothing but the standard library, and the three things in the reply that every later lesson builds on — content blocks, the stop reason and token usage
+lessonNumber: 1
+createdAt: 2026-09-20
+updatedAt: 2026-09-20
+---
+
+import { Aside, KeyIdea } from '../assets/LessonLayout'
+import { CodeTask } from '../assets/CodeTask'
+import { Quiz } from '../assets/Quiz'
+import { Steps } from '../assets/Steps'
+
+**The win for this sitting:** `go run ./cmd/hello "your question"` prints a
+model's answer, why it stopped, and what it cost in tokens — from a module
+you started in an empty folder, with no SDK. About fifteen minutes of
+reading, then forty-five at the keyboard.
+
+No agent yet. An agent is a loop around a model call, so the first thing to
+own is the call.
+
+## 1. What a model call is (6 min)
+
+Strip away the chat window and a model is a web endpoint. You `POST` some
+JSON, you get JSON back. For Anthropic's
+[Messages API](https://platform.claude.com/docs/en/api/messages) the request
+needs three things:
+
+| Field | What it is |
+| --- | --- |
+| `model` | Which model to run, by id |
+| `max_tokens` | The most it may write before it is cut off |
+| `messages` | The conversation so far: a list of `{role, content}` entries, `role` being `user` or `assistant` |
+
+A **token** is the unit a model reads and writes: a word-piece, roughly
+three-quarters of an English word. Everything is counted and billed in
+tokens, and `max_tokens` is a hard ceiling on the reply, not a target.
+
+What comes back is one assistant message. Three fields matter today, and they
+will still matter in lesson 13:
+
+| Field | What it is |
+| --- | --- |
+| `content` | A list of **blocks**, not a string. Today every block has `type: "text"`. Later the same list carries tool calls and thinking |
+| `stop_reason` | Why the model stopped writing. `end_turn` means it finished; `max_tokens` means it was cut off; `tool_use` (lesson 3) means it wants something run |
+| `usage` | `input_tokens` it read and `output_tokens` it wrote |
+
+<KeyIdea>
+	The model remembers nothing between calls. Each request stands alone: it sees exactly the
+	`messages` you send and nothing else. A "conversation" is you sending a longer list each time.
+	You will prove this to yourself in step 7, and lesson 2 is built on it.
+</KeyIdea>
+
+That is the whole interface. Everything else in this course — streaming,
+tools, the loop — is a variation on those two tables.
+
+## 2. What you need
+
+Go 1.22 or newer (`go version`), and an Anthropic API key from the
+[Claude Console](https://platform.claude.com/docs/en/get-api-key). API usage
+is prepaid and separate from any Claude subscription. We use Claude Haiku 4.5,
+listed at
+[$1 per million input tokens and $5 per million output](https://platform.claude.com/docs/en/about-claude/models/overview);
+this whole lesson is a few hundred tokens, so well under a rupee. Buy the
+minimum credit and set a spend limit in the console anyway. Model ids change,
+so if `claude-haiku-4-5-20251001` is rejected, take the current Haiku id from
+that same page.
+
+## 3. See the wire before writing code
+
+<Steps
+	title="Project and first request"
+	steps={[
+		{
+			title: 'Make the module',
+			body: (
+				<>
+					The module path is yours. If you already know where this will live, use it
+					(something like <code>github.com/aureliushq/yourname</code>); if not,{' '}
+					<code>harness</code> is fine and renaming later is one find-and-replace.
+				</>
+			),
+			commands: [
+				'mkdir harness && cd harness',
+				'git init',
+				'go mod init harness',
+				'mkdir -p cmd/hello',
+			],
+			check: 'go.mod exists and names your module',
+		},
+		{
+			title: 'Put the key in your shell, not in the repo',
+			body: (
+				<>
+					Export it for this terminal session. Do not write it to a file inside the
+					project. If you use direnv, add <code>.envrc</code> to{' '}
+					<code>.gitignore</code> first.
+				</>
+			),
+			commands: ['export ANTHROPIC_API_KEY=sk-ant-…'],
+			check: 'echo ${#ANTHROPIC_API_KEY} prints a number well above zero',
+		},
+		{
+			title: 'Make the call by hand',
+			body: (
+				<>
+					Read the raw reply before any Go exists. Find the three fields from section
+					1. Note that <code>content</code> is a list.
+				</>
+			),
+			commands: [
+				'curl -s https://api.anthropic.com/v1/messages \\',
+				'  -H "x-api-key: $ANTHROPIC_API_KEY" \\',
+				'  -H "anthropic-version: 2023-06-01" \\',
+				'  -H "content-type: application/json" \\',
+				'  -d \'{"model":"claude-haiku-4-5-20251001","max_tokens":100,"messages":[{"role":"user","content":"Say hello in five words."}]}\'',
+			],
+			check: 'JSON comes back with content, stop_reason "end_turn" and a usage object',
+		},
+	]}
+/>
+
+Three headers: the key, a pinned API version (the date is the version;
+`2023-06-01` is still the current one), and the content type. That is all the
+auth there is.
+
+## 4. The same call in Go
+
+Create `cmd/hello/main.go`. First the shapes, copied off what curl showed you.
+Only the fields we use; `encoding/json` ignores the rest.
+
+```go
+package main
+
+import (
+	"bytes"
+	"context"
+	"encoding/json"
+	"fmt"
+	"io"
+	"net/http"
+	"os"
+	"strings"
+	"time"
+)
+
+const (
+	defaultBaseURL = "https://api.anthropic.com"
+	model          = "claude-haiku-4-5-20251001"
+)
+
+// What we send.
+type request struct {
+	Model     string    `json:"model"`
+	MaxTokens int       `json:"max_tokens"`
+	Messages  []message `json:"messages"`
+}
+
+type message struct {
+	Role    string `json:"role"`
+	Content string `json:"content"`
+}
+
+// What comes back.
+type response struct {
+	Content    []block `json:"content"`
+	StopReason string  `json:"stop_reason"`
+	Usage      usage   `json:"usage"`
+}
+
+type block struct {
+	Type string `json:"type"`
+	Text string `json:"text"`
+}
+
+type usage struct {
+	InputTokens  int `json:"input_tokens"`
+	OutputTokens int `json:"output_tokens"`
+}
+```
+
+Then `main`, which is plumbing: read the key and the question, call `ask`,
+print the text blocks to stdout and the bookkeeping to stderr (so the answer
+stays pipeable).
+
+```go
+func main() {
+	apiKey := os.Getenv("ANTHROPIC_API_KEY")
+	if apiKey == "" {
+		fmt.Fprintln(os.Stderr, "set ANTHROPIC_API_KEY")
+		os.Exit(1)
+	}
+	if len(os.Args) < 2 {
+		fmt.Fprintln(os.Stderr, `usage: hello "your question"`)
+		os.Exit(1)
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+	defer cancel()
+
+	res, err := ask(ctx, defaultBaseURL, apiKey, strings.Join(os.Args[1:], " "))
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+
+	for _, b := range res.Content {
+		if b.Type == "text" {
+			fmt.Println(b.Text)
+		}
+	}
+	fmt.Fprintf(os.Stderr, "\n[stop: %s · in: %d tokens · out: %d tokens]\n",
+		res.StopReason, res.Usage.InputTokens, res.Usage.OutputTokens)
+}
+```
+
+Two choices in there that will outlive this file. `ask` takes a
+`context.Context`, because a model call can run for a minute and the caller
+must be able to give up; that becomes abort in lesson 7. And it takes the base
+URL as an argument instead of reading the constant, so a test can point it at
+a fake server and you can develop without spending tokens.
+
+## 5. Your turn: write `ask`
+
+<CodeTask
+	title="func ask(ctx, baseURL, apiKey, prompt) (*response, error)"
+	run={'go test ./cmd/hello/ -v'}
+	doneWhen={[
+		'All four tests pass without touching the network',
+		'A non-200 reply becomes a Go error that includes the body the API sent',
+		'Every error is wrapped with what was being attempted',
+	]}
+	hints={[
+		'Six moves: marshal a request with one user message; http.NewRequestWithContext for POST baseURL + "/v1/messages"; set the three headers; http.DefaultClient.Do; io.ReadAll the body; unmarshal into response.',
+		'Check res.StatusCode after reading the body, not before. On anything but 200, return fmt.Errorf with res.Status and the body bytes; the API puts a readable message in there.',
+		'The cancelled-context test passes for free if you used NewRequestWithContext. If it hangs or passes nil, you used http.NewRequest.',
+	]}
+>
+	Save the test file below as `cmd/hello/main_test.go`, then write `ask` in `main.go` until it
+	passes. The test starts a local fake of the API with `net/http/httptest`, so it checks what
+	you send as well as what you decode. My version is folded away underneath; try for ten
+	minutes before opening it.
+</CodeTask>
+
+```go
+package main
+
+import (
+	"context"
+	"encoding/json"
+	"io"
+	"net/http"
+	"net/http/httptest"
+	"strings"
+	"testing"
+)
+
+// fakeAnthropic stands in for api.anthropic.com. It records what it was sent
+// and replies with whatever status and body the test asks for.
+func fakeAnthropic(t *testing.T, status int, reply string) (*httptest.Server, *http.Request, *[]byte) {
+	t.Helper()
+	var gotReq http.Request
+	var gotBody []byte
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		gotReq = *r
+		gotBody, _ = io.ReadAll(r.Body)
+		w.Header().Set("content-type", "application/json")
+		w.WriteHeader(status)
+		io.WriteString(w, reply)
+	}))
+	t.Cleanup(srv.Close)
+	return srv, &gotReq, &gotBody
+}
+
+const okReply = `{
+  "id": "msg_01", "type": "message", "role": "assistant",
+  "content": [{"type": "text", "text": "Hello, Ilango."}],
+  "model": "claude-haiku-4-5-20251001",
+  "stop_reason": "end_turn", "stop_sequence": null,
+  "usage": {"input_tokens": 12, "output_tokens": 6}
+}`
+
+func TestAskSendsAWellFormedRequest(t *testing.T) {
+	srv, req, body := fakeAnthropic(t, 200, okReply)
+
+	if _, err := ask(context.Background(), srv.URL, "test-key", "Say hello"); err != nil {
+		t.Fatalf("ask: %v", err)
+	}
+
+	if req.Method != "POST" || req.URL.Path != "/v1/messages" {
+		t.Errorf("got %s %s, want POST /v1/messages", req.Method, req.URL.Path)
+	}
+	if got := req.Header.Get("x-api-key"); got != "test-key" {
+		t.Errorf("x-api-key = %q", got)
+	}
+	if got := req.Header.Get("anthropic-version"); got != "2023-06-01" {
+		t.Errorf("anthropic-version = %q", got)
+	}
+
+	var sent struct {
+		Model     string `json:"model"`
+		MaxTokens int    `json:"max_tokens"`
+		Messages  []struct {
+			Role    string `json:"role"`
+			Content string `json:"content"`
+		} `json:"messages"`
+	}
+	if err := json.Unmarshal(*body, &sent); err != nil {
+		t.Fatalf("request body is not JSON: %v\n%s", err, *body)
+	}
+	if sent.Model == "" || sent.MaxTokens <= 0 {
+		t.Errorf("model and max_tokens are required, got %q and %d", sent.Model, sent.MaxTokens)
+	}
+	if len(sent.Messages) != 1 || sent.Messages[0].Role != "user" || sent.Messages[0].Content != "Say hello" {
+		t.Errorf("messages = %+v, want one user message with the prompt", sent.Messages)
+	}
+}
+
+func TestAskDecodesTheReply(t *testing.T) {
+	srv, _, _ := fakeAnthropic(t, 200, okReply)
+
+	res, err := ask(context.Background(), srv.URL, "test-key", "Say hello")
+	if err != nil {
+		t.Fatalf("ask: %v", err)
+	}
+	if len(res.Content) != 1 || res.Content[0].Type != "text" || res.Content[0].Text != "Hello, Ilango." {
+		t.Errorf("content = %+v", res.Content)
+	}
+	if res.StopReason != "end_turn" {
+		t.Errorf("stop reason = %q", res.StopReason)
+	}
+	if res.Usage.InputTokens != 12 || res.Usage.OutputTokens != 6 {
+		t.Errorf("usage = %+v", res.Usage)
+	}
+}
+
+func TestAskTurnsAnAPIErrorIntoAGoError(t *testing.T) {
+	srv, _, _ := fakeAnthropic(t, 401,
+		`{"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"}}`)
+
+	_, err := ask(context.Background(), srv.URL, "bad-key", "Say hello")
+	if err == nil {
+		t.Fatal("want an error for a 401, got nil")
+	}
+	if !strings.Contains(err.Error(), "invalid x-api-key") {
+		t.Errorf("error should carry the API's message, got: %v", err)
+	}
+}
+
+func TestAskStopsWhenTheContextIsCancelled(t *testing.T) {
+	srv, _, _ := fakeAnthropic(t, 200, okReply)
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+
+	if _, err := ask(ctx, srv.URL, "test-key", "Say hello"); err == nil {
+		t.Fatal("want an error from a cancelled context, got nil")
+	}
+}
+```
+
+<details>
+<summary>My version of <code>ask</code></summary>
+
+```go
+func ask(ctx context.Context, baseURL, apiKey, prompt string) (*response, error) {
+	body, err := json.Marshal(request{
+		Model:     model,
+		MaxTokens: 1024,
+		Messages:  []message{{Role: "user", Content: prompt}},
+	})
+	if err != nil {
+		return nil, fmt.Errorf("encode request: %w", err)
+	}
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, baseURL+"/v1/messages", bytes.NewReader(body))
+	if err != nil {
+		return nil, fmt.Errorf("build request: %w", err)
+	}
+	req.Header.Set("x-api-key", apiKey)
+	req.Header.Set("anthropic-version", "2023-06-01")
+	req.Header.Set("content-type", "application/json")
+
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("send request: %w", err)
+	}
+	defer res.Body.Close()
+
+	data, err := io.ReadAll(res.Body)
+	if err != nil {
+		return nil, fmt.Errorf("read response: %w", err)
+	}
+	if res.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("anthropic: %s: %s", res.Status, data)
+	}
+
+	var out response
+	if err := json.Unmarshal(data, &out); err != nil {
+		return nil, fmt.Errorf("decode response: %w", err)
+	}
+	return &out, nil
+}
+```
+
+</details>
+
+## 6. Four experiments on the real thing
+
+Tests green means the plumbing is right. Now learn how the model behaves. Each
+of these costs a few dozen tokens.
+
+<Steps
+	title="Poke it"
+	steps={[
+		{
+			title: 'Ask it something',
+			body: <>The answer goes to stdout, the bracketed line to stderr.</>,
+			commands: ['go run ./cmd/hello "Explain a goroutine in two sentences."'],
+			check: 'An answer, then [stop: end_turn · in: … · out: …]',
+		},
+		{
+			title: 'Cut it off',
+			body: (
+				<>
+					Change <code>MaxTokens</code> to <code>5</code>, run the same question, then
+					change it back. The sentence stops mid-word. Nothing errored: the HTTP status
+					was 200. The only sign is the stop reason.
+				</>
+			),
+			commands: ['go run ./cmd/hello "Explain a goroutine in two sentences."'],
+			check: '[stop: max_tokens · … · out: 5 tokens]',
+		},
+		{
+			title: 'Prove it has no memory',
+			body: <>Two separate runs. The second knows nothing about the first.</>,
+			commands: [
+				'go run ./cmd/hello "My favourite number is 41. Remember it."',
+				'go run ./cmd/hello "What is my favourite number?"',
+			],
+			check: 'The second reply says it does not know',
+		},
+		{
+			title: 'Break the key',
+			body: <>See your error path work against the real API.</>,
+			commands: ['ANTHROPIC_API_KEY=nope go run ./cmd/hello "hi"'],
+			check: 'anthropic: 401 Unauthorized: … authentication_error …',
+		},
+		{
+			title: 'Commit',
+			body: <>First commit of the harness.</>,
+			commands: ['git add . && git commit -m "hello: one model call over net/http"'],
+		},
+	]}
+/>
+
+Experiment 2 is the one to remember. A cut-off reply looks like success to
+HTTP and to `err == nil`. A harness that ignores the stop reason will one day
+run half a tool call. pi
+[refuses to](https://github.com/earendil-works/pi/blob/b73412a/packages/agent/src/agent-loop.ts#L231-L239),
+and so will yours.
+
+## 7. Without looking back
+
+Come back to this after a break, not straight after the experiments.
+
+<Quiz
+	questions={[
+		{
+			prompt: 'Which three fields must every Messages request carry?',
+			options: [
+				'model, messages, and temperature',
+				'model, max_tokens, and messages',
+				'model, api_key, and messages',
+				'model, max_tokens, and stream',
+			],
+			answerIndex: 1,
+			explanation:
+				'The key travels in a header, not the body. temperature and stream are optional.',
+		},
+		{
+			prompt: 'A reply was cut off at the token limit. How does your program find out?',
+			options: [
+				'The HTTP status is 413',
+				'The content list is empty',
+				'The stop reason says so',
+				'The ask function returns error',
+			],
+			answerIndex: 2,
+			explanation:
+				'Status is 200 and err is nil. stop_reason is "max_tokens". Nothing else tells you.',
+		},
+		{
+			prompt: 'Why did the second run not know your favourite number?',
+			options: [
+				'Haiku has a short memory',
+				'The API key changed sessions',
+				'Requests see only their messages',
+				'The first reply was discarded',
+			],
+			answerIndex: 2,
+			explanation:
+				'The model keeps nothing. If you want it to know something, it has to be in the messages list you send.',
+		},
+		{
+			prompt: 'What type is the content field of a reply?',
+			options: [
+				'A single string of text',
+				'A list of typed blocks',
+				'A map keyed by role',
+				'A stream of raw bytes',
+			],
+			answerIndex: 1,
+			explanation:
+				'A list of blocks, each with a type. Text today; tool calls and thinking later, in the same list.',
+		},
+		{
+			prompt: 'Why does ask take the base URL as an argument?',
+			options: [
+				'Anthropic rotates its hostnames every month',
+				'Go forbids constants inside URL strings',
+				'So tests can use a fake',
+				'So curl can share the config',
+			],
+			answerIndex: 2,
+			explanation:
+				'httptest gives a local server URL. Injecting it makes the function testable offline, and later lets other hosts reuse the same code.',
+		},
+	]}
+/>
+
+## Read next
+
+The primary source is Anthropic's
+[Messages API reference](https://platform.claude.com/docs/en/api/messages).
+Read the request parameters and the response fields only, and for each one
+ask: did my `request` and `response` structs leave this out, and would I miss
+it? `system`, `temperature` and `stop_sequences` are the ones to notice.
+
+Terms from today — token, block, stop reason, usage — are in the
+[glossary](../reference/glossary). Next lesson: make it a conversation. You
+will keep the list of messages yourself, send all of it every time, and watch
+`input_tokens` climb.
+
+<Aside>
+	Ask me anything that did not land, however basic. If a test fails in a way you cannot read,
+	paste the output. If you would rather I explained something in Go from the ground up
+	(`context`, `httptest`, error wrapping), say so and I will. I am your teacher here, not just the
+	author of the page.
+</Aside>

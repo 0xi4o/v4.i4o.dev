@@ -1,0 +1,80 @@
+---
+courseTitle: Agent harness engineering in Go
+title: The harness map
+description: The two layers, what each owns, the transcript types, and what the loop does with each stop reason — on one sheet
+createdAt: 2026-09-20
+updatedAt: 2026-09-20
+---
+
+The sheet to keep open while building. Source of truth is pi at commit
+[`b73412a`](https://github.com/earendil-works/pi/tree/b73412a); terms follow
+the [glossary](./glossary).
+
+## Two layers, one direction
+
+```
+your app ──► agent core ──► provider layer ──► HTTPS ──► model
+             (agent)         (llm)
+             loop            types: Message, Block, StopReason
+             tools           Stream(model, transcript, tools) → events
+             events          one file per wire format
+             queues, hooks   auth, usage, abort
+```
+
+The arrow only points right. `llm` never imports `agent`. If the provider
+layer needs to know about a loop, the split is wrong.
+
+| Question | Owner |
+| --- | --- |
+| How is a tool call encoded for Anthropic vs OpenAI? | provider layer |
+| Which tokens were used and what did they cost? | provider layer |
+| Which function runs for `read_file`? | agent core |
+| Do tool calls run in parallel? | agent core |
+| Is another model call needed? | agent core |
+| What does the user see while it runs? | your app, from agent core events |
+
+## The transcript (lesson 4)
+
+| Role | Content blocks | Extra fields |
+| --- | --- | --- |
+| `system` | text | — |
+| `user` | text, image | — |
+| `assistant` | text, thinking, tool call | provider, model, usage, stop reason, error message |
+| `toolResult` | text, image | tool call id, tool name, is-error |
+
+Every message has a timestamp (Unix milliseconds). Thinking blocks carry an
+opaque provider signature that must be sent back unchanged. Tool call
+arguments are a JSON object; keep them as raw JSON until a tool validates them.
+
+Source: [`packages/ai/src/types.ts` L358–553](https://github.com/earendil-works/pi/blob/b73412a/packages/ai/src/types.ts#L358-L553).
+
+## Stop reasons and what the loop does
+
+| Stop reason | Meaning | The loop's move |
+| --- | --- | --- |
+| `stop` | The model is finished | No tool calls to run. Check queued messages; if none, end the run |
+| `toolUse` | The model wants tools run | Run them, append one tool result per call, call the model again |
+| `length` | Output hit the token limit | Any tool calls may have cut-off arguments: fail them all as error results, do not execute, call the model again |
+| `error` | The request failed | End the turn and the run. Partial content is kept on the message |
+| `aborted` | The caller cancelled | Same as `error` |
+
+The loop decides "are there tools to run?" by looking for tool call blocks in
+the content, not by trusting the stop reason. The stop reason decides
+*whether it is safe* to run them.
+
+Source: [`packages/agent/src/agent-loop.ts` L217–247](https://github.com/earendil-works/pi/blob/b73412a/packages/agent/src/agent-loop.ts#L217-L247).
+
+## The loop in ten lines
+
+```
+append prompt to transcript
+repeat:
+    msg = stream one assistant message        # provider layer
+    append msg
+    if msg.stop is error or aborted: end run
+    calls = tool call blocks in msg
+    if none: break                            # later: check queues first
+    results = run calls (or fail them all if msg.stop is length)
+    append results
+end run
+```
