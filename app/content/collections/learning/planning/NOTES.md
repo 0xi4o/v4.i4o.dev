@@ -38,4 +38,4 @@ Working notes and teaching preferences for this workspace.
   under construction in lessons 1–3 is the DocuDex MVP design doc, not a
   feature doc. Watch for product-spec drift; suggest a separate problem
   statement if it keeps leaking in.
-- Progress: workspace set up 2026-09-07. Lesson 1 completed 10 Sep (doc written, quiz 4/4; see LR 0002). Lesson 2 written 10 Sep, not yet completed. Next: lesson 3 on trade-offs, aimed at the storage and serving paragraphs.
+- Progress: workspace set up 2026-09-07. Lessons 1–3 completed by 17 Sep (LRs 0002–0004); the DocuDex design doc is a complete first version and the skeleton skill is established. Lesson 4 (ADRs) written 17 Sep, not yet completed. Next: lesson 5, the POC write-up, using the godoc-coverage assumption as the POC question.

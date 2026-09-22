@@ -34,3 +34,14 @@ _Avoid_: out of scope (too vague to surprise anyone), limitation
 Something the author is unsure about, listed at the end of the doc with what
 would resolve it.
 _Avoid_: TODO, TBD
+
+**Cost**:
+What a design choice makes harder, slower or riskier, written into the
+paragraph that makes the choice, followed by why it is acceptable.
+_Avoid_: downside, con, drawback (fine as a Rust RFC heading, not as a word)
+
+**Alternative**:
+An option that would have satisfied the same goals and that the author would
+have accepted had the trade-off gone the other way. Named inside the choice
+("X rather than Y") and expanded in its own section.
+_Avoid_: option (too weak), straw man

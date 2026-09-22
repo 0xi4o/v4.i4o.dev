@@ -1,0 +1,259 @@
+---
+courseTitle: Design and architecture docs for POCs and features
+title: 'Trade-offs and alternatives: make the design section argue'
+description: Turn each design paragraph into choice, reason, cost and open question, and give every choice a real alternative it beat
+lessonNumber: 3
+createdAt: 2026-09-15
+updatedAt: 2026-09-15
+---
+
+import { Aside, KeyIdea } from '../assets/LessonLayout'
+import { BeforeAfter } from '../assets/BeforeAfter'
+import { Categorise } from '../assets/Categorise'
+import { Checklist } from '../assets/Checklist'
+import { Quiz } from '../assets/Quiz'
+
+**The win for today:** the three design paragraphs of the DocuDex doc — CLI,
+storage, serving — rewritten so each names what it cost, and an alternatives
+section that mirrors them: for every choice, the option it beat and why. About
+forty minutes. Start from the [lesson 2](./0002-goals-and-non-goals) draft.
+
+<KeyIdea>
+	A design paragraph is finished when it has four parts: the <em>choice</em>, the <em>reason</em>,
+	the <em>cost</em>, and the <em>open question</em> if there is one. Your current paragraphs have
+	the first two. The cost is what lets a reviewer disagree with you precisely instead of vaguely.
+</KeyIdea>
+
+## 1. Why the cost is the part that matters (4 min)
+
+Ubl's rule from [Design Docs at Google](https://www.industrialempathy.com/posts/design-docs-at-google/)
+is that the design section should focus on trade-offs rather than
+implementation detail — the doc exists to surface the decisions a senior
+engineer might make differently. A paragraph that only gives reasons reads as
+finished; there is nothing for a reviewer to push on except "I disagree",
+which is not useful to either of you. A paragraph that names its cost invites
+"is that cost acceptable?", which is a conversation with an answer.
+
+The Rust RFC [template](https://github.com/rust-lang/rfcs/blob/master/0000-template.md)
+makes this structural. It has a **Drawbacks** section whose whole prompt is
+"why should we *not* do this?", and a **Rationale and alternatives** section
+asking why this design is the best in the space of possible designs, what
+other designs were considered and why not, and what the impact of not doing
+it would be. Steal the drawbacks question: every design choice gets asked
+"why not?" before it is written down.
+
+Ousterhout's [A Philosophy of Software Design](https://web.stanford.edu/~ouster/cgi-bin/book.php)
+supplies the vocabulary for many of the costs you will name: complexity is
+anything that makes the system harder to understand or change, and it
+accumulates from dependencies and obscurity. "This choice adds a second
+storage format that has to be kept in sync" is a complexity cost, and it
+should be said in those words.
+
+## 2. Which of your paragraphs argue? (5 min)
+
+These are the design paragraphs from your draft, compressed. Sort them.
+
+<Categorise
+	title="Choice with a cost, reason only, or assertion only?"
+	categories={['Has a cost', 'Reason only', 'Assertion only']}
+	items={[
+		{
+			text: 'CLI as the entry point: developers and coding agents both live in the terminal; agents can be told to keep DocuDex current and to look up repo-scoped docs.',
+			answer: 1,
+			note: 'Good reasons, no price. What does a CLI-first product give up? Discoverability for people who would never install a CLI; install friction; no UI until serve runs.',
+		},
+		{
+			text: 'Storage "has to be" SQLite plus Markdown: Markdown for the web app and for agents, SQLite for full-text search.',
+			answer: 2,
+			note: '"Has to be" is the tell. No reason for two formats rather than one, and no cost — two representations to keep in sync, and SQLite in a Go CLI means cgo or a pure-Go driver, which is a real trade-off.',
+		},
+		{
+			text: 'Go only for the MVP: DocuDex is written in Go so it can be dogfooded, and Go generates docs from source the way pkg.go.dev does.',
+			answer: 1,
+			note: 'Reasons, no cost. The price: the MVP proves nothing about the ecosystems where the problem is worst (TypeScript), and the fetch design may not generalise.',
+		},
+		{
+			text: 'Browsing only via a local web app; no TUI yet. The web app gets full-text search and keyboard shortcuts.',
+			answer: 1,
+			note: 'A reason appears in the non-goals (less work while the storage format is in flux), but the paragraph itself states none, and no cost: a browser hop away from the terminal for a terminal-first tool.',
+		},
+		{
+			text: 'A manifest file committed to version control is the source of truth for a team, so team use is free.',
+			answer: 2,
+			note: 'Stated inside the business-model paragraph, with no reason for a manifest over deriving everything from go.mod, and no cost: a second file that can drift from go.mod.',
+		},
+	]}
+/>
+
+None of the five has a cost. That is not a criticism of the thinking — you
+know the costs, which is why you could sort them — it is the gap between
+knowing and writing.
+
+## 3. The four-part paragraph (5 min)
+
+Here is your CLI paragraph rewritten in the form. Same decision, same reasons.
+
+<BeforeAfter
+	beforeLabel="Reason only"
+	afterLabel="Choice, reason, cost, question"
+	before={
+		<>
+			I'm building a CLI as the entrypoint into the product. This is because more and more
+			developers are using the terminal for their work but it's not just humans. Coding agents
+			are being run in the terminal. I'm building the CLI so both humans and agents can run
+			DocuDex. Agents could be instructed to keep DocuDex up-to-date whenever new dependencies
+			are added… For all of these reasons, DocuDex will ship as a CLI.
+		</>
+	}
+	after={
+		<>
+			DocuDex ships as a CLI rather than a desktop app or editor extension. Both audiences —
+			developers and coding agents — already work in the terminal, and an agent can be told to
+			run <code>sync</code> when <code>go.mod</code> changes and <code>lookup</code> when it
+			needs a symbol. The cost is reach: nothing is visible until <code>serve</code> runs, and
+			developers who would try an extension will never install a CLI. I accept that for the
+			MVP because agents are the audience I can't reach any other way. Open: whether the agent
+			interface is a subcommand, files on disk the agent reads directly, or an MCP server.
+		</>
+	}
+	note="Choice (CLI, and what it was chosen over), reason (both audiences in the terminal), cost (reach), why the cost is acceptable, and the open question moved from the end of the doc to the paragraph it belongs to."
+/>
+
+Two things to notice. "Rather than a desktop app or editor extension" names
+the alternative *inside the choice*; that sentence is what the alternatives
+section will expand. And "I accept that because…" is the sentence that makes
+it a decision rather than a list of considerations.
+
+## 4. Do it (25 min)
+
+Rewrite the storage and serving paragraphs in the four-part form, and add a
+short one for the manifest. For each, before you write, answer the drawbacks
+question on paper: *why should I not do this?* If you cannot think of a
+reason, you have not found the alternative yet.
+
+Prompts, so you do not have to invent the alternatives from nothing:
+
+- **Storage.** SQLite plus Markdown, versus SQLite only (Markdown in a
+  column, FTS5 over it — one file, one thing to back up, but agents can't
+  `cat` it), versus Markdown only with an index built in-process at `serve`
+  (no database dependency, but search quality and startup cost). Name the
+  cgo question: `mattn/go-sqlite3` needs a C toolchain and complicates
+  cross-compiling a single binary; `modernc.org/sqlite` is pure Go and
+  slower. Which, and why?
+- **Serving.** A local HTTP server versus a static site written to disk and
+  opened from a file URL versus, later, a TUI. What does a server buy that
+  static files don't (search endpoint, live reload on `sync`)? What does it
+  cost (a port, a process to leave running)?
+- **Manifest.** A hand-maintained manifest versus deriving the doc set from
+  `go.mod` on every `sync`. If `go.mod` is already the list of dependencies
+  with versions, what does the manifest add — pinned extra sources? A
+  lockfile of what was fetched? Say which, or say the manifest is not needed
+  for the MVP.
+
+Then rewrite **Alternatives considered** so it mirrors the design: one short
+entry per design choice, naming the option that lost and the trade-off that
+decided it. Your current entries (scraping, hosted, TypeScript) are about
+scope; keep them, but move them under the goals or non-goals they justify.
+Finally, take "via godoc" out of the goal it is still attached to and let it
+live here, as the choice it is.
+
+<Checklist
+	title="Self-review: does the design section argue?"
+	items={[
+		{
+			question: 'Does every design paragraph name what the choice cost?',
+			why: 'No cost, no decision. A reviewer needs something to push on.',
+		},
+		{
+			question: 'Does every paragraph say why that cost is acceptable for the MVP?',
+			why: '"I accept that because…" is the sentence that turns considerations into a decision.',
+		},
+		{
+			question: 'Does each choice name, in the choice sentence, what it was chosen over?',
+			why: '"X rather than Y" is the seed of the alternatives entry.',
+		},
+		{
+			question: 'Does every entry in Alternatives correspond to a design choice above?',
+			why: 'Alternatives to scope belong with the goals and non-goals they justify.',
+		},
+		{
+			question: 'Is each alternative one you would have accepted had the trade-off gone the other way?',
+			why: 'A straw man convinces nobody, including you.',
+		},
+		{
+			question: 'Has the storage paragraph answered the cgo question?',
+			why: 'For a Go CLI that ships one binary, this is the cost a Go reviewer will ask about first.',
+		},
+		{
+			question: 'Did "via godoc" leave the goals section?',
+			why: 'The residual from lesson 2.',
+		},
+	]}
+/>
+
+## 5. Retrieval (2 min)
+
+Two of these are from earlier lessons.
+
+<Quiz
+	questions={[
+		{
+			prompt: 'A design paragraph is complete when it has:',
+			options: [
+				'diagram, schema, estimate, and owner name',
+				'context, goal, non-goal, and summary',
+				'choice, reason, cost, and open question',
+				'problem, users, metrics, and launch date',
+			],
+			answerIndex: 2,
+			explanation: 'The cost is the part that lets a reviewer disagree with you precisely.',
+		},
+		{
+			prompt: "The Rust RFC template's Drawbacks section asks:",
+			options: [
+				'how long will this take us',
+				'why should we not do this',
+				'who will review the final design',
+				'which crates depend on this change',
+			],
+			answerIndex: 1,
+			explanation: 'Every design choice gets asked "why not?" before it is written down.',
+		},
+		{
+			prompt: 'A real alternative is one you:',
+			options: [
+				'considered briefly and then dismissed as unworkable',
+				"found in another project's design document",
+				'expect the reviewers to suggest themselves anyway',
+				'would have accepted had the trade-off flipped',
+			],
+			answerIndex: 3,
+			explanation: 'From lesson 1. If you would never have picked it, it is a straw man.',
+		},
+		{
+			prompt: "Sourcegraph's 'Reviewing problem' label means reviews should:",
+			options: [
+				'confirm the problem definition is correct',
+				'estimate the effort the solution needs',
+				'check the proposed design for gaps',
+				'decide who the final approver is',
+			],
+			answerIndex: 0,
+			explanation: 'From lesson 2. The problem is agreed before the solution is looked at.',
+		},
+	]}
+/>
+
+## Read next
+
+The Rust RFC [template](https://github.com/rust-lang/rfcs/blob/master/0000-template.md)
+itself — five minutes. Read the section prompts as questions to ask of your
+own doc, not as headings to copy. Then, if you have twenty minutes more,
+chapter 2 of Ousterhout ("The nature of complexity") gives you the words for
+the costs you are about to write.
+
+<Aside>
+	Paste the rewritten design and alternatives sections when done. After this the DocuDex doc is
+	a complete first version; lesson 4 changes gear to ADRs — the fifteen-minute record for a
+	single decision — and the storage choice you make today will be the first one.
+</Aside>

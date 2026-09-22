@@ -1,0 +1,43 @@
+---
+courseTitle: Design and architecture docs for POCs and features
+title: The design section argues — DocuDex doc is a complete first version
+description: Evidence from the third DocuDex draft after lesson 3; the one-page design doc skill is established
+createdAt: 2026-09-17
+updatedAt: 2026-09-17
+---
+
+# The design section argues — DocuDex doc is a complete first version
+
+After lesson 3 every design paragraph in the DocuDex doc carries a choice
+stated against what it was chosen over, a reason, a cost, an "I accept that
+because" sentence and, where relevant, open questions. The alternatives
+section mirrors the design choices (CLI vs hosted, server vs static site,
+both storage formats vs one, manifest vs `go.mod`), and the storage paragraph
+answers the cgo question (`modernc.org/sqlite`, for single-binary
+distribution). "Why now" was added. Quiz 4/4; two self-reported misses in the
+sorting drill, both on "reason only" vs "assertion only" — a distinction that
+matters less than the one he got right (none of the paragraphs had a cost).
+
+## Evidence
+
+- Three drafts in ten days, each fixing what the previous review named, with
+  one residual carried once ("via godoc") and then removed.
+- Costs are now written, not just known; "I accept that because…" appears in
+  every design paragraph.
+- Residuals: the CLI paragraph's cost is really the serving design's cost;
+  scope alternatives (scraping, TypeScript) still sit in Alternatives; the
+  "why now" section ends in a puffery paragraph; end-of-doc open questions
+  lack resolution lines.
+- Reviewer content notes given: Markdown as source of truth with SQLite as a
+  rebuildable index dissolves the sync cost; the "packages that use godoc"
+  assumption is a misconception (API reference is extractable for every Go
+  package via `go/doc`; the gap is narrative guides).
+
+## Implications
+
+- The one-page design doc skill is established. Stop teaching the skeleton;
+  from here lessons change gear (ADRs, POC write-up, diagrams, review).
+- Puffery in the "why now" section is the first sign of product-spec drift
+  in the writing itself; a one-line nudge, not a lesson.
+- Lesson 4 (ADRs) uses two decisions already argued in this doc — storage and
+  manifest — so the ADR is a compression exercise, not new thinking.

@@ -1,0 +1,36 @@
+---
+courseTitle: Design and architecture docs for POCs and features
+title: Goals rewritten as outcomes; non-goals carry a why
+description: Evidence from the second DocuDex draft after lesson 2, and the residual habits to watch
+createdAt: 2026-09-15
+updatedAt: 2026-09-15
+---
+
+# Goals rewritten as outcomes; non-goals carry a why
+
+After lesson 2 Ilango rewrote the DocuDex goals section: five of six bullets
+are now outcomes that more than one design could satisfy (humans and agents;
+no network for browsing; versioned docs per `go.mod` dependency; three
+commands with no manual; whole team, no server, no accounts). Each non-goal
+now states why it is out. He reported making mistakes in the goal vs design
+choice sorting drill and none on non-goals, which matches the doc: the
+distinction is learned but not yet automatic.
+
+## Evidence
+
+- Residual: "via godoc" survived inside a goal — the exact error from the
+  drill, in the doc.
+- Two goals not yet checkable ("usable by both humans and agents"; "usable
+  with no internet connection", which is untrue for `add`/`sync`).
+- Open questions collected at the end (three), but without a line on what
+  would resolve each. Context section did not get the "why now" line.
+- Design section untouched, as intended: reasons without costs remain.
+
+## Implications
+
+- Lesson 3 targets the design section: choice → over what → because → at the
+  price of → open question, on the CLI, storage and serving paragraphs, with
+  the alternatives section mirroring the design choices rather than the scope.
+- Keep interleaving the goal/design-choice test in later quizzes until it
+  stops slipping.
+- Testability of goals is a small recurring nudge, not a lesson.

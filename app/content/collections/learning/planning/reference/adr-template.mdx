@@ -1,0 +1,62 @@
+---
+courseTitle: Design and architecture docs for POCs and features
+title: The ADR template
+description: Nygard's five sections with his own words for each, the status lifecycle, file conventions, and the self-review checklist
+createdAt: 2026-09-17
+updatedAt: 2026-09-17
+---
+
+Source: [Nygard, Documenting Architecture Decisions (2011)](https://cognitect.com/blog/2011/11/15/documenting-architecture-decisions).
+Variants: [adr.github.io](https://adr.github.io/) (MADR adds *Decision
+drivers* and *Considered options*).
+
+## When to write one
+
+One decision, made once, that a future engineer would otherwise ask "why on
+earth?" about. A design doc covers a system; an ADR covers a choice. Write one
+for decisions made inside a design doc that deserve to be findable on their
+own, and for decisions made without a design doc at all.
+
+## The five sections
+
+| Section | Nygard's words | Yours |
+| --- | --- | --- |
+| **Title** | "short noun phrases" | Number and the decision: `0001 — Store docs as Markdown with a SQLite index` |
+| **Context** | "the forces at play, including technological, political, social, and project local" — value-neutral | What was true, what was pulling in which direction. No opinions. |
+| **Decision** | "our response to these forces" — active voice, "We will…" | One paragraph. The choice, stated against what it was chosen over. |
+| **Status** | proposed → accepted; later deprecated or superseded by NNNN | One word, plus a link when superseded. |
+| **Consequences** | "the resulting context, after applying the decision. All consequences should be listed here, not just the 'positive' ones" | What is now easier, what is now harder, what you have to do because of it. |
+
+Length: "one or two pages". Prose "as if it is a conversation with a future
+developer"; "bullets are acceptable only for visual style, not as an excuse
+for writing sentence fragments".
+
+## File conventions
+
+- One directory in the repo: Nygard uses `doc/arch/adr-NNN.md`; the common
+  modern layout is `docs/adr/NNNN-short-title.md`. Pick one per repo and
+  never move it.
+- Numbers are sequential and never reused.
+- A reversed decision is not deleted or edited. Write a new ADR, mark the old
+  one *superseded by NNNN*, and link both ways.
+- Keep an index (a `README.md` in the directory, or the ADR table in
+  `career/notes.org`): number, title, status, one-line decision.
+
+## Self-review before committing
+
+- Is the title a noun phrase naming the decision, not the problem?
+- Could a stranger read the context and not know which way you went?
+- Does the decision sentence say what it was chosen over?
+- Do the consequences include at least one thing that got harder?
+- Is there anything in it that belongs in the design doc instead (how it
+  works, rather than why it was chosen)?
+- Is it under two pages?
+
+## Where other formats differ
+
+- **MADR** ([adr.github.io](https://adr.github.io/)) adds *Decision drivers*
+  (the forces as a list) and *Considered options* with pros and cons per
+  option. Use it when the alternatives matter more than the narrative.
+- **Y-statements** (also on adr.github.io) compress an ADR to one sentence:
+  "In the context of X, facing Y, we decided Z to achieve A, accepting B."
+  Good as the one-line entry in the index.

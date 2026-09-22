@@ -1,0 +1,261 @@
+---
+courseTitle: Design and architecture docs for POCs and features
+title: 'ADRs: the fifteen-minute record for one decision'
+description: Start an ADR log in the DocuDex repo with the storage and manifest decisions you have already argued, and learn the one rule that keeps a log honest — supersede, never delete
+lessonNumber: 4
+createdAt: 2026-09-17
+updatedAt: 2026-09-17
+---
+
+import { Aside, KeyIdea } from '../assets/LessonLayout'
+import { BeforeAfter } from '../assets/BeforeAfter'
+import { Categorise } from '../assets/Categorise'
+import { Checklist } from '../assets/Checklist'
+import { Quiz } from '../assets/Quiz'
+
+**The win for today:** a `docs/adr/` directory in the DocuDex repo with two
+records in it — the storage decision and the manifest decision — and two rows
+in the ADR index in `career/notes.org`. About thirty-five minutes. Both
+decisions are already argued in your design doc, so this is compression, not
+new thinking.
+
+<KeyIdea>
+	A design doc covers a system. An ADR covers one decision — the kind a future engineer would
+	otherwise ask "why on earth?" about — and it is never deleted. Reverse it by writing a new one
+	and marking the old one superseded, so the history of what you believed stays readable.
+</KeyIdea>
+
+## 1. Nygard's five sections (5 min)
+
+Michael Nygard's 2011 post
+[Documenting Architecture Decisions](https://cognitect.com/blog/2011/11/15/documenting-architecture-decisions)
+is the origin of the format and still the best description of it. The
+[reference sheet](../reference/adr-template) has the full table; the shape is:
+
+**Title** — "short noun phrases". Name the decision, not the problem:
+*Store docs as Markdown with a SQLite index*, not *Storage*.
+
+**Context** — "the forces at play, including technological, political,
+social, and project local", in value-neutral language. A stranger should be
+able to read the context and not yet know which way you went.
+
+**Decision** — "our response to these forces", in active voice: "We will…".
+One paragraph, stated against what it was chosen over.
+
+**Status** — *proposed* until agreed, then *accepted*; later *deprecated*
+or *superseded by NNNN*.
+
+**Consequences** — "the resulting context, after applying the decision. All
+consequences should be listed here, not just the 'positive' ones." This is
+the section people skimp on, and the one a future reader needs most.
+
+Length: "one or two pages". Nygard wants prose "as if it is a conversation
+with a future developer" and is blunt about bullets: "acceptable only for
+visual style, not as an excuse for writing sentence fragments". Files live in
+the repo, numbered sequentially, numbers never reused; a reversed decision is
+kept "but mark it as superseded".
+
+<Aside>
+	When is a decision worth an ADR rather than a line in the design doc? Gergely Orosz's rule of
+	thumb in{' '}
+	<a href="https://newsletter.pragmaticengineer.com/p/rfcs-and-design-docs">
+		Engineering planning with RFCs, design documents and ADRs
+	</a>{' '}
+	is that ADRs record decisions that need to be findable on their own later — including ones made
+	inside a larger doc, and ones made with no doc at all. The practical test: would someone grepping
+	the repo in a year want to find this by name?
+</Aside>
+
+## 2. Design doc, ADR, or neither? (5 min)
+
+All of these are real DocuDex decisions or could be. Sort them.
+
+<Categorise
+	title="Where does it go?"
+	categories={['Design doc', 'ADR', 'Neither']}
+	items={[
+		{
+			text: 'Use modernc.org/sqlite rather than mattn/go-sqlite3',
+			answer: 1,
+			note: 'One decision with a real trade-off (pure Go and slower vs cgo and faster). A future contributor hitting a slow `add` will want to find exactly this.',
+		},
+		{
+			text: 'How DocuDex fetches, stores and serves docs, end to end',
+			answer: 0,
+			note: 'That is the system. It is what your design doc already is.',
+		},
+		{
+			text: 'Rename the `lookup` command to `find`',
+			answer: 2,
+			note: 'A PR with a one-line description. Reversible in five minutes, no forces worth recording.',
+		},
+		{
+			text: 'Derive a manifest from go.mod rather than reading go.mod directly',
+			answer: 1,
+			note: 'One decision, argued against a real alternative, with consequences (drift detection, explicit sync). Findable on its own.',
+		},
+		{
+			text: 'Add keyboard shortcuts to the web app',
+			answer: 2,
+			note: 'A feature. If it ever needed a doc it would be a tiny design doc, not an ADR — there is no "why on earth?" in it.',
+		},
+		{
+			text: 'Six months in: drop the local server and ship a static site after all',
+			answer: 1,
+			note: 'A reversal. New ADR, and the old one gets "superseded by". This is the case the format exists for.',
+		},
+		{
+			text: 'Markdown on disk is the source of truth; SQLite is a rebuildable index',
+			answer: 1,
+			note: 'Small sentence, large consequence — it decides what `sync` does and what can be deleted safely. Exactly the kind of thing that gets lost if it only lives in a paragraph.',
+		},
+	]}
+/>
+
+## 3. Consequences, all of them (4 min)
+
+The storage decision, consequences section only.
+
+<BeforeAfter
+	beforeLabel="Positive only"
+	afterLabel="All consequences"
+	before={
+		<>
+			Humans get full-text search in the web app and agents can <code>cat</code> and{' '}
+			<code>grep</code> the docs directly. Distribution stays a single binary with no C toolchain.
+		</>
+	}
+	after={
+		<>
+			Humans get full-text search in the web app and agents can <code>cat</code> and{' '}
+			<code>grep</code> the docs directly. Distribution stays a single binary; contributors need
+			no C toolchain. Because the Markdown files are the source of truth, the SQLite file is a
+			cache: <code>sync</code> must rebuild it, and it can be deleted safely. There are now two
+			read paths to keep consistent in tests. <code>modernc.org/sqlite</code> is slower than the
+			cgo driver, so a large <code>add</code> will be noticeably slow; we need a benchmark on a
+			real monorepo before calling that acceptable.
+		</>
+	}
+	note="Same decision. The second version tells the future developer what they will run into — and turns the 'sync cost' from your design doc into a concrete obligation on sync."
+/>
+
+## 4. Do it (20 min)
+
+In the DocuDex repo (create it if it does not exist yet — the ADRs can be the
+first commit):
+
+1. Make `docs/adr/` and a `README.md` in it with a three-column table:
+   number, title, status.
+2. Write `0001-store-docs-as-markdown-with-a-sqlite-index.md`. Lift the
+   context from your design doc's storage paragraph and the storage entry in
+   Alternatives — but strip every opinion out of the context; it should read
+   the same whichever way you had decided. Decision in one "We will…"
+   paragraph, naming what it beat. Consequences: at least one thing that got
+   harder. Status: accepted.
+3. Write `0002-derive-a-manifest-from-go-mod.md` the same way. This one has
+   a real rejected alternative (read `go.mod` directly) and real consequences
+   (drift detection is now your problem; sync is explicit).
+4. Add both rows to the ADR index table in `career/notes.org` — the format
+   there is date, project, ADR, decision in one line, link. Try writing the
+   one-line decision as a Y-statement: "In the context of X, facing Y, we
+   decided Z to achieve A, accepting B."
+
+Time-box each ADR to fifteen minutes. If it is taking longer, you are
+re-deciding rather than recording.
+
+<Checklist
+	title="Self-review: each ADR"
+	items={[
+		{
+			question: 'Is the title a noun phrase naming the decision, not the topic?',
+			why: '"Storage" is a topic. "Store docs as Markdown with a SQLite index" is a decision.',
+		},
+		{
+			question: 'Could a stranger read the context and not yet know which way you went?',
+			why: "Nygard: value-neutral. If the context argues, it is the decision section wearing a disguise.",
+		},
+		{
+			question: 'Does the decision say "We will…" and name what it was chosen over?',
+			why: 'Active voice; the rejected option is what makes it a decision rather than a description.',
+		},
+		{
+			question: 'Do the consequences include at least one thing that got harder?',
+			why: '"All consequences, not just the positive ones."',
+		},
+		{
+			question: 'Is everything about how it works (rather than why it was chosen) back in the design doc?',
+			why: 'An ADR that explains the implementation will be wrong within a month.',
+		},
+		{
+			question: 'Is it under two pages, in sentences rather than fragments?',
+			why: 'Nygard: a conversation with a future developer.',
+		},
+		{ question: 'Are both rows in the career/notes.org index?', why: 'Evidence for the tech-lead scoreboard.' },
+	]}
+/>
+
+## 5. Retrieval (2 min)
+
+One of these is from lesson 3.
+
+<Quiz
+	questions={[
+		{
+			prompt: "Nygard's Consequences section must list:",
+			options: [
+				'the estimated cost in weeks',
+				'all consequences, not only positive',
+				'the people who approved it',
+				'the alternatives that were rejected',
+			],
+			answerIndex: 1,
+			explanation: 'It describes "the resulting context" — everything the future developer will run into.',
+		},
+		{
+			prompt: 'When a decision is reversed, the old ADR is:',
+			options: [
+				'deleted from the repository',
+				'edited to match reality',
+				'marked superseded, kept around',
+				'moved to an archive',
+			],
+			answerIndex: 2,
+			explanation: 'The history of what you believed is part of the record.',
+		},
+		{
+			prompt: "Nygard's Decision section is written:",
+			options: [
+				'as bullets of sentence fragments',
+				'in value-neutral passive language',
+				'as a table of options',
+				"in active voice, 'we will'",
+			],
+			answerIndex: 3,
+			explanation: 'Value-neutral is the context section; the decision commits.',
+		},
+		{
+			prompt: 'A design paragraph without a cost is:',
+			options: [
+				'describing, not deciding',
+				'concise and therefore good',
+				'ready for the reviewer',
+				'a finished design decision',
+			],
+			answerIndex: 0,
+			explanation: 'From lesson 3. The cost is what a reviewer can push on.',
+		},
+	]}
+/>
+
+## Read next
+
+Nygard's post itself — it is short, and you have now seen every line of it
+quoted. Then skim the MADR template on [adr.github.io](https://adr.github.io/)
+to see the "considered options" variant; decide which format the DocuDex repo
+uses and do not change it later.
+
+<Aside>
+	Paste ADR 0001 when it is done. Lesson 5 is the POC write-up — the document that ends in a
+	recommendation — and it will use the "packages that use godoc" assumption from your design doc
+	as the question a POC would answer.
+</Aside>
