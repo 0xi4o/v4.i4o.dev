@@ -5,7 +5,7 @@ tags:
     - tools & utilities
     - open source
 createdAt: 2026-06-12
-progress: 'current'
+progress: 'completed'
 site: https://ink.aurelius.ink
 github: https://github.com/aureliushq/ink
 ---
