@@ -1,4 +1,5 @@
 {
+	"$schema": "https://app.kobun.io/schemas/v1.json",
 	"version": 1,
 	"basePath": "app/content/collections",
 	"collections": {
@@ -32,7 +33,7 @@
 						{ "label": "Journal", "value": "journal" },
 						{ "label": "Learning", "value": "learning" },
 						{ "label": "Local-first", "value": "local-first" },
-						{ "label": "Open source", "value": "open-source" },
+						{ "label": "Open Source", "value": "open-source" },
 						{ "label": "Opinion", "value": "opinion" },
 						{ "label": "Productivity", "value": "productivity" },
 						{ "label": "Remix", "value": "remix" },
@@ -42,6 +43,97 @@
 					]
 				},
 				"content": { "label": "Content", "type": "document", "required": true }
+			}
+		},
+		"Papers": {
+			"label": "Papers",
+			"format": "md",
+			"features": {
+				"publish": true,
+				"timestamps": { "createdAt": true, "updatedAt": true }
+			},
+			"schema": {
+				"title": { "label": "Title", "type": "text", "required": true },
+				"authors": { "label": "Authors", "type": "text", "required": true },
+				"slug": {
+					"label": "Slug",
+					"type": "slug",
+					"from": "title",
+					"required": true
+				},
+				"description": {
+					"label": "Description",
+					"type": "text",
+					"multiline": true,
+					"required": true
+				},
+				"tags": {
+					"label": "Tags",
+					"type": "multi_select",
+					"options": [
+						{ "label": "AI", "value": "ai" },
+						{ "label": "Learning", "value": "learning" },
+						{ "label": "Local-first", "value": "local-first" },
+						{ "label": "Open Source", "value": "open-source" }
+					]
+				},
+				"content": { "label": "Content", "type": "document", "required": true }
+			}
+		}
+	},
+	"singletons": {
+		"home": {
+			"label": "Home",
+			"format": "md",
+			"features": {
+				"publish": true,
+				"timestamps": { "createdAt": true, "updatedAt": true }
+			},
+			"schema": {
+				"title": { "label": "Title", "type": "text", "required": true },
+				"content": { "label": "Content", "type": "document", "required": true },
+				"description": {
+					"label": "Description",
+					"type": "text",
+					"multiline": true,
+					"required": true
+				}
+			}
+		},
+		"now": {
+			"label": "Now",
+			"format": "md",
+			"features": {
+				"publish": true,
+				"timestamps": { "createdAt": true, "updatedAt": true }
+			},
+			"schema": {
+				"title": { "label": "Title", "type": "text", "required": true },
+				"content": { "label": "Content", "type": "document", "required": true },
+				"description": {
+					"label": "Description",
+					"type": "text",
+					"multiline": true,
+					"required": true
+				}
+			}
+		},
+		"uses": {
+			"label": "Uses",
+			"format": "md",
+			"features": {
+				"publish": true,
+				"timestamps": { "createdAt": true, "updatedAt": true }
+			},
+			"schema": {
+				"title": { "label": "Title", "type": "text", "required": true },
+				"content": { "label": "Content", "type": "document", "required": true },
+				"description": {
+					"label": "Description",
+					"type": "text",
+					"multiline": true,
+					"required": true
+				}
 			}
 		}
 	}
