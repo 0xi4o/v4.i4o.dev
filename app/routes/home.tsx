@@ -10,7 +10,7 @@ import { pageMeta } from '~/lib/site'
 import type { Route } from './+types/home'
 
 export function loader() {
-	const about = getContent(`singletons/about`)
+	const about = getContent(`singletons/home`)
 	if (!about) throw data(null, { status: 404 })
 	const articles = getCollection('collections/articles')
 	const publishedArticles = articles.filter(

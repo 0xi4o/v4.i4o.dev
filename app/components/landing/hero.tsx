@@ -6,7 +6,7 @@ export default function Hero({ title }: { title: string }) {
 		<article className='typeset border-border mb-10 border-b pb-10'>
 			<h1>{title}</h1>
 
-			<Content id='singletons/about' className='mb-8 max-w-[820px]' />
+			<Content id='singletons/home' className='mb-8 max-w-[820px]' />
 
 			<span className='flex items-center gap-3.5'>
 				{profile.socials.map((social) => {
