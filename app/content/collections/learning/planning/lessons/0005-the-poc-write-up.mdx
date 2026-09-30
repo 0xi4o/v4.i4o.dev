@@ -1,0 +1,260 @@
+---
+courseTitle: Design and architecture docs for POCs and features
+title: 'The POC write-up: a question, some evidence, a recommendation'
+description: Run a two-hour proof of concept against the riskiest assumption in the DocuDex design doc and write the one-page document that turns what you found into a decision someone else can act on
+lessonNumber: 5
+createdAt: 2026-09-26
+updatedAt: 2026-09-26
+---
+
+import { Aside, KeyIdea } from '../assets/LessonLayout'
+import { BeforeAfter } from '../assets/BeforeAfter'
+import { Categorise } from '../assets/Categorise'
+import { Checklist } from '../assets/Checklist'
+import { Quiz } from '../assets/Quiz'
+
+**The win for today:** a one-page POC write-up, recommendation first, on the
+riskiest assumption in your design doc — that docs derived from Go source
+cover what a real project's dependencies actually document. This is the
+longest lesson in the course: a two-hour time-boxed POC plus thirty minutes
+of writing. If two hours are not available this week, section 4 says how to
+do the writing half on a POC you have already run.
+
+<KeyIdea>
+	A POC answers a question. Its write-up leads with the answer — build, don't build, or build
+	differently — and then shows the evidence. A reader who stops after the first line should
+	know what you recommend; a reader who finishes should be able to disagree with you on the
+	facts.
+</KeyIdea>
+
+## 1. Where the shape comes from (5 min)
+
+Nobody has published the canonical POC template, so the
+[reference sheet](../reference/poc-write-up) is a synthesis and says so. The
+three sources it draws on:
+
+Shape Up's [Write the pitch](https://basecamp.com/shapeup/1.5-chapter-06)
+gives you **appetite** — how much time this is worth, stated before you
+start, so "we ran out of time" is a finding rather than an excuse — and
+**rabbit holes**, the parts that would eat a real project if not decided
+now. A POC is the cheapest place to find rabbit holes.
+
+Oxide's [RFD 1](https://rfd.shared.oxide.computer/rfd/0001) has a state
+machine that ends in *committed* or *abandoned*, and keeps abandoned
+documents published. A POC that ends in "don't build this" has succeeded;
+the write-up is how that success is not lost.
+
+Ubl's [Design Docs at Google](https://www.industrialempathy.com/posts/design-docs-at-google/)
+notes that prototyping can be part of the design process. Your design doc
+already flagged the assumption ("this is an assumption so I've to test
+this"). The POC is the test; the write-up is what closes the open question.
+
+The shape, then: **recommendation** (first line), **question**,
+**appetite**, **what was built**, **what was found**, **rabbit holes and
+next**. The full table with budgets is in the reference.
+
+## 2. Question or wish? (5 min)
+
+A POC question has to be able to come back "no". Sort these.
+
+<Categorise
+	title="Could a POC answer this with a no?"
+	categories={['Falsifiable', 'A wish']}
+	items={[
+		{
+			text: "Can go/doc over the module cache produce reference docs for every dependency in Ink's go.mod?",
+			answer: 0,
+			note: 'Count the dependencies, count the ones with usable output, name the failures. It can come back no.',
+		},
+		{
+			text: 'Is DocuDex useful for coding agents?',
+			answer: 1,
+			note: '"Useful" has no failing case. Rewrite it as a measurable lookup task before it can be a POC.',
+		},
+		{
+			text: 'Does `lookup` return the right symbol in under 2,000 tokens for 8 of 10 real queries?',
+			answer: 0,
+			note: 'Ten queries, a token count, a threshold. This is the agent question from your open-questions list, made testable.',
+		},
+		{
+			text: 'Will teams like the manifest workflow?',
+			answer: 1,
+			note: 'A user-research question, not a POC question. Nothing you build in two hours answers it.',
+		},
+		{
+			text: 'Does modernc.org/sqlite build an FTS5 index over 400 packages in under 60 seconds on a laptop?',
+			answer: 0,
+			note: 'The benchmark your ADR 0001 promised. A number and a threshold.',
+		},
+		{
+			text: 'Is SQLite the right choice for storage?',
+			answer: 1,
+			note: '"Right" is a design-doc judgement built from several falsifiable questions. Ask those instead.',
+		},
+	]}
+/>
+
+## 3. Recommendation first (4 min)
+
+The same findings, written twice.
+
+<BeforeAfter
+	beforeLabel="Findings, then a verdict"
+	afterLabel="Verdict, then findings"
+	before={
+		<>
+			I ran <code>go/doc</code> over the module cache for Ink's 31 dependencies. 29 produced
+			package docs; two had no doc comments at all. Cobra, chi and testify have guides on their
+			websites that are not in the source. Indexing took 12 seconds. Overall I think the
+			approach is viable for the MVP but we may want to think about guides later.
+		</>
+	}
+	after={
+		<>
+			<strong>Build it as designed.</strong> Source-derived docs cover API reference for 29 of
+			Ink's 31 dependencies; the gap is narrative guides (cobra, chi, testify keep theirs on a
+			website), which the MVP's non-goals already exclude.
+			<br />
+			<br />
+			<strong>Question.</strong> Does <code>go/doc</code> over the module cache give usable
+			reference docs for every dependency in a real <code>go.mod</code>?
+			<br />
+			<strong>Found.</strong> 29/31 packages produced docs; 2 had no doc comments (named in the
+			table below). 3 packages have guides outside the source. Indexing 31 packages: 12 s.
+			<br />
+			<strong>Rabbit hole.</strong> "Guides" is a second content type with a second fetch path;
+			decide before v1 whether it exists at all.
+		</>
+	}
+	note="Same evidence. The second version can be acted on from its first line, and 'we may want to think about' has become a named rabbit hole."
+/>
+
+## 4. Do it (2 h + 30 min)
+
+**The POC (two hours, hard stop).** Question: *does `go/doc` over the module
+cache give usable reference docs for every dependency in a real `go.mod`?*
+Pick a Go repo of yours with real dependencies — Ink or Bunko. Write the
+smallest Go program that:
+
+1. reads `go.mod`, resolves each module path to its directory in the module
+   cache (`go list -m -json all` gives you `Dir`),
+2. runs `go/doc` (or shells out to `go doc -all`) over each package and
+   writes the result to a Markdown file,
+3. prints a table: module, version, packages found, packages with empty
+   docs, bytes written, seconds taken.
+
+Then pick five dependencies you know keep guides on a website and check by
+hand whether anything you would actually need is missing from the output.
+Do not build the CLI, the manifest or the SQLite index. Everything here is
+throwaway; say so in the write-up. When the two hours are up, stop, even if
+it is not finished — "did not finish X" is a finding.
+
+<Aside>
+	No two hours this week? Then do only the writing half, on a POC you have already run: the one
+	at work. Its outcome doc is due about now in your career plan. Write it in this shape — you
+	keep it, I never see it — and bring the DocuDex POC back when there is time. The skill is the
+	same either way.
+</Aside>
+
+**The write-up (thirty minutes).** One page, in the six-part shape.
+Recommendation on the first line. Numbers everywhere you are tempted to
+write an adjective. Name the packages that failed. Include the surprise —
+there is always one. End with the rabbit hole and the next step, and close
+the open question in the design doc by linking the write-up from it.
+
+<Checklist
+	title="Self-review: the write-up"
+	items={[
+		{
+			question: 'Is the recommendation the first line, and is it one of build / don’t / build differently?',
+			why: '"It depends" is allowed only with "on what, and how we find out".',
+		},
+		{
+			question: 'Could your question have come back no?',
+			why: 'If not, you ran a demo, not a POC.',
+		},
+		{
+			question: 'Does every claim in "what was found" carry a number, a name or a link?',
+			why: '"Fast enough" is a design-doc phrase. Here it is a duration.',
+		},
+		{
+			question: 'Did you say what was faked, skipped or hard-coded, and that the code is throwaway?',
+			why: 'Otherwise someone will try to ship it.',
+		},
+		{
+			question: 'Is there at least one thing that surprised you?',
+			why: 'If nothing did, the question may not have needed a POC.',
+		},
+		{
+			question: 'Does "next" name the decision the real project has to make first?',
+			why: 'That is the rabbit hole. The write-up exists to surface it while it is cheap.',
+		},
+		{
+			question: 'Did you write both what worked and what did not?',
+			why: 'Your ADRs listed only the negatives; your design doc once listed only the reasons. Both columns, every time.',
+		},
+		{ question: 'One page?', why: 'The evidence table can be an appendix.' },
+	]}
+/>
+
+## 5. Retrieval (2 min)
+
+One of these is from lesson 4.
+
+<Quiz
+	questions={[
+		{
+			prompt: 'A POC question is well-formed when it is:',
+			options: [
+				'ambitious enough to impress reviewers',
+				'broad enough to cover everything',
+				'falsifiable within the time box',
+				'phrased as a product goal',
+			],
+			answerIndex: 2,
+			explanation: 'It has to be able to come back no, and inside the appetite.',
+		},
+		{
+			prompt: "In Shape Up, 'appetite' means:",
+			options: [
+				'how much the customer wants it',
+				'how much time it is worth',
+				'how many people will build it',
+				'how big the market could be',
+			],
+			answerIndex: 1,
+			explanation: 'Stated before you start, so running out of time is a finding.',
+		},
+		{
+			prompt: "Which ending do Oxide's RFD states treat as legitimate?",
+			options: ['Rejected', 'Archived', 'Deferred', 'Abandoned'],
+			answerIndex: 3,
+			explanation: 'Abandoned documents stay published. "Don’t build this" is a result.',
+		},
+		{
+			prompt: "An ADR's Context should read the same:",
+			options: [
+				'whichever way you had decided',
+				'for engineers and for managers',
+				'before and after the implementation',
+				'in every repo that uses it',
+			],
+			answerIndex: 0,
+			explanation: 'From lesson 4. Value-neutral: the forces, not the verdict.',
+		},
+	]}
+/>
+
+## Read next
+
+Shape Up's [Write the pitch](https://basecamp.com/shapeup/1.5-chapter-06) if
+you skipped it after lesson 2 — the rabbit-holes section in particular. Then
+skim Oxide's [RFD 1](https://rfd.shared.oxide.computer/rfd/0001) for the
+state diagram; five minutes.
+
+<Aside>
+	Paste the DocuDex write-up when it exists. Lesson 6 is diagrams — the two a design doc needs
+	and no more — and the DocuDex doc currently has none, which is the right number for a doc
+	nobody has asked a "which box talks to which?" question about yet. That changes once the POC
+	adds a fetch path.
+</Aside>

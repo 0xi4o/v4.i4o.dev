@@ -38,4 +38,7 @@ Working notes and teaching preferences for this workspace.
   under construction in lessons 1–3 is the DocuDex MVP design doc, not a
   feature doc. Watch for product-spec drift; suggest a separate problem
   statement if it keeps leaking in.
-- Progress: workspace set up 2026-09-07. Lessons 1–3 completed by 17 Sep (LRs 0002–0004); the DocuDex design doc is a complete first version and the skeleton skill is established. Lesson 4 (ADRs) written 17 Sep, not yet completed. Next: lesson 5, the POC write-up, using the godoc-coverage assumption as the POC question.
+- Recurring weakness (lessons 3–4): writes one side of a trade-off at a time — reasons without costs, then consequences without benefits. Keep a "both columns" item in every self-review checklist.
+- Feedback 29 Sep: the POC write-up reference read as a rubric, not a form — he asked "what am I supposed to write?". Fixed by adding a numbered fill-in section first. Lesson for future references: lead with the questions to answer, put the tests and tells after.
+- Diagrams: he prefers Excalidraw (familiar). Treat Mermaid in lessons as a source to redraw, not a requirement; remind about embed-scene SVG beside the doc.
+- Progress: workspace set up 2026-09-07. Lessons 1–5 completed by 29 Sep (LRs 0002–0006); DocuDex design doc, ADRs 0001–0002 and the go/doc POC write-up exist. Lesson 6 (C4 context + container diagrams in Mermaid) written 29 Sep, not yet completed. Skeleton and POC references now lead with a fill-in form. Next: lesson 7, running an async review.

@@ -3,12 +3,29 @@ courseTitle: Design and architecture docs for POCs and features
 title: The design doc skeleton
 description: The five sections, the question each answers, the one-page word budgets, the skip-it test and the self-review checklist
 createdAt: 2026-09-07
-updatedAt: 2026-09-10
+updatedAt: 2026-09-29
 ---
 
 The skeleton every doc in this course uses. Sources:
 [Ubl, Design Docs at Google](https://www.industrialempathy.com/posts/design-docs-at-google/);
 [Slatton, How to write a good design document](https://grantslatton.com/how-to-design-document).
+
+## The form — answer these five, in this order
+
+1. **Context and scope.** *What does a reader need to know to follow the
+   rest, and why now?* Facts only.
+2. **Goals and non-goals.** *What must be true when this ships? What might a
+   reader expect that you are leaving out, and why?*
+3. **Design.** *What did you choose, over what, why, at what cost, and why is
+   the cost acceptable?* One paragraph per choice.
+4. **Alternatives considered.** *For each choice, what lost and which
+   trade-off decided it?*
+5. **Cross-cutting concerns.** *What would security, privacy, observability
+   or on-call ask first?*
+
+Then **Open questions** at the end, each with what would resolve it. One
+context diagram and one container diagram if a reader would ask "which box
+talks to which".
 
 ## Should you write one?
 

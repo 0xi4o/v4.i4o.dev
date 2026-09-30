@@ -1,0 +1,44 @@
+---
+courseTitle: Design and architecture docs for POCs and features
+title: First POC run and written up; recommendation conflated code with project
+description: Evidence from the DocuDex go/doc POC after lesson 5, and what it says about the remaining lessons
+createdAt: 2026-09-29
+updatedAt: 2026-09-29
+---
+
+# First POC run and written up; recommendation conflated code with project
+
+Ilango ran the two-hour POC (a little over), generating API reference as
+Markdown via `go/doc` from the module cache for Ink's six direct
+dependencies, with timings for Ink (0.16 s) and Temporal (0.59 s), and wrote
+it up in the six-part shape: recommendation first, question answered,
+appetite honest about the overrun, skipped work named (READMEs), a surprise
+(how much the standard library already provides), rabbit holes and next.
+
+He first found the reference confusing ("what am I supposed to write?") —
+the table of parts and tests read as a rubric. A numbered fill-in form was
+added at the top and worked.
+
+## Evidence
+
+- Recommendation said "build differently" for reasons about the throwaway
+  code (hand-written `go.mod` parsing, wanting to read vanitydoc), not about
+  the project. The evidence supports "build as designed, with two changes to
+  the design doc" (fetch = module cache + `go/doc`; README content is a gap).
+- Findings had names and timings but not counts (packages, symbols, bytes).
+- Did not notice that module READMEs are in the module cache already; the
+  gap is external docs sites only.
+- Frontmatter and prompt text copied from the reference into the doc.
+
+## Implications
+
+- The distinction "recommendation is about the project, the code is
+  throwaway" needs one retrieval question in a later quiz; not a lesson.
+- "Numbers where you would write an adjective" is now the recurring nudge,
+  alongside "both columns".
+- References should lead with the questions to answer and put the checks
+  after; the ADR and skeleton references should be checked for the same
+  problem.
+- The design doc now needs updating from the POC (fetch step, README
+  decision). Lesson 6 (diagrams) can use the updated fetch path as the thing
+  a container diagram makes visible.

@@ -1,0 +1,37 @@
+---
+courseTitle: Design and architecture docs for POCs and features
+title: First ADRs written; consequences overcorrected to negatives only
+description: Evidence from ADRs 0001 and 0002 in the DocuDex repo after lesson 4
+createdAt: 2026-09-26
+updatedAt: 2026-09-26
+---
+
+# First ADRs written; consequences overcorrected to negatives only
+
+Ilango wrote ADRs 0001 (store docs as Markdown with a SQLite index) and 0002
+(derive a manifest from `go.mod`) within the fifteen-minute box each, added
+both to the ADR index in `career/notes.org`, scored 6/7 on the design doc /
+ADR / neither drill and 3/4 on the quiz. Titles are decisions, not topics;
+each Decision names what it was chosen over; contexts are value-neutral.
+
+## Evidence
+
+- Consequences in both ADRs list only what got harder — the mirror image of
+  the lesson-3 problem (reasons without costs). "All consequences" was read
+  as "the negative ones".
+- 0001 never states which store is the source of truth, and treats the
+  `modernc.org/sqlite` driver as decided without a decision (a candidate
+  ADR 0003).
+- 0001's context contradicts the design doc's non-goal (mentions a TUI).
+- A quoted line from the lesson was left pasted in 0002's Consequences.
+- Bullets are fragments rather than sentences; acceptable at this length.
+
+## Implications
+
+- The ADR format is learned. The recurring weakness across lessons 3 and 4
+  is symmetry: he writes one side of a trade-off at a time. Keep a
+  "both columns" check in later self-review lists.
+- Lesson 5 (POC write-up) can assume ADRs and the design doc as known ground
+  and spend its time on evidence and recommendation.
+- Suggest ADR 0003 for the SQLite driver as a five-minute follow-up, not a
+  lesson.

@@ -1,0 +1,84 @@
+---
+courseTitle: Design and architecture docs for POCs and features
+title: The POC write-up
+description: A one-page shape for the document a proof of concept produces — question, appetite, what was built, what was found, recommendation — with the tests for each part
+createdAt: 2026-09-26
+updatedAt: 2026-09-29
+---
+
+There is no canonical template for this document. The shape below is this
+course's synthesis of three sources: Shape Up's pitch
+([Singer, Write the pitch](https://basecamp.com/shapeup/1.5-chapter-06)) for
+*appetite*, *rabbit holes* and *no-gos*; Oxide's RFD states
+([RFD 1](https://rfd.shared.oxide.computer/rfd/0001)) for *abandoned* as a
+legitimate ending; and Ubl's note in
+[Design Docs at Google](https://www.industrialempathy.com/posts/design-docs-at-google/)
+that prototyping can be part of the design process rather than a substitute
+for it.
+
+## The form — answer these six, in this order
+
+Each answer is a paragraph or less. Write 2–6 first if that is easier, then
+write 1 and move it to the top.
+
+1. **Recommendation.** *Given what you found, what should the project do?*
+   Build as designed / don't build / build differently — then the one
+   reason. First line of the doc.
+2. **Question.** *What were you trying to find out?* One sentence that could
+   have come back "no".
+3. **Appetite.** *How long was it worth, and how long did it take?* One
+   line. Going over is a finding.
+4. **What was built.** *What does the evidence come from?* Repo, inputs,
+   what the code does in one breath, what was skipped or faked. End with
+   "this code is throwaway".
+5. **What was found.** *What actually happened, in numbers and names?* Per
+   case: worked or not, counts, sizes, timings, the failures by name, and
+   the thing that surprised you. No adjectives where a number would do.
+6. **Rabbit holes and next.** *What did this expose that the real project
+   has to decide, and what is the next step?* Three to five bullets.
+
+## What a POC is
+
+A time-boxed build whose purpose is to answer a question, not to ship. Its
+output is the answer, written down. If nobody can say what question it
+answers, it is not a POC; it is the first sprint of a project that has not
+been approved.
+
+## The six parts
+
+| Part | The test | Budget |
+| --- | --- | --- |
+| **Recommendation** | First line of the doc. Build / don't build / build differently, plus the one reason. A reader who stops here knows what you think. | 1–2 sentences |
+| **Question** | Falsifiable inside the time box. "Does X do Y for Z cases?" — not "is X a good idea?". | 1 sentence |
+| **Appetite** | How much time it was worth, and how much it took. | 1 line |
+| **What was built** | Enough that a reader knows what the evidence is evidence *of*. Say what was faked or skipped. It is throwaway; say so. | 3–5 sentences |
+| **What was found** | Evidence, not impressions: counts, timings, a table, the failing cases by name. Include what surprised you. | The bulk of the page |
+| **Rabbit holes and next** | What would eat the real project if not decided now; what the next step is if the recommendation is accepted. | 3–5 bullets |
+
+## Tells
+
+**Recommendation** is wrong if it is at the end, or if it is "it depends".
+If it depends, say on what, and what you would need to find out.
+
+**Question** is wrong if a POC could not answer it with a no. "Is DocuDex
+useful for agents?" cannot come back no. "Does `lookup` return the right
+symbol in under 2,000 tokens for 8 of 10 real queries?" can.
+
+**What was found** is wrong if it has adjectives where it should have
+numbers. "Fast enough" is a design-doc phrase; here it is "410 packages
+indexed in 38 s on the M2".
+
+**Abandoned is an answer.** A POC that ends in "don't build this" and says
+why has done its job. Oxide keeps abandoned RFDs published for the same
+reason Nygard keeps superseded ADRs.
+
+## Self-review before sharing
+
+- Is the recommendation the first thing on the page?
+- Could the question have come back "no"?
+- Does every claim in "what was found" have a number, a name, or a link?
+- Did you say what was faked, skipped or hard-coded?
+- Is there at least one finding that surprised you? (If not, was the
+  question worth a POC?)
+- Does "next" name the decision the real project must make first?
+- Is it one page?

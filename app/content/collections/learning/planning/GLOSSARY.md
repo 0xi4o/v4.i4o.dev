@@ -45,3 +45,14 @@ An option that would have satisfied the same goals and that the author would
 have accepted had the trade-off gone the other way. Named inside the choice
 ("X rather than Y") and expanded in its own section.
 _Avoid_: option (too weak), straw man
+
+**ADR (architecture decision record)**:
+A one-to-two-page record of a single decision: value-neutral context, a
+"we will" decision naming what it beat, a status, and all consequences.
+Numbered, kept in the repo, superseded rather than deleted.
+_Avoid_: decision log entry, design note
+
+**Consequences**:
+The situation after a decision is applied — what got easier and what got
+harder, both. An ADR section; the one most often written one-sided.
+_Avoid_: impact, results, pros and cons
