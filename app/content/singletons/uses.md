@@ -1,8 +1,13 @@
 ---
 title: Devices, Tools, and Tech Stack
-description: Here's my daily toolkit - everything from dev tools to everyday apps and hardware. It covers both my professional setup for software development, as well as the stuff I use outside of work.
+description: Here's my daily toolkit - everything from dev tools to everyday
+  apps and hardware. It covers both my professional setup for software
+  development, as well as the stuff I use outside of work.
+status: published
+createdAt: 2026-09-30T07:27:46.991Z
+publishedAt: 2026-09-30T07:27:46.991Z
+updatedAt: 2026-09-30T07:27:46.991Z
 ---
-
 ## Desktop
 
 - CPU: AMD Ryzen 3600XT
@@ -18,7 +23,7 @@ description: Here's my daily toolkit - everything from dev tools to everyday app
 - Mic: Maono PD100XS Dynamic Gaming Microphone
 - Headphones: Razer Blackshark V2 Pro, KZ ZSN Pro X
 - OS: MacOS for work work, MacOS/Ubuntu for personal work, and CachyOS for gaming
-- WM: i3
+- DE: KDE
 
 ## Laptops
 
@@ -41,15 +46,14 @@ description: Here's my daily toolkit - everything from dev tools to everyday app
 ## Tech Stack
 
 - Languages: JavaScript, TypeScript, Golang, Odin
-- Frameworks/Libraries: React, React Router v7, Node, Bun, Biome, Prisma, Drizzle, Chi
-- UI: ShadcnUI, TailwindCSS
-- Hosting: AWS, Railway, Cloudflare, Hetzner, Dokploy
+- Frameworks/Libraries: React, React Router v8, Remix v3, Node, Bun, VitePlus, Prisma, Drizzle, Chi
+- UI: Shadcn UI, Tailwind CSS
+- Hosting: Railway, Cloudflare
 
 ## Productivity
 
-- Product Management: Linear
-- Chat: Slack, Discord
-- Design: Canva
+- Chat: Discord
+- Design: Canva/Affinity
 - Notes: Obsidian
 - Writing: [Aurelius](https://aurelius.ink)
 - Music: Apple Music
@@ -66,3 +70,4 @@ description: Here's my daily toolkit - everything from dev tools to everyday app
 
 - Platforms: CachyOS/Steam
 - Controls: MnK, PS5 DualSense Controller
+
