@@ -1,0 +1,38 @@
+---
+courseTitle: Design and architecture docs for POCs and features
+title: First container diagram — structure right, stores given verbs
+description: Evidence from the first DocuDex C4 container diagram (Excalidraw) after lesson 6
+createdAt: 2026-10-01
+updatedAt: 2026-10-01
+---
+
+# First container diagram — structure right, stores given verbs
+
+Ilango drew his first-ever architecture diagram: a C4 container diagram of
+DocuDex in Excalidraw. System boundary present; User and Agent outside it as
+actors; GOMODCACHE, `go.mod` and the manifest outside as external systems;
+four containers inside (CLI + HTTP server + web UI as one single-binary box,
+Markdown docset, SQLite FTS5 index, `docudex.toml`). Several lines carry
+verbs and one carries a technology (`localhost:3332`).
+
+## Evidence
+
+- Three lines have a data store performing the action ("reads module
+  sources" and "reads dependency versions" terminate on `docudex.toml`;
+  "serves docs" originates at the Markdown docset).
+- The two lines that encode decisions — Markdown → SQLite (ADR 0001) and
+  the manifest line — are unlabelled.
+- `docudex.toml` drawn twice (inside as a container, outside as a cylinder
+  standing in for version control).
+- Arrow labels drawn as rectangles indistinguishable from container boxes.
+- Agent → Markdown drawn; Agent → CLI (`lookup`) missing. No legend; most
+  lines lack a technology.
+
+## Implications
+
+- Add "stores don't act — every verb line starts or ends at a process" to
+  the diagram checklist and the lesson; it is the rule he did not have.
+- He reads lesson prose and applies it to text well; the diagram skill is
+  newer than the writing skill and needs one more iteration before review.
+- Diagram tool preference is Excalidraw; feedback on diagrams must come from
+  an exported SVG, which is readable as text.

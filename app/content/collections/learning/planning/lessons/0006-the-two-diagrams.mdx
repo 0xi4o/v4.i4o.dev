@@ -4,7 +4,7 @@ title: 'The two diagrams a design doc needs: C4 context and container'
 description: Draw the system-context and container diagrams for DocuDex in Excalidraw (or any tool), with the three things C4 asks of every diagram, and learn when a diagram earns its place and when it is decoration
 lessonNumber: 6
 createdAt: 2026-09-29
-updatedAt: 2026-09-30
+updatedAt: 2026-10-01
 ---
 
 import { Aside, KeyIdea } from '../assets/LessonLayout'
@@ -128,8 +128,13 @@ CLI process, the local HTTP server and web UI (same binary? say so), the
 Markdown docset on disk, the SQLite FTS5 index, and `docudex.toml`. The
 people and external systems from the context diagram stay at the edges.
 
-For every line answer: *who initiates it, what flows, over what?* The ones
-worth getting right, because each encodes a decision you have already made:
+For every line answer: *who initiates it, what flows, over what?* One rule
+first, because it is the mistake everyone makes on a first container diagram:
+**stores don't act.** A file, a folder or a database never reads, writes or
+serves anything; the process does. So every line with a verb on it starts or
+ends at the CLI box, and the stores only ever sit at the passive end. The
+ones worth getting right, because each encodes a decision you have already
+made:
 
 - Markdown → SQLite: "rebuilt by `sync`" (ADR 0001: Markdown is the source
   of truth, SQLite is a cache).
@@ -148,6 +153,8 @@ non-goals: if there is a box for anything on that list, delete it.
 	items={[
 		{ question: 'Does each diagram have a title saying which level it is?', why: 'C4: titled diagrams. "DocuDex — containers", not "architecture".' },
 		{ question: 'Does every line have a verb, a direction and a technology?', why: 'An unlabelled arrow makes the reader guess. "Reads (filesystem)" does not.' },
+		{ question: 'Does every verb line start or end at a process, never between two stores?', why: 'Stores don\u2019t act. "Markdown serves docs" is the CLI serving docs it read from Markdown.' },
+		{ question: 'Are labels visibly different from boxes?', why: 'A label drawn in the same rectangle as a container reads as a container.' },
 		{ question: 'Is there a one-line legend for shapes?', why: 'Notation independence means you owe the reader the key.' },
 		{ question: 'Does every box correspond to something in the design doc, and nothing on the non-goals list?', why: 'A diagram that disagrees with the text is the worse of the two, because people believe pictures.' },
 		{ question: 'Is Markdown-as-source-of-truth visible as a line, not just a label?', why: 'The rebuild direction is ADR 0001. If the diagram shows a two-way arrow, the ADR is wrong or the diagram is.' },
