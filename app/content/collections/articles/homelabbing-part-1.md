@@ -9,7 +9,7 @@ tags:
   - workflow
   - learning
 createdAt: 2026-09-16T07:11:56.013Z
-updatedAt: 2026-10-08T07:52:42.287Z
+updatedAt: 2026-10-08T07:53:46.764Z
 publishedAt: 2026-10-08T07:52:42.287Z
 status: published
 ---
