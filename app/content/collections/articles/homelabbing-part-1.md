@@ -1,6 +1,6 @@
 ---
-title: Getting into homelabs
-slug: getting-into-homelabs
+title: "Building my homelab: Part 1"
+slug: building-my-homelab-part-1
 description: I wanted to start a homelab. So I bought 3 used Lenovo Thinkcentre
   mini PCs. This is the first in a series of articles where I talk about my
   homelabbing adventures.
@@ -9,9 +9,9 @@ tags:
   - workflow
   - learning
 createdAt: 2026-09-16T07:11:56.013Z
-updatedAt: 2026-10-08T07:47:11.210Z
-publishedAt: ""
-status: draft
+updatedAt: 2026-10-08T07:52:42.287Z
+publishedAt: 2026-10-08T07:52:42.287Z
+status: published
 ---
 I’m not sure when it started but I’ve wanted to set up a homelab for a long time. I first heard the concept of a homelab from The Changelog podcast. I had no particular goal for it at the time, but I found it cool that you can do a lot of awesome stuff with a homelab. So I wanted one. 
 
@@ -61,5 +61,3 @@ So here’s some of the things I want to do:
 ---
 
 I want to learn and do a lot of cool stuff with my new homelab. This is an exciting new journey that has been a long time coming. I’m starting this new series of articles to document the things I’m doing with my homelab.
-
-Follow me on X for updates on this series.
