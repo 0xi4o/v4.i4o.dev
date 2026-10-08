@@ -27,7 +27,7 @@ A lot of Hardware Haven’s videos feature used mini PCs from Lenovo, Dell, and 
 
 Then I got an idea from a friend - Facebook Marketplace. And boy did I find a treasure trove of options. I started scouring listings of used Thinkcentre mini PCs. I eventually found a seller with good reviews and contacted him. He had a bunch of used but near-new condition Lenovo Thinkcentre M710Qs. 
 
-![IMG_2386.jpg](src/assets/images/57e61553-1b07-4164-8c09-217739d32559.jpg)
+![IMG_2386.jpg](/images/57e61553-1b07-4164-8c09-217739d32559.jpg)
 
 Here are their specs:
 
@@ -43,7 +43,7 @@ Again, this is overkill for a beginner homelab but I had the budget for this. An
 
 ## Network Switch
 
-![IMG_2390.jpg](src/assets/images/90028433-5183-4093-86b0-5f6fa905f74c.jpg)
+![IMG_2390.jpg](/images/90028433-5183-4093-86b0-5f6fa905f74c.jpg)
 
 After some research, I bought a tp-link SG2008. It’s an 8-port switch that can handle up to 1000Mbps speeds. It also fits in a 10-inch mini rack. It’s slightly overkill but I wanted some headroom for experiments I want to do in the near future. 
 
