@@ -2,6 +2,8 @@
 	"$schema": "https://app.kobun.io/schemas/v1.json",
 	"version": 1,
 	"basePath": "app/content",
+	"mediaPath": "public/images",
+	"mediaUrl": "/images",
 	"collections": {
 		"articles": {
 			"label": "Articles",
