@@ -47,7 +47,7 @@
 				"content": { "label": "Content", "type": "document", "required": true }
 			}
 		},
-		"Papers": {
+		"papers": {
 			"label": "Papers",
 			"format": "md",
 			"features": {
@@ -80,6 +80,61 @@
 					]
 				},
 				"content": { "label": "Content", "type": "document", "required": true }
+			}
+		},
+		"projects": {
+			"label": "Projects",
+			"format": "md",
+			"features": {
+				"publish": true,
+				"timestamps": { "createdAt": true, "updatedAt": true }
+			},
+			"schema": {
+				"title": { "label": "Title", "type": "text", "required": true },
+				"slug": { "label": "Slug", "type": "slug", "from": "title", "required": true },
+				"site": { "label": "Website", "type": "url", "required": true },
+				"github": { "label": "Github", "type": "url" },
+				"description": {
+					"label": "Body",
+					"type": "text",
+					"multiline": true,
+					"required": true
+				},
+				"progress": {
+					"label": "Progress",
+					"type": "select",
+					"options": [
+						{ "label": "Current", "value": "current" },
+						{ "label": "Completed", "value": "completed" }
+					]
+				},
+				"tags": {
+					"label": "Tags",
+					"type": "multi_select",
+					"options": [
+						{ "label": "AI", "value": "ai" },
+						{ "label": "Learning", "value": "learning" },
+						{ "label": "Local-First", "value": "local-first" },
+						{ "label": "Open Source", "value": "open-source" },
+						{ "label": "Writing", "value": "writing" },
+						{ "label": "Jobs", "value": "jobs" },
+						{ "label": "CMS", "value": "cms" },
+						{ "label": "Tools & Utilities", "value": "tools-utilities" },
+						{ "label": "Product Design", "value": "product-design" }
+					]
+				}
+			},
+			"subcollections": {
+				"updates": {
+					"label": "Updates",
+					"format": "md",
+					"publish": true,
+					"schema": {
+						"title": { "label": "Title", "type": "text", "required": true },
+						"slug": { "label": "Slug", "type": "slug", "from": "title" },
+						"body": { "label": "Body", "type": "document" }
+					}
+				}
 			}
 		}
 	},
