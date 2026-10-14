@@ -3,7 +3,7 @@ courseTitle: Design and architecture docs for POCs and features
 title: First container diagram — structure right, stores given verbs
 description: Evidence from the first DocuDex C4 container diagram (Excalidraw) after lesson 6
 createdAt: 2026-10-01
-updatedAt: 2026-10-01
+updatedAt: 2026-10-12
 ---
 
 # First container diagram — structure right, stores given verbs
@@ -27,6 +27,28 @@ verbs and one carries a technology (`localhost:3332`).
 - Arrow labels drawn as rectangles indistinguishable from container boxes.
 - Agent → Markdown drawn; Agent → CLI (`lookup`) missing. No legend; most
   lines lack a technology.
+
+## Second iteration (12 Oct)
+
+Right-hand side fixed: all external lines terminate at the CLI box; the
+stray `docudex.toml` cylinder became "GitHub Repo"; external labels are plain
+text; layout has no crossings. Remaining: no CLI → Markdown line (the TOML
+appears to generate the docset); Markdown → SQLite still unlabelled; agent's
+two paths merged into one arrow; arrow-direction convention mixed (data-flow
+on the right, initiator on the left); no legend. He applied the "stores
+don't act" rule where it was pointed out and not yet where it wasn't —
+expected for a second diagram.
+
+## Third iteration (12 Oct) — accepted
+
+CLI → Markdown "writes docs" and CLI → TOML "writes manifest (init/add/sync)"
+added; TOML → Markdown removed; Markdown → SQLite labelled "indexing
+(sync)"; agent split into "runs lookup" → CLI and Markdown → agent "reads
+markdown (shell, files)". Every store is now passive. Remaining: arrow
+convention still mixed (initiator on go.mod, data-flow elsewhere), no legend,
+one label still boxed. Accepted as the design doc's container diagram; the
+remainder is a five-minute tidy. Three iterations from first diagram to a
+correct one.
 
 ## Implications
 

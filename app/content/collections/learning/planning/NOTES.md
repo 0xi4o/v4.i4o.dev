@@ -41,4 +41,17 @@ Working notes and teaching preferences for this workspace.
 - Recurring weakness (lessons 3–4): writes one side of a trade-off at a time — reasons without costs, then consequences without benefits. Keep a "both columns" item in every self-review checklist.
 - Feedback 29 Sep: the POC write-up reference read as a rubric, not a form — he asked "what am I supposed to write?". Fixed by adding a numbered fill-in section first. Lesson for future references: lead with the questions to answer, put the tests and tells after.
 - Diagrams: he prefers Excalidraw (familiar). Treat Mermaid in lessons as a source to redraw, not a requirement; remind about embed-scene SVG beside the doc.
-- Progress: workspace set up 2026-09-07. Lessons 1–5 completed by 29 Sep (LRs 0002–0006). Lesson 6: first container diagram drawn 1 Oct (LR 0007), one more iteration requested before lesson 7 (async review).
+- Don't argue a point he has already decided (12 Oct: suggested junior devs as reviewers after he'd ruled it out; he called it patronising). Answer the question asked.
+- Tsundoku key (lesson 8 exercise; planted flaws, ten; plus three things done right):
+  1. §1 context carries an opinion/decision ("SQLite is obviously the right place"); no "why now".
+  2. §2 "Use Bleve for indexing" is a design choice as a goal.
+  3. §2 "feel fast and natural" is uncheckable (goal 1 is the checkable version).
+  4. §2 non-goal "no breaking the bookmarks table" — nobody expected it; not a non-goal.
+  5. §3 Bleve paragraph: reasons only, no cost, no "chosen over".
+  6. §3 "the index updates itself" — store acting; no owner/trigger; background feed items unaddressed (gap).
+  7. §3 "quick", "instant" — adjectives with no number; no POC.
+  8. §4 FTS5 "too limited" — straw-man dismissal of the strongest alternative (SQLite is already the store).
+  9. §4 Elasticsearch — not a real alternative for a local single-user tool.
+  10. §5 "Probably yes" — decision hiding in open questions; also §5 cross-cutting absent (saved page text on disk: growth, deletion, PII; index beside the DB breaks one-file backup — contradicts the §5 question).
+  Done right: goal 1 (number, threshold); the semantic-search non-goal (expected, with a why); the tokenisation paragraph (choice, cost, acceptance, open question). A good review notes the tokenisation paragraph as the thing to keep. Expected verdict: request changes; the flipping item is §4 FTS5 — either a reasoned rejection or a changed decision.
+- Progress: workspace set up 2026-09-07. Lessons 1–6 completed by 12 Oct (LRs 0002–0007). Lesson 7 first half done 13 Oct (public review open; close pending). Lesson 8 (reviewing someone else's doc; Tsundoku exercise) written 14 Oct, not yet completed.

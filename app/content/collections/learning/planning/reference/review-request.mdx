@@ -1,0 +1,77 @@
+---
+courseTitle: Design and architecture docs for POCs and features
+title: The review request
+description: The header that goes on top of a design doc when it is sent for async review — status, what feedback is wanted, who decides, when it closes — and how to triage and close the comments that come back
+createdAt: 2026-10-12
+updatedAt: 2026-10-12
+---
+
+Sources: [Sourcegraph handbook, RFCs](https://github.com/sourcegraph/handbook/blob/main/content/company-info-and-process/communication/rfcs/index.md)
+(status labels; "decider, input providers, approvers"; affected teams tagged);
+[HashiCorp, Writing practices and culture](https://www.hashicorp.com/en/how-hashicorp-works/articles/writing-practices-and-culture)
+(team-first review, named approvers, broadcast after); [Ubl, Design Docs at
+Google](https://www.industrialempathy.com/posts/design-docs-at-google/)
+(review as comment threads; the point is to pull in organisational
+experience while change is cheap); [Rust RFC book](https://rust-lang.github.io/rfcs/)
+(the final comment period: a stated close date).
+
+## The form — the five lines at the top of the doc
+
+```
+Status:     Reviewing solution            (WIP | Reviewing problem | Reviewing solution | Approved | Abandoned)
+Wanted:     Challenge the storage and manifest decisions (§3, §4). Not wanted: prose, naming.
+Decider:    <you>                         Approvers: <1–2 people who must say yes>
+Input from: <2–3 people whose experience you want>     FYI: <anyone affected>
+Closes:     <date, 5–10 working days>     Comment in: <the doc / the PR / the thread>
+```
+
+## Why each line
+
+**Status** tells reviewers what kind of reading to do. "Reviewing problem"
+means check the context and goals and ignore the design; "Reviewing
+solution" means the goals are agreed and the design is open. Reviewing both
+at once produces comments that cancel each other.
+
+**Wanted / not wanted** is the line most people skip and the one that most
+improves the comments. Name the sections and the decisions. Say what you do
+not want so nobody spends their time on it.
+
+**Decider / approvers / input** separates "must agree" from "I would like
+your view". One decider. Approvers are the people who can block; keep it to
+the people who actually can. Everyone else is input or FYI.
+
+**Closes** is the Rust final-comment-period idea: a date after which silence
+is consent. Without it a review never ends.
+
+## Triage, when the comments arrive
+
+Sort every comment into one of five kinds before replying to any of them:
+
+| Kind | Looks like | What you do |
+| --- | --- | --- |
+| **Challenge** | "Why not X?" where X is a real alternative | Answer in the doc (design or alternatives), not only in the thread; link the thread. |
+| **Gap** | "What happens when…?" | Add to the design, or to open questions with what would resolve it. |
+| **Evidence** | "Have you measured…?" | Point to the POC, or add it to next steps. Never argue; measure. |
+| **Preference** | "I'd have used Y" with no goal violated | Acknowledge, say which goal decided it, do not change the doc. |
+| **Nit** | Typos, wording, naming | Fix silently. No reply needed. |
+
+Reply to challenges and gaps in the doc first, then in the thread with a
+one-line pointer. Reviewers read the doc, not the thread, a month later.
+
+## Closing
+
+Add a short **Review outcome** section at the end: what changed and why,
+what was raised and not changed and why, and the status change ("Approved
+2026-10-20 by A and B"). Then broadcast one message — HashiCorp's pattern —
+to everyone on the FYI line: what was decided, link to the doc. The review is
+over when that message is sent, not when the comments stop.
+
+## Self-review before sending the request
+
+- Is there exactly one decider?
+- Does "wanted" name sections and decisions, and does "not wanted" exist?
+- Is there a close date?
+- Are the diagrams and the ADRs linked from the doc, so a reviewer has one
+  entry point?
+- Is the doc in the state the status claims? (A "Reviewing solution" doc with
+  an unfinished design section wastes everyone's week.)

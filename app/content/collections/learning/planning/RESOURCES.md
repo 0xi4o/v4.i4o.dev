@@ -99,9 +99,21 @@ content-marketing.
 - [r/ExperiencedDevs](https://www.reddit.com/r/ExperiencedDevs/)
   Senior-leaning, moderated. Use for: threads on RFC/ADR practice at other
   companies.
-- Real reviewers: the POC's stakeholders at work, and Ilango's manager, are the
-  best critique loop available — a live doc reviewed by people who have to act
-  on it beats any forum.
+- [Gophers Slack](https://gophers.slack.com) (invite via invite.slack.golangbridge.org)
+  The Go community's chat; `#tools` and `#general` for "here is a design,
+  what is wrong with it". Use for: challenge-the-decision feedback on
+  DocuDex's storage and driver choices.
+- [Go Forum](https://forum.golangbridge.org/)
+  The golangbridge forum; slower and more considered than Reddit. Use for: a
+  design-review post that wants long replies.
+- [r/golang](https://www.reddit.com/r/golang/)
+  Takes substantive design-critique posts. Use for: a second public review
+  channel; expect blunt replies.
+- Real reviewers (decided 13 Oct 2026): public only — r/golang, Go Forum and
+  Gophers Slack, one URL, one close date, no approver. Work colleagues are
+  not an option. Bengaluru Go meetup worth checking if active.
+- Constraint (Oct 2026): no senior engineers in his own network to review
+  docs. The public channels double as the fix.
 
 ## Gaps
 

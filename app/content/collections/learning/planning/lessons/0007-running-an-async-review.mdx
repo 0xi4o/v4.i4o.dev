@@ -1,0 +1,232 @@
+---
+courseTitle: Design and architecture docs for POCs and features
+title: 'Running an async review: ask for the feedback you want, close on a date'
+description: Put a review header on the DocuDex design doc, send it to real reviewers, triage what comes back into five kinds, and close the review with a written outcome — no meeting
+lessonNumber: 7
+createdAt: 2026-10-12
+updatedAt: 2026-10-12
+---
+
+import { Aside, KeyIdea } from '../assets/LessonLayout'
+import { BeforeAfter } from '../assets/BeforeAfter'
+import { Categorise } from '../assets/Categorise'
+import { Checklist } from '../assets/Checklist'
+import { Quiz } from '../assets/Quiz'
+
+**The win for today:** the DocuDex design doc — now with POC results, two
+ADRs and two diagrams — sent for review with a five-line header that says
+what feedback you want, who decides, and when it closes; then, a week later,
+a written review outcome. About thirty minutes now and thirty when the
+comments are in. This is the lesson the tech-lead role is actually testing.
+
+## What to do (read this first)
+
+1. Put the five-line header from the [review request reference](../reference/review-request)
+   at the top of the DocuDex doc. Fill every line.
+2. Choose reviewers. For a solo project with no senior peers to hand, the
+   review is public: r/golang, the Go Forum (forum.golangbridge.org) and
+   Gophers Slack `#tools`, all pointing at one public URL for the doc, ADRs,
+   POC and diagrams so comments land in one place. No approver — say so in
+   the header; you are the decider and everyone replying is input. One post
+   text, written as the "wanted" line, one close date for all three.
+3. When comments arrive, sort every one into challenge / gap / evidence /
+   preference / nit before replying to any. Answer challenges and gaps in the
+   doc, then point to the doc from the thread.
+4. On the close date, write the **Review outcome** section and send one
+   broadcast message. Change the status.
+
+<KeyIdea>
+	A review produces useful comments in proportion to how precisely you asked for them. "Any
+	feedback welcome" gets typos and preferences. "Challenge the storage decision in §3; I am not
+	looking for naming feedback" gets a reviewer's one real objection — which is the thing you
+	could not see yourself.
+</KeyIdea>
+
+## 1. What the process is for (4 min)
+
+Ubl's [Design Docs at Google](https://www.industrialempathy.com/posts/design-docs-at-google/)
+describes review as comment threads on the doc, and gives the reason it
+exists: to bring the organisation's experience to bear "early, before
+expensive changes become necessary". The review is not a gate; it is the
+cheapest moment to be wrong.
+
+Sourcegraph's [handbook](https://github.com/sourcegraph/handbook/blob/main/content/company-info-and-process/communication/rfcs/index.md)
+adds the two things that make it work asynchronously: a status label that
+tells reviewers what kind of reading to do ("Reviewing problem" means
+"confirm the problem definition is correct"; "Reviewing solution" means the
+problem is agreed), and named roles — "the decider, input providers,
+approvers" — plus tags for teams that are affected. HashiCorp's
+[writing practices](https://www.hashicorp.com/en/how-hashicorp-works/articles/writing-practices-and-culture)
+add the order: the author's own team reviews first, named approvers sign
+off, and then the decision is broadcast to the company. The Rust RFC process
+contributes the close date: a final comment period after which the decision
+stands.
+
+Put together, that is the five-line header in the reference. Nothing in it
+is clever; all of it is routinely skipped.
+
+## 2. Triage the comments (6 min)
+
+These are comments the DocuDex doc could plausibly get. Sort each.
+
+<Categorise
+	title="Challenge, gap, evidence, preference, or nit?"
+	categories={['Challenge', 'Gap', 'Evidence', 'Preference', 'Nit']}
+	items={[
+		{
+			text: '"Why not SQLite only, with the Markdown stored in a column? One file to back up."',
+			answer: 0,
+			note: 'A real alternative you would have accepted. Answer in the alternatives section — and you already have, so link it.',
+		},
+		{
+			text: '"What happens when go.mod changes while serve is running?"',
+			answer: 1,
+			note: 'A case the design does not cover. Add it to the design or to open questions with what would resolve it.',
+		},
+		{
+			text: '"Have you measured how long indexing takes on a real monorepo?"',
+			answer: 2,
+			note: 'The benchmark ADR 0001 promised. Point to the POC timings and say when the SQLite one happens. Do not argue.',
+		},
+		{
+			text: '"I would have gone with Postgres for the index."',
+			answer: 3,
+			note: 'No goal is violated by SQLite; this is taste. Acknowledge, name the goal that decided it (no server, no accounts), change nothing.',
+		},
+		{
+			text: '"Section 3, second paragraph: ‘it’s’ should be ‘its’."',
+			answer: 4,
+			note: 'Fix it. No reply.',
+		},
+		{
+			text: '"Have you considered supporting Rust crates in the MVP?"',
+			answer: 3,
+			note: 'A non-goal with a stated reason. Point to it. It is a preference about scope, not a challenge to the design.',
+		},
+		{
+			text: '"The manifest can drift from go.mod — how does the user find out?"',
+			answer: 1,
+			note: 'The doc says sync warns, but not how or when. A gap in the design section, not a challenge to the decision.',
+		},
+		{
+			text: '"Agents reading files directly will bypass any token budget you put in lookup."',
+			answer: 0,
+			note: 'A challenge to keeping both paths. It deserves a paragraph: why both, and what you give up.',
+		},
+	]}
+/>
+
+## 3. Ask precisely (3 min)
+
+<BeforeAfter
+	beforeLabel="How most docs get sent"
+	afterLabel="The header"
+	before={
+		<>
+			Hi all — here’s the DocuDex design doc. Would love any feedback you have, no rush!
+		</>
+	}
+	after={
+		<>
+			<strong>Status:</strong> Reviewing solution.
+			<br />
+			<strong>Wanted:</strong> challenge the storage decision (§3, ADR 0001) and the manifest-over-go.mod
+			decision (§3, ADR 0002); gaps in the agent path (§3, two routes to the docs). <strong>Not wanted:</strong>{' '}
+			naming, prose, the business model.
+			<br />
+			<strong>Decider:</strong> me. <strong>Approver:</strong> A. <strong>Input:</strong> B, C.
+			<br />
+			<strong>Closes:</strong> Fri 24 Oct. Silence is consent. Comment in the doc.
+		</>
+	}
+	note="The second version takes a reviewer two minutes to act on and tells them when they can stop thinking about it."
+/>
+
+## 4. Do it (30 min now, 30 later)
+
+Now: write the header on the DocuDex doc; link the ADRs, the POC write-up
+and both diagrams from it so a reviewer has one entry point; pick the
+reviewers and send it.
+
+Public replies skew to preference and evidence rather than challenge; that is
+what the triage table is for. Do not argue in any thread — answer in the
+doc, reply with a pointer. Three channels with one close date produce one
+review outcome, not three.
+
+On the close date: triage, answer in the doc, write **Review outcome** (what
+changed, what was raised and not changed and why, the status line), send one
+broadcast message, change the status.
+
+<Checklist
+	title="Self-review: the request and the close"
+	items={[
+		{ question: 'Exactly one decider, and approvers only where someone can actually block?', why: 'Three approvers is a committee; the doc will wait on the slowest.' },
+		{ question: 'Does "wanted" name sections and decisions, and does "not wanted" exist?', why: 'The not-wanted line is what stops the week being spent on prose.' },
+		{ question: 'Is there a close date, and does it say silence is consent?', why: 'Without it the review never ends and the decision is never recorded.' },
+		{ question: 'Can a reviewer reach the ADRs, POC and diagrams from the doc in one click each?', why: 'A reviewer who has to ask for context reviews the context instead of the design.' },
+		{ question: 'Did every challenge and gap get answered in the doc, not only in the thread?', why: 'The doc is read in a month; the thread is not.' },
+		{ question: 'Does the review outcome list what was raised and NOT changed, with why?', why: 'Both columns. A review outcome that only lists changes hides the decisions you held.' },
+		{ question: 'Was one broadcast message sent to the FYI line?', why: 'HashiCorp’s pattern. The review is over when the decision is announced, not when comments stop.' },
+	]}
+/>
+
+## 5. Retrieval (2 min)
+
+Two of these are from earlier lessons.
+
+<Quiz
+	questions={[
+		{
+			prompt: 'The line most often skipped in a review request, and the one that most improves the comments:',
+			options: [
+				'the list of people on FYI',
+				'what feedback is and is not wanted',
+				'the link to the ADR index',
+				'the estimated implementation effort',
+			],
+			answerIndex: 1,
+			explanation: 'Precise asks get a reviewer’s one real objection instead of typos and taste.',
+		},
+		{
+			prompt: 'A comment that says "I’d have used Y" with no goal violated is:',
+			options: ['a challenge', 'a gap', 'a preference', 'evidence'],
+			answerIndex: 2,
+			explanation: 'Acknowledge, name the goal that decided it, change nothing.',
+		},
+		{
+			prompt: 'On a container diagram, a line with a verb on it must:',
+			options: [
+				'start or end at a process',
+				'point in the direction of data',
+				'carry a number for the legend',
+				'connect two stores at most',
+			],
+			answerIndex: 0,
+			explanation: 'From lesson 6. Stores don’t act.',
+		},
+		{
+			prompt: "Sourcegraph's 'Reviewing problem' status means reviewers should:",
+			options: [
+				'confirm the problem definition is correct',
+				'estimate how long the solution takes',
+				'propose an alternative solution',
+				'approve or reject the whole RFC',
+			],
+			answerIndex: 0,
+			explanation: 'From lesson 2. Problem first; the design is not yet open.',
+		},
+	]}
+/>
+
+## Read next
+
+HashiCorp's [Writing practices and culture](https://www.hashicorp.com/en/how-hashicorp-works/articles/writing-practices-and-culture)
+— ten minutes — for the team-first → approvers → broadcast order, from a
+dev-tools company that runs on it. Then re-read Sourcegraph's RFC page with
+the header in front of you.
+
+<Aside>
+	Send the header when it is written. Lesson 8 is the other side of the table: reviewing someone
+	else's design doc so that your comments improve the decision rather than the prose — and I will
+	have a doc for you to review.
+</Aside>

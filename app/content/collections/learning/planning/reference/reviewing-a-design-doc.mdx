@@ -1,0 +1,74 @@
+---
+courseTitle: Design and architecture docs for POCs and features
+title: Reviewing a design doc
+description: The reviewer's form — three passes, a comment shape, a verdict — so comments improve the decision rather than the prose
+createdAt: 2026-10-14
+updatedAt: 2026-10-14
+---
+
+Sources: [Ubl, Design Docs at Google](https://www.industrialempathy.com/posts/design-docs-at-google/)
+(what review is for); [Sourcegraph handbook](https://github.com/sourcegraph/handbook/blob/main/content/company-info-and-process/communication/rfcs/index.md)
+("Reviewing problem" vs "Reviewing solution" decides what you read for);
+[Slatton](https://grantslatton.com/how-to-design-document) (a doc should
+never surprise the reader — where it does, that is a comment); the Rust RFC
+[template](https://github.com/rust-lang/rfcs/blob/master/0000-template.md)
+(drawbacks, rationale and alternatives, unresolved questions as the sections
+to check). No canonical source covers design-doc review as such; this is the
+course's synthesis, built from the author-side rules in lessons 1–5 turned
+around.
+
+## The form
+
+**Before reading:** read the header. Note the status and the "wanted"
+line. You are reviewing that, and only that, unless you find something that
+makes the wanted question moot.
+
+**Pass 1 — goals (5 min).** For each goal: is it an outcome, and could it be
+checked? For each non-goal: would anyone have expected it? Does the context
+contain any opinion or decision? Is "why now" there?
+
+**Pass 2 — design (10 min).** For each design paragraph: choice stated
+against what it beat; reason; cost; why the cost is acceptable. For each
+alternative: would the author have accepted it? Does any alternative get
+dismissed without a reason? Does any goal get violated by the design? Is
+anything in open questions actually a decision in disguise?
+
+**Pass 3 — evidence and cross-cutting (5 min).** Every "fast", "small",
+"simple": is there a number? Is there a POC or a benchmark behind the
+riskiest claim? Is the cross-cutting section present, and does it cover the
+concern this design most obviously raises (data on disk, external calls,
+secrets, deletion)?
+
+**Write each comment in one shape:**
+
+```
+[kind][severity] §N — what you observed. Question, or proposed change.
+```
+
+Kind is challenge / gap / evidence / preference / nit (the author's triage
+table, so your comment lands pre-sorted). Severity is *blocking* (the
+decision is unsafe or violates a goal), *should* (the doc is weaker without
+it), or *nit*. Nits go as suggestions, not comments. Every comment ends in a
+question or a change; an observation with no ask is a remark, not a review.
+
+**Verdict, last.** One of: approve / approve with changes / request
+changes. If "request changes", name the one thing that would flip it. If
+"approve with changes", list the changes; the author should not have to
+infer them from the comments.
+
+## What makes a comment useful
+
+- It names the goal or decision it bears on. "I'd use Bleve" bears on
+  nothing; "goal 2 says 200 ms and §3 never says how the index loads" does.
+- It is about the decision, not the author's taste or yours.
+- It asks a question the author can answer in the doc.
+- It is proportionate: five comments that matter beat twenty that don't.
+
+## Self-review before sending
+
+- Did you review only what the header asked for?
+- Does every comment carry a kind, a severity and a section?
+- Does every comment end in a question or a proposed change?
+- Is at least one comment about something that got *better* than you
+  expected? (Not praise: a note of what to keep when the doc is revised.)
+- Is the verdict stated, and for "request changes", the one flipping item?

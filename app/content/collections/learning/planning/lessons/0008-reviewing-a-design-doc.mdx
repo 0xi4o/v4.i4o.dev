@@ -1,0 +1,202 @@
+---
+courseTitle: Design and architecture docs for POCs and features
+title: 'Reviewing a design doc: comments that change the decision'
+description: Review a one-page design doc someone else wrote — three passes, a comment shape, a verdict — so your comments land as challenges and gaps the author can act on, not taste
+lessonNumber: 8
+createdAt: 2026-10-14
+updatedAt: 2026-10-14
+---
+
+import { Aside, KeyIdea } from '../assets/LessonLayout'
+import { BeforeAfter } from '../assets/BeforeAfter'
+import { Categorise } from '../assets/Categorise'
+import { Checklist } from '../assets/Checklist'
+import { Quiz } from '../assets/Quiz'
+
+**The win for today:** a written review of a design doc you did not write —
+the [Tsundoku search doc](../exercises/tsundoku-search-design-doc) — with
+each comment tagged by kind and severity and tied to a section, and a verdict
+with the one thing that would change it. About forty minutes. Do not open
+the exercise doc until section 4.
+
+## What to do (read this first)
+
+1. Read the [reviewer's form](../reference/reviewing-a-design-doc) — three
+   passes, one comment shape, a verdict. Five minutes.
+2. Do the sorting drill in section 2 so you know a useful comment from a
+   remark before you write any.
+3. Open the exercise doc, read its header, and review only what it asks
+   for. Twenty minutes, three passes, comments in the shape.
+4. Write the verdict. Run the checklist. Send me the review.
+
+<KeyIdea>
+	You already know everything a reviewer needs to check — it is the author-side rules from
+	lessons 1–5, turned around. The skill in this lesson is restraint: comment on the decisions
+	the header asked about, tie every comment to a goal or a section, end every comment with a
+	question or a change, and leave taste at the door.
+</KeyIdea>
+
+## 1. What you are checking, and why (4 min)
+
+Ubl's [Design Docs at Google](https://www.industrialempathy.com/posts/design-docs-at-google/)
+gives the reviewer's job in one line: bring experience to bear while change
+is still cheap. Not to approve the prose, not to show what you would have
+built — to find the thing the author could not see.
+
+Sourcegraph's [status labels](https://github.com/sourcegraph/handbook/blob/main/content/company-info-and-process/communication/rfcs/index.md)
+tell you what to read for: under "Reviewing problem" you check that the
+problem definition is correct and ignore the design; under "Reviewing
+solution" the goals are agreed and the design is open. Slatton's rule that a
+doc should never surprise the reader is your detector — every place you
+stop and think "wait, what about…" is a comment, and every place you think
+"I'd have done it differently" is probably not.
+
+Each author-side rule becomes a reviewer's question. Goals: outcome or
+design choice? checkable? Non-goals: would anyone have expected it?
+Context: any opinion in it? Design: choice, reason, cost, acceptance — all
+four? Alternatives: real, and dismissed with a reason? Open questions: any
+decisions hiding in there? Claims: a number behind every adjective?
+Cross-cutting: present, and about the obvious concern? That list is the
+three passes in the reference.
+
+## 2. Comment or remark? (5 min)
+
+Comments on a hypothetical search design. Sort each.
+
+<Categorise
+	title="Would this comment change the decision?"
+	categories={['Useful', 'Not useful']}
+	items={[
+		{ text: '"I’d have used Bleve."', answer: 1, note: 'Preference. Bears on no goal. The author can only say "noted".' },
+		{
+			text: '"Goal 1 says 200 ms on 50k items; §3 never says how the index is loaded at start-up. Cold start could blow that — how is it loaded?"',
+			answer: 0,
+			note: 'A gap, tied to a goal, ending in a question the author can answer in the doc.',
+		},
+		{ text: '"This is great, nice work."', answer: 1, note: 'Kind, and useless. If something is good, say what to keep when the doc is revised.' },
+		{
+			text: '"§4 dismisses FTS5 as ‘too limited’ without saying what it lacks for goals 1–5. What does it lack?"',
+			answer: 0,
+			note: 'A challenge to a straw-man alternative. This is the comment the author needs most.',
+		},
+		{ text: '"A few typos in §1."', answer: 1, note: 'A nit. Send as a suggestion; do not spend a review comment on it.' },
+		{
+			text: '"§3: the index ‘updates itself’. What process triggers reindexing, and what about items fetched in the background?"',
+			answer: 0,
+			note: 'A gap. Stores don’t act — the same rule as the diagrams.',
+		},
+		{ text: '"Have you considered Elasticsearch?"', answer: 1, note: 'Not a real alternative for a single-user local tool. The author would never have accepted it, so it tests nothing.' },
+		{
+			text: '"§5 is missing. Saved page text is user data on disk — what is the disk-growth and deletion story?"',
+			answer: 0,
+			note: 'A gap in cross-cutting concerns, naming the obvious one for this design.',
+		},
+	]}
+/>
+
+## 3. The comment shape (3 min)
+
+<BeforeAfter
+	beforeLabel="A remark"
+	afterLabel="A review comment"
+	before={<>Not sure Bleve is the right call here, FTS5 might be simpler.</>}
+	after={
+		<>
+			<code>[challenge][should] §3, §4</code> — Bleve is chosen for being pure Go and having
+			highlighting, but FTS5 is dismissed in §4 without a reason, and SQLite is already the
+			store. Which of goals 1–5 does FTS5 fail? If none, the simpler choice needs a reason to
+			lose.
+		</>
+	}
+	note="Kind and severity pre-sort it for the author; the section anchors it; the question is one they can answer in the doc. The remark gets a shrug; the comment gets a paragraph in §4."
+/>
+
+## 4. Do it (25 min)
+
+Open the [Tsundoku search design doc](../exercises/tsundoku-search-design-doc).
+It is a fictional project; the author is not you. Read the header first and
+review what it asks for. Three passes, comments in the shape, five to ten
+comments, verdict last. Write it in a Markdown file as if you were going to
+paste it into the Discussion.
+
+The doc has flaws of the kinds you have learned to avoid, and some things it
+gets right. The answer key is in `NOTES.md` in this workspace, under
+"Tsundoku key" — do not read it until you have sent me the review.
+
+<Checklist
+	title="Self-review: the review"
+	items={[
+		{ question: 'Did you review only what the header asked for?', why: 'A review that ignores "wanted" trains authors to stop writing headers.' },
+		{ question: 'Does every comment carry a kind, a severity and a section?', why: 'Pre-sorted comments get acted on; unsorted ones get argued with.' },
+		{ question: 'Does every comment end in a question or a proposed change?', why: 'An observation with no ask is a remark.' },
+		{ question: 'Is every comment tied to a goal, a decision, or a missing section — never to your taste?', why: '"I’d have used X" bears on nothing.' },
+		{ question: 'Did you note at least one thing to keep?', why: 'Not praise. A revision that loses the good paragraph is a worse doc.' },
+		{ question: 'Is there a verdict, and for "request changes", the one item that would flip it?', why: 'The author should not have to infer the verdict from the tone.' },
+		{ question: 'Five to ten comments?', why: 'Twenty comments means you reviewed the prose.' },
+	]}
+/>
+
+## 5. Retrieval (2 min)
+
+One of these is from lesson 7.
+
+<Quiz
+	questions={[
+		{
+			prompt: 'A review comment is useful when it:',
+			options: [
+				'proposes the tool you would use',
+				'praises the parts you agree with',
+				'names a goal the design violates',
+				'lists every typo you found',
+			],
+			answerIndex: 2,
+			explanation: 'Tied to a goal or decision, ending in a question the author can answer in the doc.',
+		},
+		{
+			prompt: 'As a reviewer, you review:',
+			options: [
+				'every section with equal care',
+				'only what the header asked for',
+				'the code before the design',
+				'the prose for AI tells',
+			],
+			answerIndex: 1,
+			explanation: 'Unless you find something that makes the wanted question moot.',
+		},
+		{
+			prompt: "A verdict of 'request changes' must name:",
+			options: [
+				'every comment you left in order',
+				'a deadline for the next draft',
+				'the reviewer who should go next',
+				'the one thing that would flip it',
+			],
+			answerIndex: 3,
+			explanation: 'Otherwise the author guesses which of ten comments was the blocking one.',
+		},
+		{
+			prompt: 'Public review replies mostly turn out to be:',
+			options: [
+				'preferences and evidence requests',
+				'challenges to core decisions',
+				'gaps in the design',
+				'nits about the prose',
+			],
+			answerIndex: 0,
+			explanation: 'From lesson 7. That is what the triage table is for.',
+		},
+	]}
+/>
+
+## Read next
+
+Nothing new. Re-read the Rust RFC [template](https://github.com/rust-lang/rfcs/blob/master/0000-template.md)
+as a reviewer: its *Drawbacks*, *Rationale and alternatives* and
+*Unresolved questions* prompts are the three questions a reviewer asks of
+any design section.
+
+<Aside>
+	Send the review. I will compare it against the key, and we will look at which flaws you caught,
+	which you missed, and whether any comment was taste wearing a tag.
+</Aside>

@@ -1,0 +1,78 @@
+---
+courseTitle: Design and architecture docs for POCs and features
+title: 'Exercise: Tsundoku full-text search — design doc under review'
+description: A one-page design doc for a fictional read-later tool, sent for review. Review it against the header before reading anything else about it.
+createdAt: 2026-10-14
+updatedAt: 2026-10-14
+---
+
+> **Status:** Reviewing solution.
+> **Wanted:** challenge the indexing decision (§3) and the alternatives (§4);
+> tell me what I have missed. **Not wanted:** naming, prose.
+> **Decider:** the author. **Approver:** you. **Closes:** when you send your review.
+
+# Tsundoku: full-text search over saved pages and feed items
+
+## 1. Context and scope
+
+Tsundoku is a single-user read-later tool written in Go. It saves web pages
+(URL, title, extracted article text) and pulls items from RSS feeds into a
+local SQLite database, and serves a small web UI on localhost. Users
+currently find things by scrolling or by the title filter, which is fine for
+a few hundred items but useless at the 30–50k a two-year-old install has.
+SQLite is obviously the right place to keep everything, so search will be
+built around it.
+
+## 2. Goals and non-goals
+
+### Goals
+
+- A search over 50,000 items returns results in under 200 ms on a laptop.
+- Search should feel fast and natural to use.
+- Use Bleve for indexing, since it is pure Go.
+- Results rank by relevance, with a visible reason for the match (snippet).
+- Search works over article text, not only titles.
+
+### Non-goals
+
+- Semantic or vector search in v1 — the index format and ranking would be
+  a different project, and keyword search covers the common case.
+- No breaking of the existing bookmarks table.
+
+## 3. Design
+
+Indexing uses Bleve. Bleve is pure Go, has a mature query language,
+supports highlighting out of the box, and is used by several projects of
+this size. Its index lives in its own directory beside the SQLite file. For
+all these reasons Bleve is the right fit.
+
+The index updates itself when a bookmark or feed item changes, so users
+never see stale results. On a fast machine, indexing the whole 50k-item
+corpus is quick, and incremental updates are instant.
+
+Tokenisation uses Bleve's standard analyser with the English stemmer. The
+cost is that non-English pages stem badly and some exact-phrase queries lose
+precision; I accept that because the corpus is overwhelmingly English and
+exact-phrase search is rare in a read-later tool. Open: whether to detect
+language per document and pick an analyser accordingly, which Bleve supports
+but which doubles the analyser surface to test.
+
+Query handling goes through a `/search?q=` endpoint on the existing server,
+returning the top 20 hits with highlighted snippets; the UI renders them in
+the existing list component.
+
+## 4. Alternatives considered
+
+SQLite FTS5: too limited for what we need.
+
+Elasticsearch: far more capable, but a separate server process is out of
+the question for a single-user local tool.
+
+Building our own inverted index: tempting, but a distraction from the
+product.
+
+## 5. Open questions
+
+- Should the Bleve index live inside the same SQLite file as everything
+  else, to keep backups to one file? Probably yes.
+- How do we handle the first index build on an existing large install?
