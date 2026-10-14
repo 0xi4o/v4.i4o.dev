@@ -124,7 +124,7 @@
 				"updates": {
 					"label": "Updates",
 					"format": "md",
-					"publish": true,
+					"features": { "publish": true },
 					"schema": {
 						"title": { "label": "Title", "type": "text", "required": true },
 						"slug": { "label": "Slug", "type": "slug", "from": "title" },
