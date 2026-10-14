@@ -94,12 +94,8 @@
 				"slug": { "label": "Slug", "type": "slug", "from": "title", "required": true },
 				"site": { "label": "Website", "type": "url", "required": true },
 				"github": { "label": "Github", "type": "url" },
-				"description": {
-					"label": "Body",
-					"type": "text",
-					"multiline": true,
-					"required": true
-				},
+				"launchedAt": { "label": "Launched", "type": "date" },
+				"content": { "label": "Body", "type": "document", "required": true },
 				"progress": {
 					"label": "Progress",
 					"type": "select",
